@@ -1,0 +1,802 @@
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import TextField from "@mui/material/TextField";
+import CLogo from "../../assets/icons/logo.svg";
+import axios from "axios";
+import { hostUrl } from "../../utils/globals";
+import OtpInput from "react-otp-input";
+import { closeModal, setLoginMode } from "../../redux/slices/modalSlice";
+import Footer from "./../Footer/Footer";
+import { setAuthCookies } from "./../../services/cookies";
+import { setCredentials } from "../../redux/slices/authSlice";
+import { fetchMyData } from "../../redux/slices/myDataSlice";
+import { useGoogleLogin } from "@react-oauth/google";
+import InputAdornment from "@mui/material/InputAdornment";
+import IconButton from "@mui/material/IconButton";
+import Visibility from "@mui/icons-material/Visibility";
+import VisibilityOff from "@mui/icons-material/VisibilityOff";
+import useModal from "./../hooks/ModalHook";
+import LoginImage from "../../assets/channel_images/login_cover.svg";
+import googleLogo from "../../assets/channel_images/google_logo.svg";
+
+const AuthPage = () => {
+  const navigate = useNavigate();
+  const [isLogin, setIsLogin] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isOtp, setIsOtp] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [agreed, setAgreed] = useState(false);
+  const [otpBackend, setOtpBackend] = useState("");
+  const [otp, setOtp] = useState("");
+  const [newError, setNewError] = useState("");
+  const [forgotError, setForgotError] = useState("");
+  const dispatch = useDispatch();
+  const [forgot, setForgot] = useState(false);
+  const [buttonEnabled, setButtonEnabled] = useState(false);
+
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
+
+  const isOpen = useSelector((state) => state.modals.modalLoginOpen);
+
+  const [errors, setErrors] = useState({
+    fullName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    forgotEmail: "",
+  });
+  const { handleOpenModal } = useModal();
+
+  const handleOnboardOpen = () => {
+    navigate("/channels/onboarding");
+  };
+
+  const clearData = () => {
+    setFullName("");
+    setEmail("");
+    setPassword("");
+    setIsLogin(false);
+    setIsOtp(false);
+    setOtp("");
+    setOtpBackend("");
+    setNewError("");
+  };
+
+  const handleToggleLogin = () => {
+    setNewError("");
+    setIsLogin(!isLogin);
+    setErrors({
+      fullName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      agree: "",
+    });
+  };
+  const handleToggleOtp = () => {
+    setNewError("");
+    setIsOtp(false);
+    setErrors({
+      fullName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      agree: "",
+    });
+  };
+  const handleToggleForgot = () => {
+    setNewError("");
+    setIsLogin(false);
+    setForgot(false);
+    setErrors({
+      fullName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+      forgotPassword: "",
+      agree: "",
+    });
+  };
+  const handleResendCode = async () => {
+    setNewError("");
+    try {
+      const userData = {
+        name: fullName.trim(),
+        email: email.trim(),
+      };
+      await axios.post(`${hostUrl}/api/register`, userData).then((response) => {
+        if (response.data.success === true) {
+          setOtpBackend(response.data.otp);
+          setIsOtp(true);
+        } else {
+          setNewError(response.data.message);
+        }
+      });
+    } catch (error) {
+      console.error("Error registering", error);
+    }
+  };
+  const fetchUserDetails = async (accessToken) => {
+    try {
+      const response = await axios.get(
+        "https://www.googleapis.com/oauth2/v2/userinfo",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      setNewError("Auth failed. Please try again");
+    }
+  };
+  const handleforgotPassword = async () => {
+    setForgotError("");
+    if (!forgotEmail) {
+      setForgotError("Please Enter email!");
+    } else {
+      try {
+        const response = await axios.post(`${hostUrl}/api/forgot/password`, {
+          email: forgotEmail.trim(),
+        });
+        setForgotError(response.data.message);
+      } catch (error) {
+        setForgotError("Error in validation. Please try again.");
+      }
+    }
+  };
+
+  const registerOrLoginUserGoogle = async (userData) => {
+    try {
+      return await axios.post(`${hostUrl}/api/google/auth`, {
+        name: userData.name,
+        email: userData.email,
+      });
+    } catch (error) {
+      console.error("Failed to register/login user", error);
+      throw new Error("Failed to register/login");
+    }
+  };
+
+  const handleGoogleSuccess = async (tokenResponse) => {
+    try {
+      const userData = await fetchUserDetails(tokenResponse.access_token);
+      const response = await registerOrLoginUserGoogle(userData);
+      if (response.data.success) {
+        dispatch(
+          setCredentials({
+            user: response.data.user,
+            token: response.data.token,
+          })
+        );
+        setAuthCookies(response.data.token, response.data.user);
+        clearData();
+        fetchMyData();
+        if (response.data.islogin === false) {
+          handleOnboardOpen();
+        } else {
+          navigate(`/profile/${response.data.user.username}/profile`, {
+            replace: true,
+          });
+        }
+      }
+    } catch (error) {
+      console.error("Error during login process:", error);
+      setNewError("Error Registering. Please try again");
+    }
+  };
+
+  const googleLogin = useGoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: () => {
+      setNewError("Validation failed. Please try again.");
+      console.log("Login failed");
+    },
+  });
+
+  const handleMouseDownPassword = (e) => {
+    e.preventDefault();
+  };
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+  const validateForm = () => {
+    setNewError("");
+    let valid = true;
+    const newErrors = {
+      fullName: "",
+      email: "",
+      password: "",
+      confirmPassword: "",
+    };
+
+    if (!fullName && !isLogin) {
+      newErrors.fullName = "Full name is required";
+      valid = false;
+    }
+    if (!email) {
+      newErrors.email = "Email is required";
+      valid = false;
+    }
+    if (!password) {
+      newErrors.password = "Password is required";
+      valid = false;
+    }
+    if (!isLogin && !agreed) {
+      newErrors.agree = "You must agree to the terms and privacy policy";
+      valid = false;
+    }
+
+    setErrors(newErrors);
+    return valid;
+  };
+  const validateForm2 = () => {
+    let valid = true;
+    if (!fullName && !isLogin) {
+      valid = false;
+    }
+    if (!email) {
+      valid = false;
+    }
+    if (!password) {
+      valid = false;
+    }
+
+    if (!isLogin && !agreed) {
+      valid = false;
+    }
+    return valid;
+  };
+
+  useEffect(() => {
+    setButtonEnabled(validateForm2());
+  }, [fullName, email, password, agreed, isLogin]);
+
+  useEffect(() => {
+    const handleAutofill = () => {
+      const emailField = emailRef.current;
+      const passwordField = passwordRef.current;
+
+      if (emailField && passwordField) {
+        setEmail(emailField.value);
+        setPassword(passwordField.value);
+        setButtonEnabled(validateForm2());
+      }
+    };
+
+    handleAutofill();
+
+    window.addEventListener("focus", handleAutofill);
+
+    return () => {
+      window.removeEventListener("focus", handleAutofill);
+    };
+  }, [email, password]);
+
+  const handleChangeOtp = async (value) => {
+    setOtp(value);
+    if (value.length === 6 && value === otpBackend) {
+      setNewError("");
+      const userData = {
+        name: fullName.trim(),
+        email: email.trim(),
+        password: password,
+      };
+      try {
+        await axios
+          .post(`${hostUrl}/api/verify/auth`, userData)
+          .then((response) => {
+            if (response.data.success) {
+              // console.log(response.data);
+              setAuthCookies(response.data.token, response.data.user);
+              dispatch(
+                setCredentials({
+                  user: response.data.user,
+                  token: response.data.token,
+                })
+              );
+              clearData();
+              handleOnboardOpen();
+            } else {
+              setNewError(response.data.message);
+            }
+          });
+      } catch (error) {
+        setNewError("Error Registering. Please try again");
+      }
+    } else if (otp.length === 6) {
+      setNewError("Enter Correct Otp");
+      console.log("some error");
+    }
+  };
+
+  const handleFormSubmit = async () => {
+    setNewError("");
+    setLoading(true);
+    if (validateForm()) {
+      if (isLogin) {
+        const userData = {
+          email: email.trim(),
+          password: password,
+        };
+        try {
+          await axios
+            .post(`${hostUrl}/api/login`, userData)
+            .then((response) => {
+              if (response.data.success === true) {
+                dispatch(
+                  setCredentials({
+                    user: response.data.user,
+                    token: response.data.token,
+                  })
+                );
+                setAuthCookies(response.data.token, response.data.user);
+                clearData();
+                fetchMyData();
+                navigate(`/user/${response.data.user.username}/profile`, {
+                  replace: true,
+                });
+              } else {
+                setNewError(response.data.message);
+              }
+              dispatch(setLoginMode(false));
+              setLoading(false);
+            });
+        } catch (error) {
+          console.error("Error registering", error);
+          setNewError("Error in logging in. Please try again.");
+          setLoading(false);
+        }
+      } else {
+        const userData = {
+          name: fullName.trim(),
+          email: email.trim(),
+        };
+        try {
+          await axios
+            .post(`${hostUrl}/api/register`, userData)
+            .then((response) => {
+              if (response.data.success === true) {
+                setOtpBackend(response.data.otp);
+                setIsOtp(true);
+              } else {
+                setNewError(response.data.message);
+              }
+              setLoading(false);
+            });
+        } catch (error) {
+          console.error("Error registering", error);
+          setLoading(false);
+        }
+      }
+    }
+  };
+  return (
+    <div className="flex flex-col sm:flex-row h-full">
+      <div className="dark:bg-primaryBackground-dark  pl-3 pt-4 sm:pb-0 pb-4">
+        <img src={CLogo} alt="logo" />
+      </div>
+      <div className="w-full sm:w-1/2 h-full dark:bg-primaryBackground-dark xl:pl-[20%] sm:pt-20 pt-6 sm:items-start items-center flex flex-col justify-center ">
+        <h3 className=" text-xl sm:text-3xl w-3/4 sm:text-start text-center font-medium tracking-wider dark:text-secondaryText-dark font-inter">
+          {forgot
+            ? "Forgot Password"
+            : isLogin
+            ? "Get back to your channel"
+            : isOtp
+            ? "Verify it's you"
+            : "Signup to get started"}
+        </h3>
+        <p className="dark:text-secondaryText-dark text-sm mt-1">
+          {forgot
+            ? "(ಥ﹏ಥ)"
+            : isLogin
+            ? "ʕっ•ᴥ•ʔっ"
+            : isOtp
+            ? "•͡˘㇁•͡˘"
+            : "ʕノ•ᴥ•ʔノ"}
+        </p>
+        {forgot ? (
+          <div className="mt-4 w-3/5">
+            <p className="text-white font-normal text-xs font-inter">
+              Enter the email address associated with your account and we'll
+              send you a link to reset your password.
+            </p>
+            <div className="mt-6 w-full">
+              <TextField
+                label="email address"
+                error={Boolean(errors.forgotEmail)}
+                type="email"
+                helperText={errors.forgotEmail}
+                variant="outlined"
+                value={forgotEmail}
+                onChange={(e) => setForgotEmail(e.target.value)}
+                fullWidth
+                InputProps={{
+                  style: {
+                    color: "white",
+                    padding: "0px 3px",
+                    fontWeight: "300",
+                  }, // Adjust padding for less vertical spacing and ensure text color is white
+                  inputProps: {
+                    style: {
+                      color: "white", // This sets the text color
+                      fontSize: "14px",
+                    },
+                    placeholder: "email address", // This is the actual placeholder text
+                  },
+                }}
+                InputLabelProps={{
+                  style: { color: "#A3A3A3" },
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "#898989",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#898989",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#898989",
+                    },
+                    "&.Mui-focused .MuiInputLabel-root": {
+                      color: "#D0BCFF !important",
+                    },
+                  },
+                  "& .MuiInputBase-input::placeholder": {
+                    color: "#211F26",
+                    opacity: 1,
+                  },
+                  "& .MuiInputBase-root": {
+                    maxHeight: "45px",
+                    lineHeight: "45px",
+                  },
+                }}
+              />
+            </div>
+            <div className="justify-center text-center align-center mb-8">
+              <button
+                onClick={handleforgotPassword}
+                className={`w-full py-2.5 mt-6 rounded-xl ${
+                  forgotEmail !== ""
+                    ? "dark:text-secondaryText-dark dark:bg-buttonEnable-dark"
+                    : "dark:text-buttonDisable-dark dark:text-opacity-40 dark:bg-buttonDisable-dark dark:bg-opacity-10"
+                }  font-normal text-sm`}
+              >
+                Continue
+              </button>
+              <p className="text-errorLight font-normal mt-4 text-xs font-inter">
+                {forgotError}
+              </p>
+            </div>
+            <p className="text-center text-white text-xs mt-8 mb-4">
+              Don't have an account?
+              <button
+                onClick={handleToggleForgot}
+                className="text-secondaryText underline ml-1 "
+              >
+                Register
+              </button>
+            </p>
+          </div>
+        ) : isOtp ? (
+          <div className="mt-8">
+            <p className="text-white font-normal text-sm font-inter">
+              Enter the verification code we just sent to your email id {email}
+            </p>
+            <div className="mt-5">
+              <OtpInput
+                value={otp}
+                onChange={handleChangeOtp}
+                numInputs={6}
+                renderSeparator={<span className="w-2"></span>}
+                renderInput={(props) => (
+                  <input
+                    {...props}
+                    style={{
+                      width: "34px",
+                      height: "40px",
+                      borderRadius: "6px",
+                      backgroundColor: "#2B2930",
+                      textAlign: "center",
+                      color: "white",
+                    }}
+                    inputMode="numeric" // Ensures only numeric input
+                    pattern="[0-9]*" // Restricts input to digits
+                  />
+                )}
+              />
+              <p className="w-3/5  dark:text-primaryText-dark text-xs mt-3 font-inter">
+                Didn't received code?
+                <button
+                  onClick={handleResendCode}
+                  className="dark:text-secondaryText-dark underline ml-1 font-base font-inter font-normal"
+                >
+                  Resend
+                </button>
+              </p>
+              <p className="w-3/5  dark:text-primaryText-dark text-xs mb-12 mt-10 font-inter">
+                Entered wrong email?
+                <button
+                  onClick={handleToggleOtp}
+                  className="text-secondaryText underline ml-1 font-base font-inter font-normal"
+                >
+                  Change
+                </button>
+              </p>
+            </div>
+          </div>
+        ) : (
+          <>
+            {!isLogin && (
+              <div className="mt-4 w-3/5">
+                <TextField
+                  label="full name"
+                  variant="outlined"
+                  error={Boolean(errors.fullName)}
+                  helperText={errors.fullName}
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  fullWidth
+                  InputProps={{
+                    style: {
+                      color: "white",
+                      padding: "0px 3px",
+                      fontWeight: "300",
+                    },
+                    inputProps: {
+                      style: {
+                        color: "white",
+                        fontSize: "14px",
+                      },
+                      placeholder: "full name",
+                    },
+                  }}
+                  InputLabelProps={{
+                    style: { color: "#A3A3A3" },
+                  }}
+                  sx={{
+                    "& .MuiOutlinedInput-root": {
+                      "& fieldset": {
+                        borderColor: "#898989",
+                      },
+                      "&:hover fieldset": {
+                        borderColor: "#898989",
+                      },
+                      "&.Mui-focused fieldset": {
+                        borderColor: "#898989",
+                      },
+                      "&.Mui-focused .MuiInputLabel-root": {
+                        color: "#D0BCFF !important",
+                      },
+                    },
+                    "& .MuiInputBase-input::placeholder": {
+                      color: "#211F26",
+                      opacity: 1,
+                    },
+                    "& .MuiInputBase-root": {
+                      maxHeight: "45px",
+                      lineHeight: "45px",
+                    },
+                  }}
+                />
+              </div>
+            )}
+            <div className="mt-4 w-3/5">
+              <TextField
+                label="email address"
+                error={Boolean(errors.email)}
+                type="email"
+                inputRef={emailRef}
+                helperText={errors.email}
+                variant="outlined"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                fullWidth
+                InputProps={{
+                  style: {
+                    color: "white",
+                    padding: "0px 3px",
+                    fontWeight: "300",
+                  }, // Adjust padding for less vertical spacing and ensure text color is white
+                  inputProps: {
+                    style: {
+                      color: "white", // This sets the text color
+                      fontSize: "14px",
+                    },
+                    placeholder: "email address", // This is the actual placeholder text
+                  },
+                }}
+                InputLabelProps={{
+                  style: { color: "#A3A3A3" },
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "#898989",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#898989",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#898989",
+                    },
+                    "&.Mui-focused .MuiInputLabel-root": {
+                      color: "#D0BCFF !important",
+                    },
+                  },
+                  "& .MuiInputBase-input::placeholder": {
+                    color: "#211F26",
+                    opacity: 1,
+                  },
+                  "& .MuiInputBase-root": {
+                    maxHeight: "45px",
+                    lineHeight: "45px",
+                  },
+                }}
+              />
+            </div>
+            <div className="mt-4 w-3/5">
+              <TextField
+                label={isLogin ? "password" : "create password"}
+                variant="outlined"
+                type={showPassword ? "text" : "password"}
+                error={Boolean(errors.password)}
+                helperText={errors.password}
+                inputRef={passwordRef}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                fullWidth
+                InputProps={{
+                  style: {
+                    color: "white",
+                    padding: "0px 3px",
+                    fontWeight: "300",
+                  },
+                  inputProps: {
+                    style: {
+                      color: "white",
+                      fontSize: "14px",
+                    },
+                    placeholder: isLogin ? "password" : "create password",
+                  },
+                  endAdornment: (
+                    <InputAdornment position="end" className="mr-2">
+                      <IconButton
+                        className="mr-2 bg-primaryGrey"
+                        aria-label="toggle password visibility"
+                        onClick={handleClickShowPassword}
+                        onMouseDown={handleMouseDownPassword}
+                        edge="end"
+                      >
+                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+                InputLabelProps={{
+                  style: { color: "#A3A3A3" },
+                }}
+                sx={{
+                  "& .MuiOutlinedInput-root": {
+                    "& fieldset": {
+                      borderColor: "#898989",
+                    },
+                    "&:hover fieldset": {
+                      borderColor: "#898989",
+                    },
+                    "&.Mui-focused fieldset": {
+                      borderColor: "#898989",
+                    },
+                    "&.Mui-focused .MuiInputLabel-root": {
+                      color: "#D0BCFF !important",
+                    },
+                  },
+                  "& .MuiInputBase-input::placeholder": {
+                    color: "#211F26",
+                    opacity: 1,
+                  },
+                  "& .MuiInputBase-root": {
+                    maxHeight: "45px",
+                    lineHeight: "45px",
+                  },
+                }}
+              />
+            </div>
+
+            {isLogin && (
+              <button
+                onClick={() => setForgot(true)}
+                className="dark:text-primaryText-dark w-3/5 mt-2  text-end text-xs mb-2"
+              >
+                forgot password?
+              </button>
+            )}
+            {!isLogin && (
+              <div className="flex items-center mt-4">
+                <input
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                  className="w-4 h-4 text-black bg-dark rounded-sm checked:bg-primary focus:ring-primary checked:ring-primary"
+                />
+                <label className="ml-2 text-xs dark:text-primaryText-dark ">
+                  I agree to the{" "}
+                  <span className="dark:text-buttonEnable-dark underline bg-transparent">
+                    terms
+                  </span>{" "}
+                  &{" "}
+                  <span
+                    href="#"
+                    className="dark:text-buttonEnable-dark underline"
+                  >
+                    privacy policy
+                  </span>
+                </label>
+              </div>
+            )}
+            <button
+              onClick={handleFormSubmit}
+              className={` w-3/5 py-2.5 mt-6 rounded-xl ${
+                buttonEnabled
+                  ? "dark:text-secondaryText-dark dark:bg-buttonEnable-dark"
+                  : "dark:text-buttonDisable-dark dark:text-opacity-40 dark:bg-buttonDisable-dark dark:bg-opacity-10"
+              }  font-normal text-sm`}
+            >
+              {isLogin ? "Login" : "Register"}
+            </button>
+            <div className="justify-center items-center w-3/5 my-4">
+              {newError !== "" ? (
+                <p className="text-center dark:text-error-dark  text-xs">
+                  {newError}
+                </p>
+              ) : (
+                <p className="text-center text-white">or</p>
+              )}
+            </div>
+            <button
+              onClick={() => googleLogin()}
+              className="w-3/5 px-1.5 py-2 mb-4 text-xs  font-normal items-center
+               text-white dark:bg-tertiaryBackground-dark rounded-xl border border-chatDivider-dark"
+            >
+              <img
+                src={googleLogo}
+                alt="Google logo"
+                className="inline w-6 h-6 mr-2"
+              />
+              {isLogin ? "Sign in with Google" : "Sign up with Google"}
+            </button>
+            <p className="text-center dark:text-white text-xs mb-10 mt-2">
+              {isLogin
+                ? "Don't have an account? "
+                : "Already have an account? "}
+              <button
+                onClick={handleToggleLogin}
+                className="dark:text-secondaryText-dark underline "
+              >
+                {loading ? "Please wait..." : isLogin ? "Register" : "Login"}
+              </button>
+            </p>
+          </>
+        )}
+      </div>
+      <div className="hidden sm:flex sm:w-1/2 bg-primary items-center justify-start dark:bg-tertiaryBackground-dark ">
+        <img
+          src={LoginImage}
+          alt="Modal Illustration"
+          className="w-3/4 lg:w-1/2 h-auto"
+        />
+      </div>
+    </div>
+  );
+};
+
+export default AuthPage;
