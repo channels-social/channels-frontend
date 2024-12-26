@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSearch, faCheck } from "@fortawesome/free-solid-svg-icons";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { setSelectedUnsplashImage } from "../../../redux/slices/channelSlice";
+import { setSelectedUnsplashImage } from "../../../redux/slices/createChannelSlice";
 import { closeModal } from "../../../redux/slices/modalSlice";
 import { hostUrl } from "./../../../utils/globals";
 import { postRequestUnAuthenticated } from "../../../services/rest";

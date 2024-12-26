@@ -28,9 +28,12 @@ import newsletterReducer from "./../slices/newsletterSlice";
 import deleteCategoryReducer from "./../slices/deleteCategorySlice";
 import pushItemsReducer from "./../slices/pushItemsSlice";
 import themeReducer from "./../slices/themeSlice";
-import channelReducer from "./../slices/channelSlice";
+import createChannelReducer from "./../slices/createChannelSlice";
 import topicReducer from "./../slices/topicSlice";
 import channelItemsReducer from "./../slices/channelItemsSlice";
+import channelReducer from "./../slices/channelSlice";
+import FaqsReducer from "./../slices/faqsSlice";
+import chatReducer from "./../slices/chatSlice";
 
 const appReducer = combineReducers({
   auth: authReducer,
@@ -62,9 +65,12 @@ const appReducer = combineReducers({
   categoryDeletion: deleteCategoryReducer,
   pushItems: pushItemsReducer,
   theme: themeReducer,
-  channel: channelReducer,
+  createChannel: createChannelReducer,
   channelItems: channelItemsReducer,
   topic: topicReducer,
+  faqs: FaqsReducer,
+  channel: channelReducer,
+  chat: chatReducer,
 });
 
 const rootReducer = (state, action) => {

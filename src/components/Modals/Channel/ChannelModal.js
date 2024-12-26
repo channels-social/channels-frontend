@@ -12,16 +12,20 @@ import {
   createChannel,
 } from "../../../redux/slices/channelItemsSlice.js";
 import {
-  setChannelField,
-  clearChannel,
-} from "../../../redux/slices/channelSlice.js";
+  setCreateChannelField,
+  createClearChannel,
+} from "../../../redux/slices/createChannelSlice.js";
 
 const ChannelModal = () => {
   const { handleOpenModal } = useModal();
-  const channel = useSelector((state) => state.channel);
-  const Channelstatus = useSelector((state) => state.channel.channelstatus);
+  const channel = useSelector((state) => state.createChannel);
+  const Channelstatus = useSelector(
+    (state) => state.createChannel.channelstatus
+  );
 
   const handleClose = () => {
+    dispatch(createClearChannel());
+    setNameError("");
     dispatch(closeModal("modalChannelOpen"));
   };
 
@@ -42,9 +46,11 @@ const ChannelModal = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         dispatch(
-          setChannelField({ field: "cover_image", value: reader.result })
+          setCreateChannelField({ field: "cover_image", value: reader.result })
         );
-        dispatch(setChannelField({ field: "imageSource", value: "upload" }));
+        dispatch(
+          setCreateChannelField({ field: "imageSource", value: "upload" })
+        );
       };
       reader.readAsDataURL(file);
     }
@@ -55,7 +61,9 @@ const ChannelModal = () => {
       setLogoFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        dispatch(setChannelField({ field: "logo", value: reader.result }));
+        dispatch(
+          setCreateChannelField({ field: "logo", value: reader.result })
+        );
       };
       reader.readAsDataURL(file);
     }
@@ -77,33 +85,43 @@ const ChannelModal = () => {
     if (name === "description") {
       setDescCount(value.length);
     }
-    dispatch(setChannelField({ field: name, value }));
+    dispatch(setCreateChannelField({ field: name, value }));
   };
 
   const checkChannelName = async (name) => {
     setNameError("");
     if (name !== "") {
-      dispatch(setChannelField({ field: "channelstatus", value: "loading" }));
+      dispatch(
+        setCreateChannelField({ field: "channelstatus", value: "loading" })
+      );
       try {
         const response = await postRequestAuthenticated("/check/channel/name", {
           name,
         });
         if (response.success) {
-          dispatch(setChannelField({ field: "channelstatus", value: "idle" }));
+          dispatch(
+            setCreateChannelField({ field: "channelstatus", value: "idle" })
+          );
           setNameError("");
           return true;
         } else {
-          dispatch(setChannelField({ field: "channelstatus", value: "idle" }));
+          dispatch(
+            setCreateChannelField({ field: "channelstatus", value: "idle" })
+          );
           setNameError("Name already exist.");
           return false;
         }
       } catch (error) {
-        dispatch(setChannelField({ field: "channelstatus", value: "idle" }));
+        dispatch(
+          setCreateChannelField({ field: "channelstatus", value: "idle" })
+        );
         setNameError(error);
         return false;
       }
     } else {
-      dispatch(setChannelField({ field: "channelstatus", value: "idle" }));
+      dispatch(
+        setCreateChannelField({ field: "channelstatus", value: "idle" })
+      );
       setNameError("Name can't be empty");
       return false;
     }
@@ -112,6 +130,7 @@ const ChannelModal = () => {
   const handleCreateChannel = async (e) => {
     e.preventDefault();
     setError("");
+    setNameError("");
 
     const isNameUnique = await checkChannelName(channel.name);
     if (!isNameUnique) {
@@ -136,7 +155,7 @@ const ChannelModal = () => {
         .unwrap()
         .then(() => {
           handleClose();
-          dispatch(clearChannel());
+          dispatch(createClearChannel());
           setFile(null);
           setError("");
         })
@@ -153,6 +172,7 @@ const ChannelModal = () => {
     if (name !== "") {
       const formDataToSend = new FormData();
       formDataToSend.append("name", name);
+      formDataToSend.append("_id", channel._id);
       formDataToSend.append("visibility", channel.visibility);
       formDataToSend.append("description", channel.description);
       if (logoFile && channel.logo) {
@@ -163,12 +183,13 @@ const ChannelModal = () => {
       } else if (channel.cover_image && channel.imageSource === "unsplash") {
         formDataToSend.append("cover_image", channel.cover_image);
       }
+      console.log(logoFile);
       formDataToSend.append("imageSource", channel.imageSource);
       dispatch(updateChannel(formDataToSend))
         .unwrap()
         .then(() => {
           handleClose();
-          dispatch(clearChannel());
+          dispatch(createClearChannel());
           setFile(null);
           setError("");
         })
@@ -178,15 +199,15 @@ const ChannelModal = () => {
     }
   };
   const channelNameError = useSelector(
-    (state) => state.channel.channelNameError
+    (state) => state.createChannel.channelNameError
   );
 
   const handleImageClear = () => {
-    dispatch(setChannelField({ field: "cover_image", value: null }));
-    dispatch(setChannelField({ field: "imageSource", value: "" }));
+    dispatch(setCreateChannelField({ field: "cover_image", value: null }));
+    dispatch(setCreateChannelField({ field: "imageSource", value: "" }));
   };
   const handleLogoClear = () => {
-    dispatch(setChannelField({ field: "logo", value: null }));
+    dispatch(setCreateChannelField({ field: "logo", value: null }));
   };
 
   const [charCount, setCharCount] = useState(0);
@@ -209,7 +230,7 @@ const ChannelModal = () => {
             <div className="flex flex-col p-5">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="dark:text-white text-lg font-normal font-inter">
-                  New Channel
+                  {channel.isEdit ? "Edit Channel" : "New Channel"}
                 </h2>
                 <img
                   src={Close}
@@ -472,14 +493,12 @@ const ChannelModal = () => {
                 className={`w-full mt-3 py-2.5 font-normal text-sm rounded-full ${buttonClass}`}
                 disabled={isNameEmpty}
                 onClick={
-                  channel.type === "edit"
-                    ? handleEditChannel
-                    : handleCreateChannel
+                  channel.isEdit ? handleEditChannel : handleCreateChannel
                 }
               >
                 {Channelstatus === "loading"
                   ? "Please wait..."
-                  : channel.type === "edit"
+                  : channel.isEdit
                   ? "Save Changes"
                   : "Create new channel"}
               </button>

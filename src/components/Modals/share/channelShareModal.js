@@ -21,10 +21,10 @@ const ChannelShareModal = () => {
     dispatch(closeModal("modalShareChannelOpen"));
   };
   const isOpen = useSelector((state) => state.modals.modalShareChannelOpen);
-  const channelName = useSelector((state) => state.modals.channelName);
+  const channelId = useSelector((state) => state.modals.channelId);
   const username = useSelector((state) => state.myData.username);
 
-  const shareUrl = `https:/bbjbj/${domainUrl}/user/${username}/channel/${channelName}`;
+  const shareUrl = `https://${domainUrl}/user/${username}/channel/${channelId}`;
 
   const handleCopy = () => {
     setCopied(true);

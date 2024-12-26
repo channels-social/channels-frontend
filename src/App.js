@@ -41,6 +41,7 @@ import PushtoCategoryModal from "./components/Modals/PushItems/pushtoCategoryMod
 import PushtoCurationModal from "./components/Modals/PushItems/pushtoCurationModal";
 import ChipShareModal from "./components/Modals/share/ChipShareModal";
 import ChannelCoverModal from "./components/Modals/Channel/ChannelCoverModal";
+import DeleteFaqModal from "./components/Modals/deletions/DeleteFaqModal";
 
 const clientId =
   "391369792833-72medeq5g0o5sklosb58k7c98ps72foj.apps.googleusercontent.com";
@@ -93,11 +94,11 @@ const App = () => {
               <Route path="/user/:username/welcome" element={<Welcome />} />
               <Route path="/user/:username/profile" element={<Profile />} />
               <Route
-                path="/user/:username/channel/:channelName/topic/:topicName"
+                path="/user/:username/channel/:channelName/c-id/:channelId/topic/:topicId"
                 element={<PageHome />}
               />
               <Route
-                path="/user/:username/channel/:channelName"
+                path="/user/:username/channel/:channelId"
                 element={<ChannelPage />}
               />
             </Route>
@@ -126,6 +127,7 @@ const App = () => {
         <PushtoCurationModal />
         <ChipShareModal />
         <ChannelCoverModal />
+        <DeleteFaqModal />
       </GoogleOAuthProvider>
     </Router>
   );

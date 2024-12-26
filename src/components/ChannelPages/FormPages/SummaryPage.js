@@ -138,6 +138,9 @@ const SummaryPage = () => {
           </div>
         ))}
       </div>
+      <div className="mt-20 dark:text-secondaryText-dark text-center mx-auto">
+        Coming soon...
+      </div>
     </div>
   );
 };

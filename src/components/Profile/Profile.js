@@ -25,7 +25,7 @@ import {
 } from "./../../redux/slices/profileSlice";
 import ProfileSkeleton from "./../skeleton/profileSkeleton";
 import {
-  setActiveTab,
+  updateProfileField,
   toggleSubscription,
 } from "../../redux/slices/profileSlice";
 import { Outlet } from "react-router-dom";
@@ -171,7 +171,7 @@ const Profile = () => {
   };
 
   const handleEditCards = () => {
-    dispatch(setActiveTab("displayCards"));
+    dispatch(updateProfileField({ name: "activeTab", value: "displayCards" }));
     setIsBottomSheetOpen(true);
   };
 

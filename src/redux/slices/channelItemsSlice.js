@@ -36,6 +36,7 @@ export const updateChannel = createAsyncThunk(
         "/update/channel",
         channelData
       );
+      console.log(response);
       if (response.success) {
         return response.channel;
       } else {
@@ -69,7 +70,6 @@ export const fetchMyChannels = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await postRequestAuthenticated("/fetch/my/channels");
-      console.log(response);
       if (response.success) {
         return response.channels;
       } else {

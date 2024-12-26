@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import ChannelCover from "../../assets/channel_images/channel_cover.svg";
 import Settings from "../../assets/icons/setting.svg";
 import Edit from "../../assets/icons/Edit.svg";
@@ -10,10 +10,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { createGeneralTopic } from "./../../redux/slices/channelItemsSlice";
 import {
   setChannelField,
-  clearChannel,
   removeCover,
   saveCover,
+  fetchChannel,
 } from "../../redux/slices/channelSlice.js";
+import {
+  createClearChannel,
+  setCreateChannelField,
+  setCreateChannelItems,
+} from "../../redux/slices/createChannelSlice.js";
+import { useParams } from "react-router-dom";
 
 const ChannelPage = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -21,18 +27,25 @@ const ChannelPage = () => {
   const { handleOpenModal } = useModal();
   const dispatch = useDispatch();
   const channel = useSelector((state) => state.channel);
+  const channelstatus = useSelector((state) => state.channel.channelstatus);
   const [file, setFile] = useState(null);
+  const [isEditCover, setIsEditCover] = useState(null);
+  const { channelId } = useParams();
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
+  useEffect(() => {
+    dispatch(fetchChannel(channelId));
+  }, []);
+
   const closeDropdown = (event) => {
     setIsDropdownOpen(false);
   };
 
-  const handleShareChannel = (name) => {
-    handleOpenModal("modalShareChannelOpen", name);
+  const handleShareChannel = (id) => {
+    handleOpenModal("modalShareChannelOpen", id);
   };
   const handleCreateTopic = () => {
     dispatch(createGeneralTopic());
@@ -48,9 +61,16 @@ const ChannelPage = () => {
     const formDataToSend = new FormData();
     formDataToSend.append("channel", channel._id);
     if (file) {
-      formDataToSend.append("cover_image", file);
+      formDataToSend.append("file", file);
     }
-    dispatch(saveCover(formDataToSend));
+    dispatch(saveCover(formDataToSend))
+      .unwrap()
+      .then(() => {
+        setIsEditCover(false);
+      })
+      .catch((error) => {
+        alert(error);
+      });
   };
 
   const handleCoverUpload = (event) => {
@@ -66,7 +86,19 @@ const ChannelPage = () => {
         dispatch(setChannelField({ field: "imageSource", value: "upload" }));
       };
       reader.readAsDataURL(file);
+      setIsEditCover(true);
     }
+  };
+
+  const handleEditChannel = () => {
+    const transformedData = {
+      ...channel,
+    };
+    dispatch(setCreateChannelItems(transformedData));
+    dispatch(setCreateChannelField({ field: "isEdit", value: true }));
+    setTimeout(() => {
+      handleOpenModal("modalChannelOpen");
+    }, 500);
   };
 
   return (
@@ -78,13 +110,15 @@ const ChannelPage = () => {
           onClick={closeDropdown}
           className="w-full h-full object-cover"
         />
-        <div
-          className="absolute left-3 top-3 dark:bg-buttonEnable-dark px-3 text-sm font-light py-1.5
+        {isEditCover && (
+          <div
+            className="absolute left-3 top-3 cursor-pointer dark:bg-buttonEnable-dark px-3 text-sm font-light py-1.5
          dark:text-secondaryText-dark rounded-lg"
-          onClick={handleSaveCover}
-        >
-          Save
-        </div>
+            onClick={handleSaveCover}
+          >
+            {channelstatus === "loading" ? "Saving" : "Save"}
+          </div>
+        )}
       </div>
       <div className="absolute right-3 top-3">
         <img
@@ -140,32 +174,31 @@ const ChannelPage = () => {
           </div>
         </div>
       )}
-      <div className="flex flex-row items-start w-full mt-4 px-3">
-        <div className="w-16 h-16 rounded-lg mt-3 dark:bg-secondaryText-dark"></div>
-        <div className="flex flex-col ml-3 w-full">
+      <div className="flex flex-row items-start w-full mt-4 px-4">
+        <div className="w-16 h-16 rounded-lg mt-3 dark:bg-secondaryText-dark">
+          {channel.logo && <img src={channel.logo} alt="logo" />}
+        </div>
+        <div className="flex flex-col ml-4 w-full">
           <div className="flex flex-row justify-between items-center">
             <p className="text-xl dark:text-secondaryText-dark font-inter font-semibold">
-              Chips.social
+              {channel.name}
             </p>
-            <img src={SettingIcon} alt="setting-icon" className=" w-5 h-5" />
+            {/* <img src={SettingIcon} alt="setting-icon" className=" w-5 h-5" /> */}
           </div>
           <p className="mt-1 text-xs font-nromal dark:text-primaryText-dark">
-            Qorem ipsum dolor sit amet, consectetur adipiscing elit. Etiam eu
-            turpis molestie, dictum est a, mattis tellus. Sed dignissim, metus
-            nec fringilla accumsan, risus sem sollicitudin lacus, ut interdum
-            tellus elit sed risus. Maecenas eget condimentum velit, sit amet
-            feugiat lectus. Class aptent taciti sociosqu ad litora torquent per
-            conubia nostra, per inceptos himenaeos. Praesent auctor purus luctus
-            enim egestas, ac scelerisque ante pulvinar.
+            {channel.description}
           </p>
           <div className="flex flex-row space-x-4 mt-3">
             <div
               className="py-2 px-3 cursor-pointer dark:text-secondaryText-dark dark:bg-buttonEnable-dark rounded-lg text-sm font-inter"
-              onClick={() => handleShareChannel("channel1")}
+              onClick={() => handleShareChannel(channel._id)}
             >
               Share join link
             </div>
-            <div className="border dark:border-primaryText-dark py-2 px-3 rounded-lg dark:text-secondaryText-dark text-sm font-inter">
+            <div
+              className="border dark:border-primaryText-dark py-2 px-3 rounded-lg cursor-pointer dark:text-secondaryText-dark text-sm font-inter"
+              onClick={handleEditChannel}
+            >
               Edit Channel
             </div>
           </div>
@@ -173,35 +206,40 @@ const ChannelPage = () => {
       </div>
       <div className="flex flex-col mx-3">
         <div className="border-t my-4 dark:border-t-chatDivider-dark "></div>
-        <p className="mt-2 text-xl dark:text-white font-inter font-normal">
-          Topics
-        </p>
-        <div className="mt-2 flex flex-row space-x-3">
-          <div className="p-4 dark:bg-chatDivider-dark rounded-lg flex-col justify-start items-start w-max">
-            <div className="flex-col justify-start items-start  flex">
-              <div className=" dark:text-sidebarColor-dark text-xs font-normal font-inter ">
-                Suggested
+        {channel.topics.length === 0 && (
+          <p className="mt-2 text-xl dark:text-white font-inter font-normal">
+            Topics
+          </p>
+        )}
+        {channel.topics.length === 0 && (
+          <div className="mt-2 flex flex-row space-x-3">
+            <div className="p-4 dark:bg-chatDivider-dark rounded-lg flex-col justify-start items-start w-max">
+              <div className="flex-col justify-start items-start  flex">
+                <div className=" dark:text-sidebarColor-dark text-xs font-normal font-inter ">
+                  Suggested
+                </div>
+                <div className="dark:text-primaryText-dark text-xs font-normal font-inter mt-1">
+                  For open-ended conversations,
+                  <br />
+                  you can start with General
+                </div>
               </div>
-              <div className="dark:text-primaryText-dark text-xs font-normal font-inter mt-1">
-                For open-ended conversations,
-                <br />
-                you can start with General
+
+              <div
+                className="p-2 rounded border mt-2 w-max dark:border-primaryText-dark dark:text-secondaryText-dark text-xs justify-center items-center "
+                onClick={handleCreateTopic}
+              >
+                Create General
               </div>
-            </div>
-            <div
-              className="p-2 rounded border mt-2 w-max dark:border-primaryText-dark dark:text-secondaryText-dark text-xs justify-center items-center "
-              onClick={handleCreateTopic}
-            >
-              Create General
             </div>
           </div>
-          <div className="px-4 pt-6 dark:bg-chatDivider-dark rounded-lg flex-col justify-center items-center">
-            <img src={AddIcon} alt="add" className="ml-2" />
-            <div className="text-center mt-2 text-[#e4e4e4] text-xs font-medium font-inter">
-              New Topic
-            </div>
+        )}
+        {/* <div className="px-4 py-6 dark:bg-chatDivider-dark rounded-lg flex-col justify-start w-max items-center">
+          <img src={AddIcon} alt="add" className="ml-2" />
+          <div className="text-center mt-2 text-[#e4e4e4] text-xs font-medium font-inter">
+            New Topic
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

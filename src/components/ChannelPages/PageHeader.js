@@ -5,7 +5,7 @@ import ArrowRight from "../../assets/icons/arrow_right.svg";
 
 const PageHeader = ({
   channelName,
-  pageName,
+  topic,
   toggleBottomSheet,
   // toggleSidebar,
   isOpen,
@@ -20,15 +20,15 @@ const PageHeader = ({
             onClick={toggleBottomSheet}
           >
             <p className="dark:text-secondaryText-dark text-2xl font-normal font-inter tracking-wide">
-              {pageName.charAt(0).toUpperCase() + pageName.slice(1)}
+              {topic.name.charAt(0).toUpperCase() + topic.name.slice(1)}
             </p>
             <img src={ArrowRight} alt="arrow-right" className="w-3 h-3 pl-2 " />
           </div>
           <p className="sm:flex hidden dark:text-secondaryText-dark text-2xl font-normal font-inter tracking-wide">
-            {pageName.charAt(0).toUpperCase() + pageName.slice(1)}
+            {topic.name.charAt(0).toUpperCase() + topic.name.slice(1)}
           </p>
           <p className="text-xs dark:text-primaryText-dark font-normal tracking-tight">
-            23 active
+            {topic.allowedVisibleUsers.length} members
           </p>
         </div>
         <img

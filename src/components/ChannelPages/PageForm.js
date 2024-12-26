@@ -3,7 +3,7 @@ import SummaryPage from "./FormPages/SummaryPage";
 import ResourcePage from "./FormPages/ResourcePage";
 import EventsPage from "./FormPages/EventsPage";
 
-const PageForm = ({ isOpen, onClose, channelName, pageName }) => {
+const PageForm = ({ isOpen, onClose, channelName, topic }) => {
   const modalRef = useRef(null);
   const [activeTab, setActiveTab] = useState("summary");
 
@@ -51,7 +51,7 @@ const PageForm = ({ isOpen, onClose, channelName, pageName }) => {
         lg:w-[35%] xl:w-[30%] sm:h-[93%] h-5/6 pt-2 pointer-events-auto  z-50"
       >
         <div className="dark:text-white text-center mb-3">
-          {pageName.charAt(0).toUpperCase() + pageName.slice(1)}
+          {topic.name.charAt(0).toUpperCase() + topic.name.slice(1)}
         </div>
         <div className="flex justify-between mb-3 pr-1 border-b  dark:border-chatDivider-dark">
           <button

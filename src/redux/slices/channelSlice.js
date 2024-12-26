@@ -3,6 +3,7 @@ import {
   postRequestAuthenticated,
   postRequestAuthenticatedWithFile,
 } from "./../../services/rest";
+import { updateChannel } from "./channelItemsSlice";
 
 export const removeCover = createAsyncThunk(
   "channel/remove-cover",
@@ -40,28 +41,48 @@ export const saveCover = createAsyncThunk(
     }
   }
 );
+export const fetchChannel = createAsyncThunk(
+  "channel/fetch-channel",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await postRequestAuthenticated("/fetch/channel", {
+        id: id,
+      });
+      if (response.success) {
+        return response.channel;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+const initialState = {
+  _id: "",
+  name: "",
+  visibility: "anyone",
+  members: [],
+  cover_image: null,
+  admins: [],
+  paywall: false,
+  topics: [],
+  logo: null,
+  description: "",
+  channelstatus: "idle",
+  channelNameError: false,
+  isEdit: false,
+};
 
 export const channelSlice = createSlice({
   name: "channel",
-  initialState: {
-    _id: "",
-    name: "",
-    visibility: "anyone",
-    members: [],
-    cover_image: null,
-    admins: [],
-    paywall: false,
-    topics: [],
-    logo: null,
-    description: "",
-    channelstatus: "idle",
-    channelNameError: false,
-  },
+  initialState,
   reducers: {
-    setSelectedUnsplashImage: (state, action) => {
-      state.cover_image = action.payload;
-      state.imageSource = "unsplash";
-    },
+    // setSelectedUnsplashImage: (state, action) => {
+    //   state.cover_image = action.payload;
+    //   state.imageSource = "unsplash";
+    // },
     setChannelItems: (state, action) => {
       return { ...state, ...action.payload };
     },
@@ -85,6 +106,7 @@ export const channelSlice = createSlice({
       state.description = "";
       state.channelstatus = "idle";
       state.channelNameError = false;
+      state.isEdit = false;
     },
   },
   extraReducers: (builder) => {
@@ -110,17 +132,21 @@ export const channelSlice = createSlice({
       .addCase(saveCover.rejected, (state, action) => {
         state.channelstatus = "idle";
         state.channelNameError = action.payload || action.error.message;
+      })
+      .addCase(fetchChannel.pending, (state) => {
+        state.channelstatus = "loading";
+      })
+      .addCase(fetchChannel.fulfilled, (state, action) => {
+        state.channelstatus = "idle";
+        Object.assign(state, initialState, action.payload);
+      })
+      .addCase(fetchChannel.rejected, (state, action) => {
+        state.channelstatus = "idle";
+        state.channelNameError = action.payload || action.error.message;
+      })
+      .addCase(updateChannel.fulfilled, (state, action) => {
+        Object.assign(state, initialState, action.payload);
       });
-    // .addCase(updateChannel.pending, (state) => {
-    //   state.channelstatus = "loading";
-    // })
-    // .addCase(updateChannel.fulfilled, (state, action) => {
-    //   state.channelstatus = "idle";
-    // })
-    // .addCase(updateChannel.rejected, (state, action) => {
-    //   state.channelstatus = "idle";
-    //   state.channelNameError = action.payload || action.error.message;
-    // });
   },
 });
 

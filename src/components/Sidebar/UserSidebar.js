@@ -35,20 +35,19 @@ const UserSidebar = ({ username, closeSidebar }) => {
     dispatch(setTopicField({ field: "channel", value: channelId }));
     handleOpenModal("modalTopicOpen");
   };
-  const toggleChannel = (channelId) => {
+  const toggleChannel = (id) => {
+    navigate(`channel/${id}`);
+  };
+
+  const toggleChannelExpanded = (channelId) => {
     setExpandedChannels((prevState) => ({
       ...prevState,
       [channelId]: !prevState[channelId],
     }));
   };
-  // if (!expandedChannels[index]) {
-  //   const firstPage = channels[index].pages[0];
-  //   navigate(`/channel/${channelName}/page/${encodeURIComponent(firstPage)}`);
-  // }
-  // };
+
   const handleTopicSelect = (topicId, channelName, topicName) => {
     setSelectedTopic(topicId);
-    // navigate();
   };
 
   useEffect(() => {
@@ -66,7 +65,7 @@ const UserSidebar = ({ username, closeSidebar }) => {
   }
   if (error) return <p>Error loading channels: {error}</p>;
   return (
-    <div className="flex flex-col justify-between h-full w-full overflow-y-auto custom-scrollbar">
+    <div className="flex flex-col justify-between h-screen w-full overflow-y-auto custom-scrollbar">
       <div>
         <div className="w-full sm:hidden flex justify-end">
           <img
@@ -108,18 +107,27 @@ const UserSidebar = ({ username, closeSidebar }) => {
             <div key={channel._id} className="flex flex-col">
               <div className="border border-[1] dark:border-tertiaryBackground-dark my-3"></div>
               <div
-                className="flex flex-row justify-between px-6 mb-1 items-center cursor-pointer"
-                onClick={() => toggleChannel(channelIndex)}
+                className={`flex flex-row justify-between px-6 mb-1 items-center cursor-pointer
+              ${
+                location.pathname === `/user/${username}/channel/${channel._id}`
+                  ? "dark:text-secondaryText-dark dark:bg-tertiaryBackground-dark rounded-lg mx-3 py-1"
+                  : "dark:text-primaryText-dark"
+              } 
+                `}
               >
-                <p className="text-sm font-normal font-inter dark:text-primaryText-dark">
+                <p
+                  className="text-sm font-normal font-inter dark:text-primaryText-dark"
+                  onClick={() => toggleChannel(channel._id)}
+                >
                   {channel.name.charAt(0).toUpperCase() + channel.name.slice(1)}
                 </p>
                 <img
                   src={expandedChannels[channelIndex] ? ArrowUp : ArrowDown}
+                  onClick={() => toggleChannelExpanded(channelIndex)}
                   alt={
                     expandedChannels[channelIndex] ? "up-arrow" : "down-arrow"
                   }
-                  className="h-6 w-6"
+                  className="h-7 w-7"
                 />
               </div>
               {expandedChannels[channelIndex] && (
@@ -127,12 +135,10 @@ const UserSidebar = ({ username, closeSidebar }) => {
                   {channel.topics.map((topic, topicIndex) => (
                     <div key={topic._id}>
                       <Link
-                        to={`/user/${username}/channel/${
-                          channel.name
-                        }/topic/${encodeURIComponent(topic.name)}`}
+                        to={`/user/${username}/channel/${channel.name}/c-id/${channel._id}/topic/${topic._id}`}
                         className={`block ${
                           location.pathname ===
-                          `/user/${username}/channel/${channel.name}/topic/${topic.name}`
+                          `/user/${username}/channel/${channel.name}/c-id/${channel._id}/topic/${topic._id}`
                             ? "dark:bg-tertiaryBackground-dark rounded-lg mx-3 my-1"
                             : ""
                         } px-6 py-2.5 text-sm font-inter font-light cursor-pointer dark:text-primaryText-dark`}
@@ -165,7 +171,7 @@ const UserSidebar = ({ username, closeSidebar }) => {
         </nav>
       </div>
       <div className="mb-2 mt-2">
-        <Link
+        {/* <Link
           to="/user/username/account"
           className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6 ${
             location.pathname === `/user/${username}/account`
@@ -174,7 +180,7 @@ const UserSidebar = ({ username, closeSidebar }) => {
           }`}
         >
           Account Settings
-        </Link>
+        </Link> */}
 
         <div className="border border-[1] dark:border-tertiaryBackground-dark my-2"></div>
 

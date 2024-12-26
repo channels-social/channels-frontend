@@ -31,6 +31,7 @@ const initialState = {
   modalPushtoCategoryOpen: false,
   modalPushtoCurationOpen: false,
   modalCategoryReorderOpen: false,
+  modalFaqDeleteOpen: false,
   shareLink: "",
   shareUsername: "",
   modalDocumentOpen: false,
@@ -38,7 +39,7 @@ const initialState = {
   document: null,
   isLoginMode: false,
   profileId: "",
-  channelName: "",
+  channelId: "",
 };
 
 const modalSlice = createSlice({
@@ -64,7 +65,7 @@ const modalSlice = createSlice({
         state.profileId = link;
       }
       if (modalName === "modalShareChannelOpen") {
-        state.channelName = link;
+        state.channelId = link;
       }
       if (modalName === "modalDocumentOpen") {
         state.document = {
@@ -93,7 +94,7 @@ const modalSlice = createSlice({
         state.profileId = "";
       }
       if (modalName === "modalShareChannelOpen") {
-        state.channelName = "";
+        state.channelId = "";
       }
     },
   },

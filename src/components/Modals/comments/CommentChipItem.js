@@ -4,6 +4,7 @@ import Upvoted from "../../../assets/icons/upvoted.svg";
 import ReplyLine from "../../../assets/icons/reply_line.svg";
 import { formatDistanceToNowStrict } from "date-fns";
 import CommentChipReplyItem from "./CommentChipReplyItem";
+import Profile from "../../../assets/icons/profile.svg";
 import {
   toggleCommentUpvote,
   setScroll,
@@ -50,7 +51,7 @@ const CommentItem = ({ item, handleChange }) => {
   return (
     <div className="flex flex-row items-start space-x-2 w-full px-5">
       <img
-        src={item.user?.logo}
+        src={item.user?.logo ? item.user?.logo : Profile}
         alt="Curation"
         className=" w-8 h-8 rounded-lg object-cover"
       />

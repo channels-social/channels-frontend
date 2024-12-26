@@ -1,14 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import PageSidebar from "./PageSidebar";
 import PageHeader from "./PageHeader";
 import { useLocation, useParams, useNavigate } from "react-router-dom";
 import PageForm from "./PageForm";
 import PageChat from "./PageChat";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchTopic } from "../../redux/slices/topicSlice";
 
 const PageHome = () => {
-  const { channelName, topicName } = useParams();
+  const { channelName, channelId, topicId } = useParams();
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const dispatch = useDispatch();
+  const topic = useSelector((state) => state.topic);
 
   const toggleBottomSheet = () => {
     setIsBottomSheetOpen(!isBottomSheetOpen);
@@ -21,24 +25,28 @@ const PageHome = () => {
   const closeBottomSheet = () => setIsBottomSheetOpen(false);
   const closeSidebar = () => setIsSidebarOpen(false);
 
+  useEffect(() => {
+    dispatch(fetchTopic(topicId));
+  }, []);
+
   return (
     <div className="w-full h-screen dark:bg-secondaryBackground-dark flex  ">
       <div className="flex flex-col w-full h-full">
         <PageHeader
           channelName={channelName}
-          pageName={topicName}
+          topic={topic}
           // toggleSidebar={toggleSidebar}
           toggleBottomSheet={toggleBottomSheet}
           isOpen={isBottomSheetOpen}
           // isSidebarOpen={isSidebarOpen}
         />
-        <PageChat />
+        <PageChat topicId={topicId} channelId={channelId} />
       </div>
       <PageForm
         isOpen={isBottomSheetOpen}
         onClose={closeBottomSheet}
         channelName={channelName}
-        pageName={topicName}
+        topic={topic}
       />
     </div>
   );

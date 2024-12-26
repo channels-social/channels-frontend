@@ -159,7 +159,11 @@ const CategorySection = ({
   };
 
   return (
-    <div className="mb-12 flex flex-col border dark:border-chatDivider-dark rounded-lg px-3 pb-3">
+    <div
+      className={`mb-12 flex flex-col ${
+        items.length > 1 ? "border dark:border-chatDivider-dark" : ""
+      }  rounded-lg px-3 pb-3`}
+    >
       {items.length > 1 && (
         <div className="flex flex-row items-center  space-x-4 py-3 relative mb-2">
           <div className="text-white text-2xl font-normal font-familjen-grotesk -mt-1">
