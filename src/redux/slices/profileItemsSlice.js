@@ -7,6 +7,7 @@ import {
 import { deleteChip } from "./deleteChipSlice";
 import { createChipComment, createChipCommentReply } from "./commentChipSlice";
 import { deleteCategory } from "./deleteCategorySlice";
+import { deleteCuration } from "./deleteCurationSlice";
 import {
   pushItemToCategory,
   pushChipToCuration,
@@ -282,7 +283,7 @@ export const profileItemsSlice = createSlice({
         state.status = "loading";
       })
       .addCase(fetchProfileItems.fulfilled, (state, action) => {
-        state.status = "succeeded";
+        state.status = "success";
         state.items = action.payload;
         state.fetchedOnce = true;
       })
@@ -479,14 +480,28 @@ export const profileItemsSlice = createSlice({
       })
       .addCase(deleteChip.fulfilled, (state, action) => {
         const updatedChip = action.payload;
+        console.log(updatedChip._id);
         const categoryId = updatedChip.profile_category || "";
         let index = state.items.findIndex((item) => item._id === categoryId);
         if (index !== -1) {
           const chipIndex = state.items[index].items.findIndex(
-            (chip) => chip._id === action.payload._id
+            (chip) => chip._id === updatedChip._id
           );
           if (chipIndex !== -1) {
             state.items[index].items.splice(chipIndex, 1);
+          }
+        }
+      })
+      .addCase(deleteCuration.fulfilled, (state, action) => {
+        const updatedCuration = action.payload;
+        const categoryId = updatedCuration.profile_category || "";
+        let index = state.items.findIndex((item) => item._id === categoryId);
+        if (index !== -1) {
+          const curationIndex = state.items[index].items.findIndex(
+            (cur) => cur._id === updatedCuration._id
+          );
+          if (curationIndex !== -1) {
+            state.items[index].items.splice(curationIndex, 1);
           }
         }
       })

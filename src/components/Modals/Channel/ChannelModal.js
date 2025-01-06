@@ -183,7 +183,6 @@ const ChannelModal = () => {
       } else if (channel.cover_image && channel.imageSource === "unsplash") {
         formDataToSend.append("cover_image", channel.cover_image);
       }
-      console.log(logoFile);
       formDataToSend.append("imageSource", channel.imageSource);
       dispatch(updateChannel(formDataToSend))
         .unwrap()

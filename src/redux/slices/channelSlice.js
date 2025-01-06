@@ -4,6 +4,7 @@ import {
   postRequestAuthenticatedWithFile,
 } from "./../../services/rest";
 import { updateChannel } from "./channelItemsSlice";
+import { createGeneralTopic } from "./channelItemsSlice";
 
 export const removeCover = createAsyncThunk(
   "channel/remove-cover",
@@ -59,6 +60,63 @@ export const fetchChannel = createAsyncThunk(
   }
 );
 
+export const createChannelInvite = createAsyncThunk(
+  "channel/create-channel-invite",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await postRequestAuthenticated(
+        "/create/channel/invite",
+        {
+          channelId: id,
+        }
+      );
+      if (response.success) {
+        return response.invite;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const joinChannel = createAsyncThunk(
+  "channel/join-channel",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await postRequestAuthenticated("/join/channel", {
+        channelId: id,
+      });
+      if (response.success) {
+        return response.channel;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+export const joinChannelInvite = createAsyncThunk(
+  "channel/join-channel-invite",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await postRequestAuthenticated(
+        "/join/channel/invite",
+        data
+      );
+      if (response.success) {
+        return response.channelId;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const initialState = {
   _id: "",
   name: "",
@@ -73,6 +131,7 @@ const initialState = {
   channelstatus: "idle",
   channelNameError: false,
   isEdit: false,
+  code: "",
 };
 
 export const channelSlice = createSlice({
@@ -132,6 +191,11 @@ export const channelSlice = createSlice({
       .addCase(saveCover.rejected, (state, action) => {
         state.channelstatus = "idle";
         state.channelNameError = action.payload || action.error.message;
+      })
+      .addCase(createGeneralTopic.fulfilled, (state, action) => {
+        state.channelstatus = "idle";
+        const topic = action.payload;
+        state.topics.unshift(topic._id);
       })
       .addCase(fetchChannel.pending, (state) => {
         state.channelstatus = "loading";

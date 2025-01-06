@@ -14,7 +14,7 @@ const CurationMansonry = ({ curation, owner, gallery }) => {
       navigate(`/curation/${curation._id}`, { state: { owner } });
     } else {
       const username = location.pathname.split("/")[2];
-      navigate(`/profile/${username}/curation/${curation._id}`, {
+      navigate(`/user/${username}/curation/${curation._id}`, {
         state: { owner },
       });
     }

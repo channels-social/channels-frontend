@@ -13,7 +13,10 @@ import Edit from "../../assets/icons/Edit.svg";
 import Delete from "../../assets/icons/Delete.svg";
 import { setCurationField } from "../../redux/slices/curationSlice";
 import { setChipField } from "../../redux/slices/chipSlice";
-import { setCurationIdToDelete } from "../../redux/slices/deleteCurationSlice";
+import {
+  setCurationIdToDelete,
+  setProfileCategoryToDelete,
+} from "../../redux/slices/deleteCurationSlice";
 import { updateItemField } from "./../../redux/slices/pushItemsSlice";
 import Send from "../../assets/icons/Send.svg";
 import {
@@ -71,9 +74,6 @@ const ProfileChipsView = () => {
   // const toggleFilterPanel = () => {
   //     setisSorting(!isSorting);
   //   };
-  const handleNavigateHome = (value) => {
-    navigate(`/profile/${username}`);
-  };
 
   useEffect(() => {
     if (curId) {
@@ -136,6 +136,7 @@ const ProfileChipsView = () => {
     if (isLoggedIn) {
       setIsDropdownOpen(false);
       dispatch(setCurationIdToDelete(curId));
+      dispatch(setProfileCategoryToDelete(curation.profile_category));
       handleOpenModal("modalCurationDeleteOpen");
     } else {
       openLoginModal();
@@ -165,7 +166,7 @@ const ProfileChipsView = () => {
   };
 
   const handleNavigationHome = () => {
-    navigate("/");
+    navigate(`/user/${username}/profile`);
   };
 
   const handleEmptyCuration = () => {
@@ -195,11 +196,20 @@ const ProfileChipsView = () => {
   const isEditable = curation?.visibility === "anyone" || isOwner;
 
   return (
-    <div className="flex flex-col mr-4 xs:mr-8 -ml-1">
-      {/* <div className="flex flex-row items-center cursor-pointer -ml-2"onClick={handleNavigateHome}>
-              <img src={ArrowBack} alt="arrow-back" className="text-primary font-normal text-lg font-inter"/>
-              <p className="ml-2 text-lightText text-xs font-light font-inter">Profile</p>
-            </div> */}
+    <div className="flex flex-col pr-4 pl-4 dark:bg-tertiaryBackground-dark h-full">
+      <div
+        className="flex flex-row items-center cursor-pointer mt-2"
+        onClick={handleNavigationHome}
+      >
+        <img
+          src={ArrowBack}
+          alt="arrow-back"
+          className="text-primary font-normal text-lg font-inter"
+        />
+        <p className="ml-2 dark:text-primaryText-dark text-xs font-light font-inter">
+          Profile
+        </p>
+      </div>
       {/* <div className="flex flex-row justify-between items-center mt-3 relative"> */}
       <div className="flex flex-row items-center space-x-3 w-full mt-2">
         <p className="sm:text-3xl text-xl text-white font-normal font-familjen-grotesk">
@@ -248,15 +258,16 @@ const ProfileChipsView = () => {
               className="flex flex-col space-y-1 cursor-pointer"
               onClick={toggleDropdown}
             >
-              <div className="w-1 h-1 bg-primary rounded-full"></div>
-              <div className="w-1 h-1 bg-primary rounded-full"></div>
-              <div className="w-1 h-1 bg-primary rounded-full"></div>
+              <div className="w-1 h-1 dark:bg-secondaryText-dark rounded-full"></div>
+              <div className="w-1 h-1 dark:bg-secondaryText-dark rounded-full"></div>
+              <div className="w-1 h-1 dark:bg-secondaryText-dark rounded-full"></div>
             </div>
           )}
           {isDropdownOpen && (
             <div
               ref={dropdownRef}
-              className="absolute right-0 mt-2 w-max rounded-md shadow-lg border border-dividerLine bg-chipBackground ring-1 ring-black ring-opacity-5 z-50"
+              className="absolute right-0 mt-2 w-max rounded-md shadow-lg border 
+              dark:border-chatDivider-dark dark:bg-tertiaryBackground-dark ring-1 ring-black ring-opacity-5 z-50"
             >
               <div
                 className="py-1"
@@ -270,7 +281,7 @@ const ProfileChipsView = () => {
                 >
                   <img src={Edit} alt="edit" className="w-4 h-4" />
                   <p
-                    className="block ml-1 py-2 text-sm text-textFieldColor cursor-pointer"
+                    className="block ml-1 py-2 text-sm dark:text-primaryText-dark cursor-pointer"
                     role="menuitem"
                   >
                     Edit
@@ -282,7 +293,7 @@ const ProfileChipsView = () => {
                 >
                   <img src={Delete} alt="edit" className="w-4 h-4" />
                   <p
-                    className="block  ml-1 py-2 text-sm text-deleteIcon cursor-pointer"
+                    className="block  ml-1 py-2 text-sm dark:text-primaryText-dark cursor-pointer"
                     role="menuitem"
                   >
                     Delete
@@ -294,7 +305,7 @@ const ProfileChipsView = () => {
                 >
                   <img src={Send} alt="push-category" className="w-4 h-4" />
                   <p
-                    className="block  ml-1 py-2 text-sm text-textFieldColor cursor-pointer"
+                    className="block  ml-1 py-2 text-sm dark:text-primaryText-dark cursor-pointer"
                     role="menuitem"
                   >
                     Push to Category
@@ -312,14 +323,14 @@ const ProfileChipsView = () => {
                 </div>} */}
       </div>
       {curation.description && (
-        <p className="text-textColor text-xs mt-2 mb-1 w-full lg:w-1/2 font-normal font-inter">
+        <p className="dark:text-primaryText-dark text-xs mt-2 mb-1 w-full lg:w-1/2 font-normal font-inter">
           {curation.description}
         </p>
       )}
       {curation?.user?.username && (
         <a
           href={`https://${domainUrl}/profile/${curation.user.username}`}
-          className="text-primary font-normal text-xs mt-2 underline mb-8 w-max"
+          className="dark:text-secondaryText-dark font-normal text-xs mt-2 underline mb-8 w-max"
           style={{ textUnderlineOffset: "2px" }}
         >
           {curation.user.name}
@@ -343,12 +354,12 @@ const ProfileChipsView = () => {
             className="container rounded-md bg-dark pl-4 pr-4 pt-3 pb-3 flex flex-col min-w-fit max-w-72 ml-auto mb-36"
             style={{ marginRight: "auto" }}
           >
-            <h3 className=" text-textColor text-sm">
+            <h3 className=" dark:text-secondaryText-dark text-sm">
               (. ❛ ᴗ ❛.) Seems like this curation is empty
             </h3>
-            <div className="mt-2 rounded-md bg-chipBackground pl-5 pt-4 pb-4 cursor-pointer">
+            <div className="mt-2 rounded-md dark:bg-secondaryBackground-dark pl-5 pt-4 pb-4 cursor-pointer">
               <p
-                className=" text-textColor text-xs font-light"
+                className=" dark:text-secondaryText-dark text-xs font-light"
                 onClick={handleEmptyCuration}
               >
                 {myData?._id === curation.user?._id ||

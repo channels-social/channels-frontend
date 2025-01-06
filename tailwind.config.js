@@ -68,6 +68,9 @@ module.exports = {
         profileColor: {
           dark: "#7b7b7c",
         },
+        homeToggle: {
+          dark: "#32302c",
+        },
       },
       fontFamily: {
         inter: ["Inter"],

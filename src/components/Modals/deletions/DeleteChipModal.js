@@ -12,6 +12,9 @@ const DeleteChipModal = () => {
   const dispatch = useDispatch();
   const isOpen = useSelector((state) => state.modals.modalChipDeleteOpen);
   const chipIdToDelete = useSelector((state) => state.chipDeletion.chipId);
+  const profile_category = useSelector(
+    (state) => state.chipDeletion.profile_category
+  );
 
   if (!isOpen) return null;
 
@@ -21,7 +24,7 @@ const DeleteChipModal = () => {
   };
 
   const handleDelete = () => {
-    dispatch(deleteChip(chipIdToDelete))
+    dispatch(deleteChip({ chipId: chipIdToDelete, profile_category }))
       .unwrap()
       .then(() => {
         dispatch(closeModal("modalChipDeleteOpen"));

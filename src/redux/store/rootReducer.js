@@ -29,6 +29,7 @@ import deleteCategoryReducer from "./../slices/deleteCategorySlice";
 import pushItemsReducer from "./../slices/pushItemsSlice";
 import themeReducer from "./../slices/themeSlice";
 import createChannelReducer from "./../slices/createChannelSlice";
+import createTopicReducer from "./../slices/createTopicSlice";
 import topicReducer from "./../slices/topicSlice";
 import channelItemsReducer from "./../slices/channelItemsSlice";
 import channelReducer from "./../slices/channelSlice";
@@ -66,6 +67,7 @@ const appReducer = combineReducers({
   pushItems: pushItemsReducer,
   theme: themeReducer,
   createChannel: createChannelReducer,
+  createTopic: createTopicReducer,
   channelItems: channelItemsReducer,
   topic: topicReducer,
   faqs: FaqsReducer,

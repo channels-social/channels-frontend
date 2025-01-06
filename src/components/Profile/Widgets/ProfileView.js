@@ -392,11 +392,14 @@ const ProfileView = ({ gallery, owner, enableReorder }) => {
   if (status === "failed") {
     return <div>Error: {error}</div>;
   }
-
-  if (status === "success" && items.length === 0 && owner) {
+  if (
+    status === "success" &&
+    items[0] &&
+    items[0].items.length === 0 &&
+    owner
+  ) {
     return <EmptyItemsCard />;
   }
-
   return (
     <div className="w-full flex flex-col mt-4 rounded-md">
       <DragDropContext onDragEnd={handleDragEnd}>

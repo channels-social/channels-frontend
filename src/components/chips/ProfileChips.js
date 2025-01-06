@@ -11,7 +11,10 @@ import Upvoted from "../../assets/icons/upvoted.svg";
 import ImageList from "../chips/widgets/ImageList";
 import RenderLink from "../chips/widgets/videoPlayer";
 import useModal from "./../hooks/ModalHook";
-import { setChipIdToDelete } from "../../redux/slices/deleteChipSlice";
+import {
+  setChipIdToDelete,
+  setProfileCategorytoDelete,
+} from "../../redux/slices/deleteChipSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { setEditChipData } from "./../../redux/slices/editChipSlice";
 import { upvoteChip } from "./../../redux/slices/profileItemsSlice";
@@ -83,6 +86,7 @@ const ProfileChips = ({ item }) => {
     if (isLoggedIn) {
       setIsDropdownOpen(false);
       dispatch(setChipIdToDelete(item._id));
+      dispatch(setProfileCategorytoDelete(item.profile_category));
       handleOpenModal("modalChipDeleteOpen");
     } else {
       openLoginModal();

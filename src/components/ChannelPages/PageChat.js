@@ -22,7 +22,7 @@ import {
   createChannelChatReply,
 } from "../../redux/slices/chatSlice";
 
-const PageChat = ({ topicId, channelId }) => {
+const PageChat = ({ topicId, channelId, isLoggedIn, myData }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [fileObjects, setFileObjects] = useState([]);
@@ -31,6 +31,22 @@ const PageChat = ({ topicId, channelId }) => {
   const dispatch = useDispatch();
   const fileInputRef = useRef(null);
   const channelChat = useSelector((state) => state.chat);
+  const chatContainerRef = useRef(null);
+  const Chats = useSelector((state) => state.chat.chats);
+
+  const scrollToBottom = () => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTop =
+        chatContainerRef.current.scrollHeight;
+    }
+  };
+  useEffect(() => {
+    scrollToBottom();
+  }, [Chats]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, []);
 
   // useEffect(() => {
   //   const handleClickOutside = (event) => {
@@ -138,7 +154,6 @@ const PageChat = ({ topicId, channelId }) => {
     const formDataToSend = new FormData();
     formDataToSend.append("content", channelChat.content);
     formDataToSend.append("media", JSON.stringify(channelChat.media));
-    formDataToSend.append("reactions", JSON.stringify(channelChat.reactions));
     formDataToSend.append("mentions", JSON.stringify(channelChat.mentions));
     formDataToSend.append("replyTo", channelChat.replyTo || null);
     formDataToSend.append("channel", channelId);
@@ -157,14 +172,21 @@ const PageChat = ({ topicId, channelId }) => {
   };
 
   const handleReplyClear = () => {
-    dispatch(setChatField({ field: "replyTo", value: "" }));
+    dispatch(setChatField({ field: "replyTo", value: null }));
     dispatch(setChatField({ field: "replyUsername", value: "" }));
   };
 
   return (
-    <div className=" w-full flex flex-col relative h-full overflow-y-auto custom-scrollbar">
-      <div className="flex-1 overflow-y-auto p-4 dark:bg-secondaryBackground-dark w-full">
-        <PageChatData topicId={topicId} />
+    <div
+      className=" w-full flex flex-col relative h-full overflow-y-auto custom-scrollbar"
+      ref={chatContainerRef}
+    >
+      <div className="flex-1 p-4 dark:bg-secondaryBackground-dark w-full">
+        <PageChatData
+          topicId={topicId}
+          isLoggedIn={isLoggedIn}
+          myData={myData}
+        />
       </div>
 
       {channelChat.media.length > 0 && (
@@ -183,13 +205,13 @@ const PageChat = ({ topicId, channelId }) => {
                     <img
                       src={item.url}
                       alt="pdf-image"
-                      className=" rounded-lg h-24 w-auto"
+                      className=" rounded-lg h-24 max-w-32 w-auto"
                     />
                   </div>
                 ) : item.type === "video" ? (
                   <video
                     controls
-                    className="w-auto h-24 object-cover rounded-t-xl"
+                    className="w-auto h-24 object-cover max-w-32 rounded-t-xl"
                   >
                     <source src={item.url} type="video/mp4" />
                     Your browser does not support the video tag.
@@ -198,7 +220,7 @@ const PageChat = ({ topicId, channelId }) => {
                   <img
                     src={PdfImage}
                     alt="pdf-image"
-                    className="rounded-lg h-24 w-auto"
+                    className="rounded-lg h-24 max-w-32 w-auto"
                   />
                 )}
                 <p className="dark:text-secondaryText-dark mt-1 font-normal text-xs truncate max-w-24">
@@ -209,11 +231,11 @@ const PageChat = ({ topicId, channelId }) => {
           ))}
         </div>
       )}
-      {channelChat.replyTo && (
+      {channelChat.replyTo && channelChat.replyUsername && (
         <div className="dark:text-secondaryText-dark dark:bg-chatDivider-dark my-1 py-1 px-4 text-sm font-light w-full flex flex-row justify-between items-center">
           <p>Replying to {channelChat.replyUsername}</p>
           <div
-            className="p-2 rounded-full dark:bg-secondaryBackground-dark"
+            className="p-2 rounded-full dark:bg-secondaryBackground-dark cursor-pointer"
             onClick={handleReplyClear}
           >
             <img src={Close} alt="close-icon" className="w-3 h-3" />
@@ -240,6 +262,7 @@ const PageChat = ({ topicId, channelId }) => {
               <input
                 type="file"
                 accept="image/*,video/*"
+                multiple
                 onChange={handleMediaChange}
                 className="absolute inset-0 opacity-0 cursor-pointer"
                 ref={fileInputRef}

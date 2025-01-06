@@ -19,6 +19,7 @@ const initialState = {
   modalLogoutOpen: false,
   modalChipDeleteOpen: false,
   modalCurationDeleteOpen: false,
+  modalChatDeleteOpen: false,
   modalShareOpen: false,
   modalShareChipOpen: false,
   modalShareChannelOpen: false,

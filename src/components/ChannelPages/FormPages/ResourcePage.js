@@ -1,62 +1,167 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Close from "../../../assets/icons/Close.svg";
 import Search from "../../../assets/icons/search.svg";
+import { useSelector, useDispatch } from "react-redux";
+import ArrowDropDown from "../../../assets/icons/arrow_drop_down.svg";
+import ReplyIcon from "../../../assets/icons/reply_line.svg";
+import { useParams } from "react-router-dom";
+import { removeFromResource } from "../../../redux/slices/chatSlice";
+import documentImage from "../../../assets/images/Attachment.svg";
 
 const ResourcePage = () => {
-  const [selectedTab, setSelectedTab] = useState("Images");
+  // const [selectedTab, setSelectedTab] = useState("Images");
   const [searchQuery, setSearchQuery] = useState("");
+  const { username } = useParams();
+  const [resourceChats, setResourceChats] = useState([]);
+  const myData = useSelector((state) => state.myData);
+  const Chats = useSelector((state) => state.chat.chats);
+  const dispatch = useDispatch();
+  const [hoveredMedia, setHoveredMedia] = useState({
+    mediaId: null,
+    mediaIndex: null,
+  });
+  const [showMediaMenu, setShowMediaMenu] = useState(false);
+  const [filterItems, setFilterItems] = useState([]);
+
+  const handleMouseEnterMedia = (mediaId, mediaIndex) => {
+    setHoveredMedia({ mediaId, mediaIndex });
+  };
+  const handleShowMediaMenu = (chatId, mediaIndex) => {
+    if (
+      showMediaMenu.chatId === chatId &&
+      showMediaMenu.mediaIndex === mediaIndex
+    ) {
+      setShowMediaMenu({ chatId: null, mediaIndex: null });
+    } else {
+      setShowMediaMenu({ chatId: chatId, mediaIndex: mediaIndex });
+    }
+  };
+
+  const handleMouseLeaveMedia = () => {
+    setHoveredMedia({ mediaId: null, mediaIndex: null });
+  };
 
   const handleClear = () => {
     setSearchQuery("");
   };
 
+  // const handleRefilterChats = () => {
+  //   const resourceChat = resourceChats.filter((chat) =>
+  //     chat.media.some((media) => filterItems.includes(media.type))
+  //   );
+  //   setResourceChats(resourceChat);
+  // };
+
+  const handleFilterItems = (name) => {
+    setFilterItems((prevItems) =>
+      prevItems.includes(name)
+        ? prevItems.filter((item) => item !== name)
+        : [...prevItems, name]
+    );
+  };
+
+  useEffect(() => {
+    let filteredChats = Chats.filter((chat) =>
+      chat.media.some((media) => media.resource === true)
+    );
+    if (filterItems.length > 0) {
+      filteredChats = filteredChats
+        .map((chat) => ({
+          ...chat,
+          media: chat.media.filter((media) => filterItems.includes(media.type)),
+        }))
+        .filter((chat) => chat.media.length > 0);
+    }
+    if (searchQuery.trim() !== "") {
+      filteredChats = filteredChats
+        .map((chat) => ({
+          ...chat,
+          media: chat.media.filter((media) =>
+            media.name.toLowerCase().includes(searchQuery.toLowerCase())
+          ),
+        }))
+        .filter((chat) => chat.media.length > 0);
+    }
+    console.log("Filtered Chats:", filteredChats);
+    setResourceChats(filteredChats);
+  }, [Chats, filterItems, searchQuery]);
+
+  const handleRemoveResource = (chatId, mediaId) => {
+    const formDataToSend = new FormData();
+    formDataToSend.append("chatId", chatId);
+    formDataToSend.append("mediaId", mediaId);
+    dispatch(removeFromResource(formDataToSend))
+      .unwrap()
+      .then(() => {
+        setShowMediaMenu(false);
+        const updatedResourceChats = resourceChats
+          .map((chat) => {
+            if (chat._id === chatId) {
+              return {
+                ...chat,
+                media: chat.media.filter((media) => media._id !== mediaId),
+              };
+            }
+            return chat;
+          })
+          .filter((chat) => chat.media.length > 0);
+
+        setResourceChats(updatedResourceChats);
+      })
+      .catch((error) => {
+        console.error("Issue in pushing to resources. Please try again.");
+      });
+  };
+
   const handleInputChange = (e) => {
     setSearchQuery(e.target.value);
+    // handleSearchMedia();
   };
+  const isOwner = username === myData.username;
 
   return (
     <div className="flex flex-col">
       <div className="flex flex-row justify-between">
         <div
           className={`rounded-full text-xs border dark:border-chatBackground-dark px-3.5 py-1.5 cursor-pointer ${
-            selectedTab === "Images"
+            filterItems.includes("image")
               ? "dark:bg-secondaryText-dark"
               : "dark:text-chatBackground-dark"
           }`}
-          onClick={() => setSelectedTab("Images")}
+          onClick={() => handleFilterItems("image")}
         >
           Images
         </div>
         <div
           className={`rounded-full text-xs border dark:border-chatBackground-dark px-3.5 py-1.5 cursor-pointer ${
-            selectedTab === "Documents"
+            filterItems.includes("document")
               ? "dark:bg-secondaryText-dark dark:text-primaryBackground-dark"
               : "dark:text-chatBackground-dark"
           }`}
-          onClick={() => setSelectedTab("Documents")}
+          onClick={() => handleFilterItems("document")}
         >
           Documents
         </div>
         <div
           className={`rounded-full text-xs border dark:border-chatBackground-dark px-3.5 py-1.5 cursor-pointer ${
-            selectedTab === "Links"
+            filterItems.includes("video")
               ? "dark:bg-secondaryText-dark dark:text-primaryBackground-dark"
               : "dark:text-chatBackground-dark"
           }`}
-          onClick={() => setSelectedTab("Links")}
+          onClick={() => handleFilterItems("video")}
         >
-          Links
+          Videos
         </div>
-        <div
+        {/* <div
           className={`rounded-full text-xs border dark:border-chatBackground-dark px-3.5 py-1.5 cursor-pointer ${
-            selectedTab === "Custom"
+            filterItems.contains("Custom")
               ? "dark:bg-secondaryText-dark dark:text-primaryBackground-dark"
               : "dark:text-chatBackground-dark"
           }`}
-          onClick={() => setSelectedTab("Custom")}
+          onClick={() => setFilterItems("Custom")}
         >
           Custom Label
-        </div>
+        </div> */}
       </div>
       <div className="mt-3 relative w-full ">
         <img
@@ -83,6 +188,112 @@ const ResourcePage = () => {
           onChange={handleInputChange}
         />
       </div>
+
+      {resourceChats.length === 0 ? (
+        <div className="dark:text-primaryText-dark mt-20 text-center font-light text-sm">
+          No Resources found...
+        </div>
+      ) : (
+        resourceChats.map((chat) => (
+          <div className="flex flex-col mt-2 h-full  overflow-y-auto custom-scrollbar">
+            {chat.media.map((media, index) => (
+              <div className="flex flex-row space-x-2 mt-2 overflow-x-auto w-full custom-scrollbar">
+                <div
+                  key={`${chat._id}-${media._id}`}
+                  className="relative flex flex-col"
+                  onMouseEnter={() => handleMouseEnterMedia(media._id, index)}
+                  onMouseLeave={handleMouseLeaveMedia}
+                >
+                  <div className="dark:text-emptyEvent-dark font-extralight text-xs">
+                    {chat.user.username}{" "}
+                    {new Date(chat.createdAt).toLocaleString()}
+                  </div>
+                  {media.type === "image" ? (
+                    <div className="relative h-40">
+                      <img
+                        src={media.url}
+                        alt={media.name}
+                        className="h-36 rounded-md object-cover w-auto max-w-52"
+                      />
+                      <div></div>
+                    </div>
+                  ) : media.type === "video" ? (
+                    <video
+                      controls
+                      className="h-36 object-cover  rounded-t-xl w-auto max-w-52"
+                    >
+                      <source src={media.url} type="video/mp4" />
+                      Your browser does not support the video tag.
+                    </video>
+                  ) : media.type === "document" ? (
+                    <div className="w-full rounded-lg dark:bg-secondaryBackground-dark cursor-pointer relative mt-2 ">
+                      <div className="flex flex-row items-center justify-start w-full">
+                        <img
+                          src={documentImage}
+                          alt="Document Icon"
+                          className="h-14 w-15 object-fill"
+                        />
+                        <div className="flex flex-col my-1 ml-3 w-full-minus-68">
+                          <p className="dark:text-secondaryText-dark text-xs overflow-hidden text-ellipsis whitespace-nowrap font-normal">
+                            {media.name}
+                          </p>
+                          <p className="dark:text-primaryText-dark mt-1  text-[10px] xs:text-xs font-light font-inter">
+                            {media.size} Kb
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+                  {isOwner &&
+                    hoveredMedia.mediaId === media._id &&
+                    hoveredMedia.mediaIndex === index && (
+                      <div
+                        className="absolute top-3 right-1 cursor-pointer"
+                        onClick={() => handleShowMediaMenu(chat._id, index)}
+                      >
+                        <img
+                          src={ArrowDropDown}
+                          alt="arrow-dop-down"
+                          className="w-8 h-8"
+                        />
+                      </div>
+                    )}
+                  {isOwner &&
+                    showMediaMenu.chatId === chat._id &&
+                    showMediaMenu.mediaIndex === index && (
+                      <div
+                        className="absolute top-10 right-0 w-max rounded-md shadow-lg
+                            dark:bg-dropdown-dark z-50"
+                      >
+                        <div
+                          className="py-1"
+                          role="menu"
+                          aria-orientation="vertical"
+                          aria-labelledby="options-menu"
+                        >
+                          <div
+                            className="relative flex flex-row px-4 items-center"
+                            onClick={() =>
+                              handleRemoveResource(chat._id, media._id)
+                            }
+                          >
+                            <img src={ReplyIcon} alt="reply" />
+                            <p
+                              className="block ml-2 py-2 text-sm dark:text-primaryText-dark cursor-pointer"
+                              role="menuitem"
+                            >
+                              Remove from Resource
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                </div>
+              </div>
+            ))}
+          </div>
+        ))
+      )}
     </div>
   );
 };

@@ -13,17 +13,21 @@ import {
   removeCover,
   saveCover,
   fetchChannel,
+  createChannelInvite,
+  joinChannel,
+  joinChannelInvite,
 } from "../../redux/slices/channelSlice.js";
 import {
   createClearChannel,
   setCreateChannelField,
   setCreateChannelItems,
 } from "../../redux/slices/createChannelSlice.js";
-import { useParams } from "react-router-dom";
+import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 
 const ChannelPage = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const navigate = useNavigate();
   const { handleOpenModal } = useModal();
   const dispatch = useDispatch();
   const channel = useSelector((state) => state.channel);
@@ -31,6 +35,12 @@ const ChannelPage = () => {
   const [file, setFile] = useState(null);
   const [isEditCover, setIsEditCover] = useState(null);
   const { channelId } = useParams();
+  const [searchParams] = useSearchParams();
+  const inviteCode = searchParams.get("code");
+
+  const myData = useSelector((state) => state.myData);
+  const isOwner = myData?._id === channel?.user;
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -38,7 +48,10 @@ const ChannelPage = () => {
 
   useEffect(() => {
     dispatch(fetchChannel(channelId));
-  }, []);
+    if (inviteCode) {
+      dispatch(setChannelField({ field: "code", value: inviteCode }));
+    }
+  }, [channelId]);
 
   const closeDropdown = (event) => {
     setIsDropdownOpen(false);
@@ -47,8 +60,31 @@ const ChannelPage = () => {
   const handleShareChannel = (id) => {
     handleOpenModal("modalShareChannelOpen", id);
   };
+  const handleOwnerShareChannel = (id) => {
+    dispatch(createChannelInvite(id))
+      .unwrap()
+      .then((invite) => {
+        console.log(invite.code);
+        dispatch(setChannelField({ field: "code", value: invite.code }));
+        setTimeout(() => {
+          handleOpenModal("modalShareChannelOpen", id);
+        }, 500);
+      })
+      .catch((error) => {
+        alert(error);
+      });
+  };
   const handleCreateTopic = () => {
-    dispatch(createGeneralTopic());
+    if (channel._id) {
+      dispatch(createGeneralTopic(channel._id))
+        .unwrap()
+        .then((topic) => {
+          navigate(`c-id/${channel._id}/topic/${topic._id}`);
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    }
   };
   const handleRemoveCover = () => {
     setFile(null);
@@ -101,6 +137,41 @@ const ChannelPage = () => {
     }, 500);
   };
 
+  const handleJoinChannel = () => {
+    if (isLoggedIn) {
+      if (inviteCode) {
+        const formDataToSend = new FormData();
+        formDataToSend.append("channelId", channel._id);
+        formDataToSend.append("code", inviteCode);
+        dispatch(joinChannelInvite(formDataToSend))
+          .unwrap()
+          .then(() => {
+            navigate(`c-id/${channel._id}/topic/${channel.topics[0]}`);
+          })
+          .catch((error) => {
+            alert(error);
+          });
+      } else {
+        if (channel.members.includes(myData._id)) {
+          navigate(`c-id/${channel._id}/topic/${channel.topics[0]}`);
+        } else if (channel.requests.includes(myData._id)) {
+          return;
+        } else {
+          dispatch(joinChannel(channel._id))
+            .unwrap()
+            .then(() => {
+              navigate(`c-id/${channel._id}/topic/${channel.topics[0]}`);
+            })
+            .catch((error) => {
+              alert(error);
+            });
+        }
+      }
+    } else {
+      navigate("/get-started", { replace: true });
+    }
+  };
+
   return (
     <div className="dark:bg-secondaryBackground-dark w-full h-full flex flex-col">
       <div className="relative w-full h-44">
@@ -120,14 +191,16 @@ const ChannelPage = () => {
           </div>
         )}
       </div>
-      <div className="absolute right-3 top-3">
-        <img
-          src={Settings}
-          alt="settings"
-          className="w-6 h-6 cursor-pointer"
-          onClick={toggleDropdown}
-        />
-      </div>
+      {isOwner && (
+        <div className="absolute right-3 sm:top-3 top-10">
+          <img
+            src={Settings}
+            alt="settings"
+            className="w-6 h-6 cursor-pointer"
+            onClick={toggleDropdown}
+          />
+        </div>
+      )}
 
       {isDropdownOpen && (
         <div
@@ -175,12 +248,12 @@ const ChannelPage = () => {
         </div>
       )}
       <div className="flex flex-row items-start w-full mt-4 px-4">
-        <div className="w-16 h-16 rounded-lg mt-3 dark:bg-secondaryText-dark">
+        <div className="w-16 h-16 rounded-lg mt-3 dark:bg-secondaryText-dark flex-shrink-0">
           {channel.logo && <img src={channel.logo} alt="logo" />}
         </div>
         <div className="flex flex-col ml-4 w-full">
           <div className="flex flex-row justify-between items-center">
-            <p className="text-xl dark:text-secondaryText-dark font-inter font-semibold">
+            <p className=" text-lg sm:text-xl dark:text-secondaryText-dark font-inter font-semibold">
               {channel.name}
             </p>
             {/* <img src={SettingIcon} alt="setting-icon" className=" w-5 h-5" /> */}
@@ -189,18 +262,40 @@ const ChannelPage = () => {
             {channel.description}
           </p>
           <div className="flex flex-row space-x-4 mt-3">
-            <div
-              className="py-2 px-3 cursor-pointer dark:text-secondaryText-dark dark:bg-buttonEnable-dark rounded-lg text-sm font-inter"
-              onClick={() => handleShareChannel(channel._id)}
-            >
-              Share join link
-            </div>
-            <div
-              className="border dark:border-primaryText-dark py-2 px-3 rounded-lg cursor-pointer dark:text-secondaryText-dark text-sm font-inter"
-              onClick={handleEditChannel}
-            >
-              Edit Channel
-            </div>
+            {isOwner ? (
+              <div
+                className="py-2 px-3 cursor-pointer dark:text-secondaryText-dark dark:bg-buttonEnable-dark rounded-lg text-xs sm:text-sm font-inter"
+                onClick={() => handleOwnerShareChannel(channel._id)}
+              >
+                Share join link
+              </div>
+            ) : (
+              <div
+                className="py-2 px-3 cursor-pointer dark:text-secondaryText-dark dark:bg-buttonEnable-dark rounded-lg text-xs sm:text-sm font-inter"
+                onClick={() => handleJoinChannel(channel._id)}
+              >
+                {channel.requests?.includes(myData._id)
+                  ? "Channel Request"
+                  : channel.members?.includes(myData._id)
+                  ? "Get in"
+                  : "Join channel"}
+              </div>
+            )}
+            {isOwner ? (
+              <div
+                className="border dark:border-primaryText-dark py-2 px-3 rounded-lg cursor-pointer dark:text-secondaryText-dark text-xs sm:text-sm font-inter"
+                onClick={handleEditChannel}
+              >
+                Edit Channel
+              </div>
+            ) : (
+              <div
+                className="border dark:border-primaryText-dark py-2 px-3 rounded-lg cursor-pointer dark:text-secondaryText-dark text-sm font-inter"
+                onClick={() => handleShareChannel(channel._id)}
+              >
+                Share
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -226,7 +321,7 @@ const ChannelPage = () => {
               </div>
 
               <div
-                className="p-2 rounded border mt-2 w-max dark:border-primaryText-dark dark:text-secondaryText-dark text-xs justify-center items-center "
+                className="p-2 rounded border cursor-pointer mt-2 w-max dark:border-primaryText-dark dark:text-secondaryText-dark text-xs justify-center items-center "
                 onClick={handleCreateTopic}
               >
                 Create General

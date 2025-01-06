@@ -6,18 +6,19 @@ import { useSelector, useDispatch } from "react-redux";
 import useModal from "./../../hooks/ModalHook";
 import { closeModal } from "../../../redux/slices/modalSlice";
 import {
-  setTopicField,
-  clearTopic,
+  setCreateTopicField,
+  clearCreateTopic,
   createTopic,
   updateTopic,
-} from "../../../redux/slices/topicSlice.js";
+} from "../../../redux/slices/createTopicSlice.js";
 
 const TopicModal = () => {
-  const topic = useSelector((state) => state.topic);
+  const topic = useSelector((state) => state.createTopic);
   const Topicstatus = useSelector((state) => state.topic.topicstatus);
   const [error, setError] = useState("");
   const dispatch = useDispatch();
   const handleClose = () => {
+    dispatch(clearCreateTopic());
     dispatch(closeModal("modalTopicOpen"));
   };
 
@@ -26,7 +27,7 @@ const TopicModal = () => {
     if (name === "name") {
       setCharCount(value.length);
     }
-    dispatch(setTopicField({ field: name, value: value }));
+    dispatch(setCreateTopicField({ field: name, value: value }));
   };
 
   const handleCreateTopic = async (e) => {
@@ -43,7 +44,7 @@ const TopicModal = () => {
         .unwrap()
         .then(() => {
           handleClose();
-          dispatch(clearTopic());
+          dispatch(clearCreateTopic());
           setError("");
         })
         .catch((error) => {
@@ -54,39 +55,24 @@ const TopicModal = () => {
   const handleEditTopic = async (e) => {
     e.preventDefault();
     setError("");
-    // if (curation.name.trim !== "") {
-    //   const formDataToSend = new FormData();
-    //   formDataToSend.append("id", curation._id);
-    //   formDataToSend.append("name", curation.name.trim());
-    //   formDataToSend.append("visibility", curation.visibility);
-    //   formDataToSend.append("description", curation.description);
-    //   formDataToSend.append("category", curation.category);
-    //   if (file && curation.imageSource === "upload") {
-    //     formDataToSend.append("file", file);
-    //   } else if (curation.image && curation.imageSource === "unsplash") {
-    //     formDataToSend.append("image", curation.image);
-    //   } else if (curation.image) {
-    //     formDataToSend.append("image", curation.image);
-    //   } else {
-    //     const encodedCategory = curation.category
-    //       ? curation.category
-    //       : "NoCategory";
-    //     const imageUrl = curationImages[encodedCategory];
-    //     formDataToSend.append("image", imageUrl);
-    //   }
-    //   dispatch(updateCuration(formDataToSend))
-    //     .unwrap()
-    //     .then((curation) => {
-    //       handleClose();
-    //       dispatch(updateCurationPage(curation));
-    //       dispatch(clearCuration());
-    //       setFile(null);
-    //       setError("");
-    //     })
-    //     .catch((error) => {
-    //       alert(error);
-    //     });
-    // }
+    const name = topic.name.trim();
+    if (name !== "") {
+      const formDataToSend = new FormData();
+      formDataToSend.append("name", name);
+      formDataToSend.append("_id", topic._id);
+      formDataToSend.append("visibility", topic.visibility);
+      formDataToSend.append("editability", topic.editability);
+      dispatch(updateTopic(formDataToSend))
+        .unwrap()
+        .then(() => {
+          handleClose();
+          dispatch(clearCreateTopic());
+          setError("");
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    }
   };
   const topicNameError = useSelector((state) => state.topic.channelNameError);
 
@@ -188,7 +174,7 @@ const TopicModal = () => {
                   </label>
                 </div>
               </div>
-              <div className="mb-4 mt-1">
+              {/* <div className="mb-4 mt-1">
                 <p className="dark:text-white text-sm font-normal font-inter">
                   Who can write in this topic?
                 </p>
@@ -227,7 +213,7 @@ const TopicModal = () => {
                     <span>Only me</span>
                   </label>
                 </div>
-              </div>
+              </div> */}
 
               {error && (
                 <div className="my-2 text-errorLight font-light text-sm">
@@ -237,13 +223,11 @@ const TopicModal = () => {
               <button
                 className={`w-full mt-3 py-2.5 font-normal text-sm rounded-full ${buttonClass}`}
                 disabled={isNameEmpty}
-                onClick={
-                  topic.type === "edit" ? handleEditTopic : handleCreateTopic
-                }
+                onClick={topic.isEdit ? handleEditTopic : handleCreateTopic}
               >
                 {Topicstatus === "loading"
                   ? "Please wait..."
-                  : topic.type === "edit"
+                  : topic.isEdit
                   ? "Save Changes"
                   : "Create topic"}
               </button>

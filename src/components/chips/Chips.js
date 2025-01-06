@@ -96,7 +96,7 @@ const Chips = ({ item }) => {
       key={key}
       target="_blank"
       rel="noopener noreferrer"
-      className="custom-link text-metaLink"
+      className="custom-link dark:text-buttonEnable-dark"
     >
       {text}
     </a>

@@ -4,11 +4,7 @@ import {
   postRequestAuthenticated,
   postRequestAuthenticatedWithFile,
 } from "./../../services/rest";
-import { upvoteChip, saveChip, createChip } from "./profileItemsSlice";
-import { saveCuration } from "./curationPageSlice";
-import { deleteChip } from "./deleteChipSlice";
-import { createChipComment, createChipCommentReply } from "./commentChipSlice";
-import { createTopic } from "./topicSlice";
+import { createTopic, updateTopic } from "./createTopicSlice";
 
 export const createChannel = createAsyncThunk(
   "channel/create-channel",
@@ -49,12 +45,12 @@ export const updateChannel = createAsyncThunk(
 );
 export const createGeneralTopic = createAsyncThunk(
   "channel/create-general-topic",
-  async (channel, { rejectWithValue }) => {
+  async (channelId, { rejectWithValue }) => {
     try {
-      const response = await postRequestAuthenticated(
-        "/create/general/topic",
-        channel
-      );
+      const response = await postRequestAuthenticated("/create/general/topic", {
+        channelId,
+      });
+      console.log(response);
       if (response.success) {
         return response.topic;
       } else {
@@ -172,6 +168,20 @@ const channelItemsSlice = createSlice({
         );
         if (index !== -1) {
           state.channels[index].topics.unshift(topic);
+        }
+      })
+      .addCase(updateTopic.fulfilled, (state, action) => {
+        state.topicstatus = "idle";
+        const topic = action.payload;
+        let index = state.channels.findIndex(
+          (item) => item._id === topic.channel
+        );
+        let topicIndex;
+        if (index !== -1) {
+          topicIndex = state.channels[index].topics.findIndex(
+            (item) => item._id === topic._id
+          );
+          state.channels[index].topics[topicIndex].name = topic.name;
         }
       })
       .addCase(createTopic.rejected, (state, action) => {

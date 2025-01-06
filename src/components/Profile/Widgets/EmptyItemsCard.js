@@ -76,7 +76,7 @@ const EmptyItemsCard = () => {
             Set context with Categories
           </p>
           <img
-            src="https://chips-social.s3.ap-south-1.amazonaws.com/profileChipCard.png"
+            src="https://chips-social.s3.ap-south-1.amazonaws.com/profileChannelCard.svg"
             alt="chip-profile"
             className="lg:h-52 md:h-48 h-44 bg-emptyChip rounded-lg w-full object-cover"
           />

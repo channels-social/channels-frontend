@@ -2,7 +2,7 @@ import React from "react";
 
 const Welcome = () => {
   return (
-    <div className="flex flex-col dark:bg-tertiaryBackground-dark space-y-6 p-6 h-full">
+    <div className="flex flex-col dark:bg-tertiaryBackground-dark space-y-6 p-6 h-screen overflow-y-auto  ">
       <div className="relative p-6 dark:bg-welcomeColor-dark rounded-md">
         <div className="absolute left-0 top-0 bottom-0 w-2 rounded-l-lg dark:bg-sidebarColor-dark"></div>
         <p className=" dark:text-secondaryText-dark font-light font-inter italic text-sm tracking-wide">

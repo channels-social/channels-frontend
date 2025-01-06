@@ -12,7 +12,10 @@ import Edit from "../../assets/icons/Edit.svg";
 import Delete from "../../assets/icons/Delete.svg";
 import { setCurationField } from "../../redux/slices/curationSlice";
 import { setChipField } from "../../redux/slices/chipSlice";
-import { setCurationIdToDelete } from "../../redux/slices/deleteCurationSlice";
+import {
+  setCurationIdToDelete,
+  setProfileCategoryToDelete,
+} from "../../redux/slices/deleteCurationSlice";
 import {
   fetchCuration,
   saveCuration,
@@ -126,6 +129,7 @@ const CurationView = () => {
     if (isLoggedIn) {
       setIsDropdownOpen(false);
       dispatch(setCurationIdToDelete(curId));
+      dispatch(setProfileCategoryToDelete(curation.profile_category));
       handleOpenModal("modalCurationDeleteOpen");
     } else {
       openLoginModal();

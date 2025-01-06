@@ -5,43 +5,7 @@ import {
   postRequestUnAuthenticated,
   postRequestAuthenticatedWithFile,
 } from "./../../services/rest";
-
-export const createTopic = createAsyncThunk(
-  "topic/create-topic",
-  async (topicData, { rejectWithValue }) => {
-    try {
-      const response = await postRequestAuthenticated(
-        "/create/topic",
-        topicData
-      );
-      if (response.success) {
-        return response.topic;
-      } else {
-        return rejectWithValue(response.message);
-      }
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-export const updateTopic = createAsyncThunk(
-  "topic/update-topic",
-  async (topicData, { rejectWithValue }) => {
-    try {
-      const response = await postRequestAuthenticatedWithFile(
-        "/update/topic",
-        topicData
-      );
-      if (response.success) {
-        return response.topic;
-      } else {
-        return rejectWithValue(response.message);
-      }
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
+import { updateTopic } from "./createTopicSlice";
 
 export const fetchTopic = createAsyncThunk(
   "topic/fetch-topic",
@@ -99,6 +63,10 @@ export const topicSlice = createSlice({
         state.topicstatus = "loading";
       })
       .addCase(fetchTopic.fulfilled, (state, action) => {
+        Object.assign(state, initialState, action.payload);
+        state.topicstatus = "idle";
+      })
+      .addCase(updateTopic.fulfilled, (state, action) => {
         Object.assign(state, initialState, action.payload);
         state.topicstatus = "idle";
       })

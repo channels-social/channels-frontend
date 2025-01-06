@@ -11,20 +11,27 @@ import {
 import LinkIcon from "../../../assets/icons/link.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../../redux/slices/modalSlice";
+import { setChannelField } from "../../../redux/slices/channelSlice";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { domainUrl } from "./../../../utils/globals";
 
 const ChannelShareModal = () => {
   const dispatch = useDispatch();
   const [copied, setCopied] = useState(false);
+  const code = useSelector((state) => state.channel.code);
   const handleClose = () => {
     dispatch(closeModal("modalShareChannelOpen"));
+    setChannelField({ field: "code", value: "" });
   };
   const isOpen = useSelector((state) => state.modals.modalShareChannelOpen);
   const channelId = useSelector((state) => state.modals.channelId);
   const username = useSelector((state) => state.myData.username);
-
-  const shareUrl = `https://${domainUrl}/user/${username}/channel/${channelId}`;
+  let shareUrl;
+  if (code) {
+    shareUrl = `https://${domainUrl}/user/${username}/channel/${channelId}?code=${code}`;
+  } else {
+    shareUrl = `https://${domainUrl}/user/${username}/channel/${channelId}`;
+  }
 
   const handleCopy = () => {
     setCopied(true);

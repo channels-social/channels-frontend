@@ -11,7 +11,10 @@ import Add from "../../assets/icons/add_btn.svg";
 import ArrowDown from "../../assets/icons/arrow_drop_down.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchMyChannels } from "./../../redux/slices/channelItemsSlice";
-import { setTopicField } from "./../../redux/slices/topicSlice";
+import {
+  setCreateTopicField,
+  clearCreateTopic,
+} from "./../../redux/slices/createTopicSlice";
 import useModal from "./../hooks/ModalHook";
 import Close from "../../assets/icons/Close.svg";
 
@@ -22,7 +25,7 @@ const UserSidebar = ({ username, closeSidebar }) => {
 
   const dispatch = useDispatch();
   const [expandedChannels, setExpandedChannels] = useState({});
-  const user_id = useSelector((state) => state.myData._id);
+  const myData = useSelector((state) => state.myData);
 
   const [selectedTopic, setSelectedTopic] = useState(null);
   const { channels, selectedChannel, selectedPage, loading, error } =
@@ -32,7 +35,9 @@ const UserSidebar = ({ username, closeSidebar }) => {
     handleOpenModal("modalChannelOpen");
   };
   const handleTopicModal = (channelId) => {
-    dispatch(setTopicField({ field: "channel", value: channelId }));
+    dispatch(clearCreateTopic());
+    dispatch(setCreateTopicField({ field: "channel", value: channelId }));
+
     handleOpenModal("modalTopicOpen");
   };
   const toggleChannel = (id) => {
@@ -76,9 +81,18 @@ const UserSidebar = ({ username, closeSidebar }) => {
           />
         </div>
 
-        <div className="rounded-md dark:text-primaryBackground-dark font-medium pt-1 dark:bg-white w-8 h-8 text-center ml-6 mt-4">
-          {username.charAt(0).toUpperCase() + username.charAt(1).toUpperCase()}
+        <div className="rounded-lg dark:text-primaryBackground-dark font-medium  dark:bg-white w-8 h-8 text-center ml-6 mt-4">
+          {myData.logo ? (
+            <img
+              src={myData.logo}
+              alt="logo"
+              className="w-full h-full rounded-lg object-cover"
+            />
+          ) : (
+            username.charAt(0).toUpperCase() + username.charAt(1).toUpperCase()
+          )}
         </div>
+
         <nav className="mt-6">
           <Link
             to={`/user/${username}/welcome`}
@@ -132,21 +146,25 @@ const UserSidebar = ({ username, closeSidebar }) => {
               </div>
               {expandedChannels[channelIndex] && (
                 <div className="">
-                  {channel.topics.map((topic, topicIndex) => (
-                    <div key={topic._id}>
-                      <Link
-                        to={`/user/${username}/channel/${channel.name}/c-id/${channel._id}/topic/${topic._id}`}
-                        className={`block ${
-                          location.pathname ===
-                          `/user/${username}/channel/${channel.name}/c-id/${channel._id}/topic/${topic._id}`
-                            ? "dark:bg-tertiaryBackground-dark rounded-lg mx-3 my-1"
-                            : ""
-                        } px-6 py-2.5 text-sm font-inter font-light cursor-pointer dark:text-primaryText-dark`}
-                      >
-                        # {topic.name}
-                      </Link>
-                    </div>
-                  ))}
+                  {channel.topics.map(
+                    (topic, topicIndex) =>
+                      (topic.visibility === "anyone" ||
+                        channel.user === myData._id) && (
+                        <div key={topic._id}>
+                          <Link
+                            to={`/user/${username}/channel/${channel._id}/c-id/${channel._id}/topic/${topic._id}`}
+                            className={`block ${
+                              location.pathname ===
+                              `/user/${username}/channel/${channel._id}/c-id/${channel._id}/topic/${topic._id}`
+                                ? "dark:bg-tertiaryBackground-dark rounded-lg mx-3 my-1"
+                                : ""
+                            } px-6 py-2.5 text-sm font-inter font-light cursor-pointer dark:text-primaryText-dark`}
+                          >
+                            # {topic.name}
+                          </Link>
+                        </div>
+                      )
+                  )}
                   <p
                     className="text-sm font-normal cursor-pointer my-1.5 mx-6 font-inter dark:text-primaryText-dark "
                     onClick={() => handleTopicModal(channel._id)}

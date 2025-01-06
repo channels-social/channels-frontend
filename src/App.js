@@ -7,6 +7,7 @@ import {
   Route,
   Outlet,
   useLocation,
+  Navigate,
 } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import PageHome from "./components/ChannelPages/PageHome";
@@ -42,6 +43,10 @@ import PushtoCurationModal from "./components/Modals/PushItems/pushtoCurationMod
 import ChipShareModal from "./components/Modals/share/ChipShareModal";
 import ChannelCoverModal from "./components/Modals/Channel/ChannelCoverModal";
 import DeleteFaqModal from "./components/Modals/deletions/DeleteFaqModal";
+import DeleteChatModal from "./components/Modals/deletions/chatDeleteModal";
+import ProfileChipsView from "./components/View/ProfileChipsView";
+import AcceptInvite from "./components/widgets/AcceptInvite";
+import HomePage from "./components/Home/Home";
 
 const clientId =
   "391369792833-72medeq5g0o5sklosb58k7c98ps72foj.apps.googleusercontent.com";
@@ -87,21 +92,24 @@ const App = () => {
         <ThemeHandler />
         <Routes>
           <Route element={<MainLayout />}>
-            <Route path="/" element={<PageHome />} />
+            <Route path="/" element={<HomePage />} />
             <Route path="/get-started" element={<AuthPage />} />
             <Route path="/channels/onboarding" element={<Onboarding />} />
             <Route path="/user/:username" element={<Landing />}>
-              <Route path="/user/:username/welcome" element={<Welcome />} />
-              <Route path="/user/:username/profile" element={<Profile />} />
+              <Route index element={<Navigate to="welcome" replace />} />
+              <Route path="welcome" element={<Welcome />} />
+              <Route path="profile" element={<Profile />} />
               <Route
-                path="/user/:username/channel/:channelName/c-id/:channelId/topic/:topicId"
+                path="channel/:channelId/c-id/:channelId/topic/:topicId"
                 element={<PageHome />}
               />
-              <Route
-                path="/user/:username/channel/:channelId"
-                element={<ChannelPage />}
-              />
+              <Route path="channel/:channelId" element={<ChannelPage />} />
             </Route>
+            <Route
+              path="/user/:username/curation/:curId"
+              element={<ProfileChipsView />}
+            />
+            <Route path="/accept-invite" element={<AcceptInvite />} />
           </Route>
           {/* <Route
             path="/channel/:channelName/page/:pageName"
@@ -128,6 +136,7 @@ const App = () => {
         <ChipShareModal />
         <ChannelCoverModal />
         <DeleteFaqModal />
+        <DeleteChatModal />
       </GoogleOAuthProvider>
     </Router>
   );

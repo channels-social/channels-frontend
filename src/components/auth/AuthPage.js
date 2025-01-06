@@ -16,7 +16,6 @@ import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import useModal from "./../hooks/ModalHook";
 import LoginImage from "../../assets/channel_images/login_cover.svg";
 import googleLogo from "../../assets/channel_images/google_logo.svg";
 
@@ -42,8 +41,6 @@ const AuthPage = () => {
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
 
-  const isOpen = useSelector((state) => state.modals.modalLoginOpen);
-
   const [errors, setErrors] = useState({
     fullName: "",
     email: "",
@@ -51,10 +48,11 @@ const AuthPage = () => {
     confirmPassword: "",
     forgotEmail: "",
   });
-  const { handleOpenModal } = useModal();
 
   const handleOnboardOpen = () => {
-    navigate("/channels/onboarding");
+    navigate("/channels/onboarding", {
+      replace: true,
+    });
   };
 
   const clearData = () => {

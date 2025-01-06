@@ -87,6 +87,7 @@ const ProfileForm = ({ isOpen, onClose, onUnsplashClick, gallery = false }) => {
               dispatch(setProfileData(user));
               setLoading(false);
               dispatch(setImageCards(myData.imageCards || []));
+              dispatch(setMyData(user));
               dispatch(setActiveTab("profileDetails"));
               setFile(null);
               setFileObjects([]);

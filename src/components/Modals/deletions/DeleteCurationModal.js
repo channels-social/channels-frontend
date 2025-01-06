@@ -16,6 +16,9 @@ const DeleteCurationModal = () => {
   const curationIdToDelete = useSelector(
     (state) => state.curationDeletion.curationId
   );
+  const profile_category = useSelector(
+    (state) => state.curationDeletion.profile_category
+  );
   const myData = useSelector((state) => state.myData);
   const navigate = useNavigate();
 
@@ -27,13 +30,15 @@ const DeleteCurationModal = () => {
   };
 
   const handleDelete = () => {
-    dispatch(deleteCuration(curationIdToDelete))
+    dispatch(
+      deleteCuration({ curationId: curationIdToDelete, profile_category })
+    )
       .unwrap()
       .then(() => {
         dispatch(closeModal("modalCurationDeleteOpen"));
         dispatch(clearCurationIdToDelete());
         dispatch(fetchProfileItems(myData._id));
-        navigate(`/profile/${myData.username}`);
+        navigate(`/user/${myData.username}/profile`);
       })
       .catch((error) => {
         console.error("Failed to delete curation:", error);
