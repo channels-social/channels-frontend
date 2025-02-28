@@ -6,7 +6,6 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import {
   fetchProfileItems,
   fetchGalleryItems,
-  clearItems,
   updateCategoryField,
   updateField,
 } from "../../../redux/slices/profileItemsSlice";
@@ -16,7 +15,6 @@ import {
 } from "../../../redux/slices/deleteCategorySlice";
 import { updateReorderItems } from "../../../redux/slices/pushItemsSlice";
 import AddIcon from "../../../assets/icons/addIcon.svg";
-import DropDown from "../../../assets/icons/arrow_drop_down.svg";
 import { useDispatch, useSelector } from "react-redux";
 import ProfileItemsSkeleton from "./../../skeleton/profileItemsSkeleton";
 import EmptyItemsCard from "./EmptyItemsCard";
@@ -28,7 +26,7 @@ import ChipIcon from "../../../assets/icons/chip_icon.svg";
 import CurationIcon from "../../../assets/icons/curation_icon.svg";
 import Edit from "../../../assets/icons/Edit.svg";
 import Delete from "../../../assets/icons/Delete.svg";
-import DragDrop from "../../../assets/icons/dragdrop.png";
+import useWindowSize from "../../../utils/sizeHook";
 
 const MasonryItem = ({ item, owner, gallery, enableReorder }) => {
   if (item.type === "curation") {
@@ -58,6 +56,7 @@ const CategorySection = ({
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const dispatch = useDispatch();
   const { handleOpenModal } = useModal();
+  const { width } = useWindowSize();
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDropdownDotOpen, setIsDropdownDotOpen] = useState(false);
@@ -161,13 +160,19 @@ const CategorySection = ({
   return (
     <div
       className={`mb-12 flex flex-col ${
-        items.length > 1 ? "border dark:border-chatDivider-dark" : ""
+        items.length > 1 && category.name
+          ? "border dark:border-chatDivider-dark "
+          : ""
       }  rounded-lg px-3 pb-3`}
     >
       {items.length > 1 && (
-        <div className="flex flex-row items-center  space-x-4 py-3 relative mb-2">
+        <div
+          className={`flex flex-row items-center  space-x-4 ${
+            category.name ? " py-3 " : ""
+          }relative mb-2`}
+        >
           <div className="text-white text-2xl font-normal font-familjen-grotesk -mt-1">
-            {category.name || "All"}
+            {category.name}
           </div>
           <div className="relative">
             {owner && category.name && (
@@ -276,22 +281,16 @@ const CategorySection = ({
       )}
       <ResponsiveMasonry
         columnsCountBreakPoints={{
-          default: 4,
-          1500: 4,
-          1150: 3,
-          1100: 4,
-          900: 3,
-          700: 2,
-          600: 2,
-          460: 2,
           300: 1,
+          500: 2,
+          650: 1,
+          850: 2,
+          1150: 3,
+          1500: 4,
+          default: 4,
         }}
       >
-        <Masonry
-          gutter="18px"
-          className="my-masonry-grid"
-          columnClassName="my-masonry-grid_column"
-        >
+        <Masonry gutter="18px" className="" columnClassName="">
           {category.items.map((item, index) => (
             <Draggable
               key={item._id}
@@ -310,6 +309,7 @@ const CategorySection = ({
                     item={item}
                     owner={owner}
                     enableReorder={enableReorder}
+                    gallery={gallery}
                   />
                 </div>
               )}
@@ -338,7 +338,7 @@ const ProfileView = ({ gallery, owner, enableReorder }) => {
   const [items, setItems] = useState(initialItems);
 
   useEffect(() => {
-    if (!gallery && profileData._id && !fetchedOnce) {
+    if (!gallery && profileData._id) {
       dispatch(fetchProfileItems(profileData._id));
     } else if (gallery && galleryData.username && !fetchedOnce) {
       dispatch(fetchGalleryItems(galleryData.username));
@@ -394,7 +394,7 @@ const ProfileView = ({ gallery, owner, enableReorder }) => {
   }
   if (
     status === "success" &&
-    items[0] &&
+    items.length === 1 &&
     items[0].items.length === 0 &&
     owner
   ) {

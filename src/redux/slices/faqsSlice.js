@@ -21,9 +21,11 @@ export const createFaq = createAsyncThunk(
 );
 export const fetchFaqs = createAsyncThunk(
   "faqs/fetch-faqs",
-  async (_, { rejectWithValue }) => {
+  async (username, { rejectWithValue }) => {
     try {
-      const response = await postRequestAuthenticated("/fetch/user/faqs");
+      const response = await postRequestUnAuthenticated("/fetch/user/faqs", {
+        username: username,
+      });
       if (response.success) {
         return response.faqs;
       } else {

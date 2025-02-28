@@ -159,7 +159,7 @@ const CurationChips = ({ item, owner }) => {
   );
 
   return (
-    <div className="container pl-4 pb-4 w-full pt-4 rounded-lg space-y-2.5 border border-borderColor bg-chipBackground">
+    <div className="container pl-4 pb-4 w-full pt-4 rounded-lg space-y-2.5 border dark:border-chatDivider-dark dark:bg-tertiaryBackground-dark">
       <div className="flex flex-row justify-between">
         <div
           className="cursor-pointer w-max"
@@ -176,19 +176,20 @@ const CurationChips = ({ item, owner }) => {
           )}
         </div>
         {owner ? (
-          <div className="flex items-center justify-end mr-4">
+          <div className="flex items-center justify-end mr-4 relative">
             <div
               className="flex space-x-1 cursor-pointer"
               onClick={toggleDropdown}
             >
-              <div className="w-1 h-1 bg-lightText rounded-full"></div>
-              <div className="w-1 h-1 bg-lightText rounded-full"></div>
-              <div className="w-1 h-1 bg-lightText rounded-full"></div>
+              <div className="w-1 h-1 dark:bg-primaryText-dark rounded-full"></div>
+              <div className="w-1 h-1 dark:bg-primaryText-dark rounded-full"></div>
+              <div className="w-1 h-1 dark:bg-primaryText-dark rounded-full"></div>
             </div>
             {isDropdownOpen && (
               <div
                 ref={dropdownRef}
-                className="absolute mt-28 ml-3 w-max rounded-md shadow-lg border border-dividerLine bg-chipBackground ring-1 ring-black ring-opacity-5 z-50"
+                className="absolute top-8 right-0 w-max rounded-md shadow-lg border
+                 dark:border-chatDivider-dark dark:bg-tertiaryBackground-dark  ring-1 ring-black ring-opacity-5 z-50"
               >
                 <div
                   className="py-1"
@@ -202,7 +203,7 @@ const CurationChips = ({ item, owner }) => {
                   >
                     <img src={Edit} alt="edit" className="w-4 h-4" />
                     <p
-                      className="block ml-1 py-2 text-sm text-textFieldColor cursor-pointer"
+                      className="block ml-2 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
                       role="menuitem"
                     >
                       Edit
@@ -214,7 +215,7 @@ const CurationChips = ({ item, owner }) => {
                   >
                     <img src={Delete} alt="edit" className="w-4 h-4" />
                     <p
-                      className="block  ml-1 py-2 text-sm text-deleteIcon cursor-pointer"
+                      className="block  ml-2 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
                       role="menuitem"
                     >
                       Delete
@@ -226,7 +227,7 @@ const CurationChips = ({ item, owner }) => {
                   >
                     <img src={Send} alt="push-curation" className="w-4 h-4" />
                     <p
-                      className="block  ml-1 py-2 text-sm text-textFieldColor cursor-pointer"
+                      className="block  ml-1 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
                       role="menuitem"
                     >
                       Push to Curation
@@ -238,26 +239,28 @@ const CurationChips = ({ item, owner }) => {
           </div>
         ) : null}
       </div>
-      <p className="text-lightText text-sm mt-1 font-light pr-4">
+      <p className="dark:text-profileColor-dark text-sm mt-1 font-light pr-4">
         {item.user.name}
       </p>
       <div className="flex flex-col space-y-2.5">
         <Linkify componentDecorator={componentDecorator}>
-          <p className="text-chipDesc pr-1 text-sm font-light font-inter whitespace-pre-wrap overflow-hidden overflow-wrap break-word">
-            {isExpanded
-              ? item.text
-              : `${item.text.slice(0, maxLength)}${
-                  item.text.length > maxLength ? "..." : ""
-                }`}
-            {item.text.length > maxLength && (
-              <span
-                onClick={toggleReadMore}
-                className="text-primary cursor-pointer ml-1"
-              >
-                {isExpanded ? "<- Show Less" : "Read More ->"}
-              </span>
-            )}
-          </p>
+          <div className="w-full pr-1 overflow-hidden">
+            <p className="dark:text-secondaryText-dark text-sm font-light font-inter whitespace-pre-wrap break-words">
+              {isExpanded
+                ? item.text
+                : `${item.text.slice(0, maxLength)}${
+                    item.text.length > maxLength ? "..." : ""
+                  }`}
+              {item.text.length > maxLength && (
+                <span
+                  onClick={toggleReadMore}
+                  className="dark:text-white cursor-pointer ml-1"
+                >
+                  {isExpanded ? "<- Show Less" : "Read More ->"}
+                </span>
+              )}
+            </p>
+          </div>
         </Linkify>
         {item.date.date && item.date.event && <DateTimeCard item={item.date} />}
         {item.location.text && <GoogleMapsCard item={item.location} />}
@@ -289,7 +292,7 @@ const CurationChips = ({ item, owner }) => {
             alt="Upvote"
             className="mr-0.5 h-5 w-5"
           />
-          <p className="text-lightText text-sm font-normal">
+          <p className="dark:text-secondaryText-dark text-sm font-normal">
             {item.upvotes.length}
           </p>
         </div>
@@ -298,7 +301,7 @@ const CurationChips = ({ item, owner }) => {
           onClick={openCommentModal}
         >
           <img src={Comment} alt="Comment" className="mr-0.5" />
-          <p className="text-lightText text-sm font-normal">
+          <p className="dark:text-secondaryText-dark text-sm font-normal">
             {item.comments ? item?.comments : 0}
           </p>
         </div>
@@ -307,7 +310,9 @@ const CurationChips = ({ item, owner }) => {
           onClick={openShareModal}
         >
           <img src={Send} alt="Send" className="mr-0.5 h-7 w-7" />
-          <p className="text-lightText text-sm font-normal">{item.shared_by}</p>
+          <p className="dark:text-secondaryText-dark text-sm font-normal">
+            {item.shared_by}
+          </p>
         </div>
         <div className="relative">
           {" "}
@@ -319,7 +324,7 @@ const CurationChips = ({ item, owner }) => {
           )}
           <div
             className={`${
-              isSaved ? "bg-iconColor" : "bg-primary"
+              isSaved ? "" : "dark:bg-chatDivider-dark"
             } px-2 py-0.5 rounded-xl cursor-pointer`}
             onClick={handleSaved}
           >

@@ -3,6 +3,7 @@ import {
   postRequestAuthenticated,
   postRequestAuthenticatedWithFile,
 } from "./../../services/rest";
+import { joinChannel } from "./channelSlice";
 
 export const updateProfile = createAsyncThunk(
   "myData/updateProfile",
@@ -14,6 +15,24 @@ export const updateProfile = createAsyncThunk(
       );
       if (response.success) {
         return response.user;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+export const updateWhatsAppNumber = createAsyncThunk(
+  "myData/updateWhatsAppNumber",
+  async (number, { rejectWithValue }) => {
+    try {
+      const response = await postRequestAuthenticated(
+        "/update/whatsapp/number",
+        { number }
+      );
+      if (response.success) {
+        return number;
       } else {
         return rejectWithValue(response.message);
       }
@@ -38,9 +57,11 @@ const initialState = {
   otherLink: "",
   imageCards: [],
   subscriptions: [],
+  channel_subscriptions: [],
   subscribers: [],
   updatestatus: "idle",
   updateerror: null,
+  whatsapp_number: "",
 };
 
 const myDataSlice = createSlice({
@@ -66,9 +87,26 @@ const myDataSlice = createSlice({
         state.updatestatus = "succeeded";
         Object.assign(state, action.payload);
       })
+      .addCase(updateWhatsAppNumber.pending, (state) => {
+        state.updatestatus = "loading";
+        state.updateerror = null;
+      })
+      .addCase(updateWhatsAppNumber.fulfilled, (state, action) => {
+        state.updatestatus = "succeeded";
+        state.whatsapp_number = action.payload;
+      })
       .addCase(updateProfile.rejected, (state, action) => {
         state.updatestatus = "failed";
         state.updateerror = action.payload || action.error.message;
+      })
+      .addCase(joinChannel.fulfilled, (state, action) => {
+        state.channelstatus = "idle";
+        const response = action.payload;
+        if (response.success && response.visit) {
+          if (!state.channel_subscriptions.includes(response.channel._id)) {
+            state.channel_subscriptions.push(response.channel._id);
+          }
+        }
       });
   },
 });
@@ -85,6 +123,7 @@ export const fetchMyData = () => async (dispatch, getState) => {
   try {
     const response = await postRequestAuthenticated("/fetch/userData");
     if (response.success) {
+      console.log(response);
       dispatch(setMyData(response.user));
     }
   } catch (error) {

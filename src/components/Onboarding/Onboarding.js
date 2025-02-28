@@ -1,12 +1,13 @@
-import React, { useState } from "react";
-import Onboard from "../../assets/channel_images/Onboard.svg";
+import React, { useState, useEffect } from "react";
 import CLogo from "../../assets/icons/logo.svg";
-import { closeModal } from "../../redux/slices/modalSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { domainUrl } from "./../../utils/globals";
 import { updateUser } from "../../redux/slices/authSlice";
 import { updateMyField } from "../../redux/slices/myDataSlice";
 import Tick from "../../assets/icons/tick.svg";
+import { useLocation } from "react-router-dom";
+import { setOnboarding } from "../../redux/slices/authSlice";
+
 import {
   postRequestUnAuthenticated,
   postRequestAuthenticated,
@@ -25,10 +26,9 @@ const Onboarding = () => {
   const [isUsernameLoading, setUsernameLoading] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
-  const handleClose = () => {
-    dispatch(closeModal("modalOnboardOpen"));
-  };
+  const location = useLocation();
+  const [redirectUrl, setRedirectUrl] = useState("");
+  const [redirectDomain, setRedirectDomain] = useState("");
 
   const handleDomainChange = (e) => {
     const value = e.target.value;
@@ -37,6 +37,18 @@ const Onboarding = () => {
       setDomainName(value);
     }
   };
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const redirectParam = searchParams.get("redirect");
+    const redirectParamDomain = searchParams.get("redirectDomain");
+    if (redirectParam) {
+      setRedirectUrl(redirectParam);
+    }
+    if (redirectParamDomain) {
+      setRedirectDomain(redirectParamDomain);
+    }
+  }, [location.search]);
 
   const checkUsername = async () => {
     if (domainName !== "") {
@@ -65,7 +77,6 @@ const Onboarding = () => {
         const response = await postRequestAuthenticated("/claim/username", {
           username: domainName,
         });
-        console.log(response);
         if (response.success === true) {
           const currentUser = getUserData();
           if (currentUser) {
@@ -74,7 +85,21 @@ const Onboarding = () => {
           }
           dispatch(updateUser({ username: domainName }));
           dispatch(updateMyField({ name: "username", value: domainName }));
-          navigate(`/user/${domainName}/welcome`);
+          if (redirectDomain !== "" && redirectUrl !== "") {
+            window.location.replace(
+              `https://${redirectDomain}.${domainUrl}${redirectUrl}`
+            );
+            dispatch(setOnboarding(false));
+          } else if (redirectDomain !== "") {
+            window.location.replace(`https://${redirectDomain}.${domainUrl}`);
+            dispatch(setOnboarding(false));
+          } else if (redirectUrl !== "") {
+            navigate(`${redirectUrl}`, { replace: true });
+            dispatch(setOnboarding(false));
+          } else {
+            navigate(`/user/${domainName}/welcome`, { replace: true });
+            dispatch(setOnboarding(false));
+          }
         } else {
           setIsUsername(false);
         }
@@ -147,11 +172,11 @@ const Onboarding = () => {
         </button>
       </div>
 
-      <div className="sm:flex  hidden justify-start items-center dark:bg-tertiaryBackground-dark w-full sm:w-1/2 h-full">
+      <div className="sm:flex  hidden justify-start items-center dark:bg-onboardBackground-dark w-full sm:w-1/2 h-full">
         <img
-          src={Onboard}
+          src="https://chips-social.s3.ap-south-1.amazonaws.com/channelsWebsite/Onboard.svg"
           alt="LinkOnboard"
-          className="w-3/4 lg:w-1/2 h-auto"
+          className="w-3/4 lg:w-1/2 h-auto dark:bg-onboardBackground-dark"
         />
       </div>
     </div>

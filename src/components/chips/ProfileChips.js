@@ -26,10 +26,10 @@ import { setCommentChip } from "./../../redux/slices/commentChipSlice";
 import { updateItemField } from "./../../redux/slices/pushItemsSlice";
 
 const ProfileChips = ({ item }) => {
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { handleOpenModal } = useModal();
   const myData = useSelector((state) => state.myData);
   const dropdownRef = useRef(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dispatch = useDispatch();
   const [isExpanded, setIsExpanded] = useState(false);
   const maxLength = 250;
@@ -216,21 +216,23 @@ const ProfileChips = ({ item }) => {
       <div className="flex flex-col space-y-2.5">
         {
           <Linkify componentDecorator={componentDecorator}>
-            <p className="dark:text-secondaryText-dark pr-1 text-sm font-light font-inter whitespace-pre-wrap overflow-hidden overflow-wrap break-word">
-              {isExpanded
-                ? item.text
-                : `${item.text.slice(0, maxLength)}${
-                    item.text.length > maxLength ? "..." : ""
-                  }`}
-              {item.text.length > maxLength && (
-                <span
-                  onClick={toggleReadMore}
-                  className="dark:text-white cursor-pointer ml-1"
-                >
-                  {isExpanded ? "<- Show Less" : "Read More ->"}
-                </span>
-              )}
-            </p>
+            <div className="w-full pr-1 overflow-hidden">
+              <p className="dark:text-secondaryText-dark text-sm font-light font-inter whitespace-pre-wrap break-words">
+                {isExpanded
+                  ? item.text
+                  : `${item.text.slice(0, maxLength)}${
+                      item.text.length > maxLength ? "..." : ""
+                    }`}
+                {item.text.length > maxLength && (
+                  <span
+                    onClick={toggleReadMore}
+                    className="dark:text-white cursor-pointer ml-1"
+                  >
+                    {isExpanded ? "<- Show Less" : "Read More ->"}
+                  </span>
+                )}
+              </p>
+            </div>
           </Linkify>
         }
         {item.date.date && item.date.event && <DateTimeCard item={item.date} />}

@@ -10,13 +10,11 @@ import {
   fetchCategories,
   updateCategoriesOrder,
 } from "../../../redux/slices/pushItemsSlice";
-import useModal from "./../../hooks/ModalHook";
 
 const CategoryReorderModal = () => {
   const isOpen = useSelector((state) => state.modals.modalCategoryReorderOpen);
   const dispatch = useDispatch();
   const pushItems = useSelector((state) => state.pushItems);
-  const { handleOpenModal } = useModal();
   const [newCategories, setNewCategories] = useState([]);
 
   const handleClose = () => {

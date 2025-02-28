@@ -25,14 +25,14 @@ const SummaryPage = () => {
     return options;
   };
 
-  const dayInitials = () => {
-    const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-    return days.map((day) => (
-      <div key={day} className="flex justify-center items-center w-7 h-7">
-        {day[0]} {/* Taking the first letter of each day */}
-      </div>
-    ));
-  };
+  // const dayInitials = () => {
+  //   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  //   return days.map((day) => (
+  //     <div key={day} className="flex justify-center items-center w-7 h-7">
+  //       {day[0]} {/* Taking the first letter of each day */}
+  //     </div>
+  //   ));
+  // };
 
   const generateDates = (month, year) => {
     const dates = [];
@@ -60,6 +60,7 @@ const SummaryPage = () => {
 
   useEffect(() => {
     setDates(generateDates(selectedMonth, selectedYear));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMonth, selectedYear]);
 
   const handleMonthChange = (month, year) => {

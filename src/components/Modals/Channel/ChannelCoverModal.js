@@ -3,15 +3,14 @@ import * as Dialog from "@radix-ui/react-dialog";
 import CloseIcon from "../../../assets/icons/Close.svg";
 import ReactCrop from "react-image-crop";
 import "react-image-crop/dist/ReactCrop.css";
-import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../../redux/slices/modalSlice";
+import Compressor from "compressorjs";
 
 const ChannelCoverModal = () => {
   const fileInputRef = useRef(null);
   const dispatch = useDispatch();
   const isOpen = useSelector((state) => state.modals.modalChannelCoverOpen);
-  const navigate = useNavigate();
   const [imageRef, setImageRef] = useState(null);
   const [croppedImageUrl, setCroppedImageUrl] = useState(null);
   const [src, setSrc] = useState(null);
@@ -30,6 +29,12 @@ const ChannelCoverModal = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
+      if (file.size > 8 * 1024 * 1024) {
+        alert(
+          `The file "${file.name}" exceeds the 8  MB size limit and will not be uploaded.`
+        );
+        return;
+      }
       const fileReader = new FileReader();
       fileReader.onloadend = () => {
         setSrc(fileReader.result);

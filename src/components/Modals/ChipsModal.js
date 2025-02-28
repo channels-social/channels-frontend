@@ -6,9 +6,10 @@ import "react-datepicker/dist/react-datepicker.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCalendarAlt } from "@fortawesome/free-solid-svg-icons";
 import Close from "../../assets/icons/Close.svg";
+import Event from "../../assets/icons/calendar.svg";
 import { ReactComponent as LinkIcon } from "../../assets/icons/link_enable.svg";
 import { ReactComponent as PhotoIcon } from "../../assets/icons/photograph.svg";
-import { ReactComponent as LocationIcon } from "../../assets/icons/location-marker.svg";
+import { ReactComponent as LocationIcon } from "../../assets/icons/location.svg";
 import documentImage from "../../assets/images/Attachment.svg";
 import { ReactComponent as DocumentIcon } from "../../assets/icons/docs.svg";
 import { ReactComponent as CalendarIcon } from "../../assets/icons/calendar.svg";
@@ -16,6 +17,9 @@ import { v4 as uuidv4 } from "uuid";
 import { closeModal } from "../../redux/slices/modalSlice";
 import { postRequestUnAuthenticated } from "./../../services/rest";
 import { createChip } from "../../redux/slices/profileItemsSlice";
+import { getAddressFromCoords } from "../../utils/methods";
+import Compressor from "compressorjs";
+
 import {
   setChipField,
   setDocumentField,
@@ -101,28 +105,72 @@ const ChipsModal = () => {
 
   const handleMediaUpload = (event) => {
     const files = Array.from(event.target.files);
-    const maxFileSize = 16 * 1024 * 1024;
+    const maxFileSize = 20 * 1024 * 1024;
+    const maxVideoSize = 16 * 1024 * 1024;
 
     if (files.length <= 5) {
       const newFiles = [];
-      for (let file of files) {
-        if (file.size > maxFileSize) {
-          alert(
-            `The file "${file.name}" exceeds the 16  MB size limit and will not be uploaded.`
-          );
-          continue;
-        }
-        const newFile = {
-          id: uuidv4(),
-          url: URL.createObjectURL(file),
-          type: file.type.startsWith("video") ? "video" : "image",
-          exclusive: false,
-          source: "upload",
-        };
-        dispatch(addImageUrl(newFile));
-        newFiles.push(file);
-      }
-      setFileObjects([...fileObjects, ...newFiles]);
+      const promises = files.map((file) => {
+        return new Promise((resolve, reject) => {
+          if (file.size > maxFileSize && file.type.startsWith("image")) {
+            alert(
+              `The file "${file.name}" exceeds the 20 MB size limit and will not be uploaded.`
+            );
+            return resolve();
+          } else if (
+            file.size > maxVideoSize &&
+            file.type.startsWith("video")
+          ) {
+            alert(
+              `The file "${file.name}" exceeds the 16 MB size limit and will not be uploaded.`
+            );
+            return resolve();
+          }
+
+          if (file.size >= 7 * 1024 * 1024 && file.type.startsWith("image")) {
+            new Compressor(file, {
+              quality: 0.5,
+              maxWidth: 1920,
+              maxHeight: 1080,
+              success(result) {
+                const newFile = {
+                  id: uuidv4(),
+                  url: URL.createObjectURL(result),
+                  type: "image",
+                  exclusive: false,
+                  source: "upload",
+                };
+                dispatch(addImageUrl(newFile));
+                newFiles.push(result);
+                resolve();
+              },
+              error(err) {
+                alert("Image compression failed: " + err);
+                resolve();
+              },
+            });
+          } else {
+            const newFile = {
+              id: uuidv4(),
+              url: URL.createObjectURL(file),
+              type: file.type.startsWith("video") ? "video" : "image",
+              exclusive: false,
+              source: "upload",
+            };
+            dispatch(addImageUrl(newFile));
+            newFiles.push(file);
+            resolve();
+          }
+        });
+      });
+
+      Promise.all(promises)
+        .then(() => {
+          setFileObjects((prevFiles) => [...prevFiles, ...newFiles]);
+        })
+        .catch((err) => {
+          console.error("Error processing files:", err);
+        });
     } else {
       alert("You can upload up to 5 files only.");
     }
@@ -134,7 +182,7 @@ const ChipsModal = () => {
     if (!file) return;
     const maxFileSize = 16 * 1024 * 1024;
     if (file.size > maxFileSize) {
-      alert("File size exceeds 10 MB limit.");
+      alert("File size exceeds 16 MB limit.");
       return;
     }
 
@@ -171,25 +219,6 @@ const ChipsModal = () => {
   const handleFileClick = () => {
     if (chipData.document.url) {
       window.open(chipData.document.url, "_blank");
-    }
-  };
-
-  const getAddressFromCoords = async (lat, lng) => {
-    const apiKey = "AIzaSyA4giJjY94Cl2MJegYyp0NZYIUEOUTq9I0";
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`;
-
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-
-      if (data.status === "OK" && data.results.length > 0) {
-        return data.results[0].formatted_address;
-      } else {
-        throw new Error("Unable to fetch address");
-      }
-    } catch (error) {
-      console.error("Error fetching address:", error);
-      return "Unknown location";
     }
   };
 
@@ -490,15 +519,15 @@ const ChipsModal = () => {
                     <LocationIcon
                       className={`w-5 h-5 fill-current ${
                         visibleFields.location
-                          ? "text-enabledTextColor"
-                          : "text-primary"
+                          ? "dark:text-primaryBackground-dark"
+                          : "dark:text-emptyEvent-dark-dark"
                       }`}
                     />
                     <span className="ml-1 text-xs sm:text-sm font-inter font-normal">
                       Map
                     </span>
                   </div>
-                  <div
+                  {/* <div
                     className={`${
                       visibleFields.calendar
                         ? "dark:bg-secondaryText-dark dark:text-primaryBackground-dark"
@@ -506,17 +535,15 @@ const ChipsModal = () => {
                     } rounded-full px-2.5 py-1.5 cursor-pointer flex items-center`}
                     onClick={() => toggleFieldVisibility("calendar")}
                   >
-                    <CalendarIcon
-                      className={`w-5 h-5 fill-current ${
-                        visibleFields.calendar
-                          ? "text-enabledTextColor"
-                          : "text-primary"
-                      }`}
+                    <img
+                      src={Event}
+                      alt="event"
+                      className-="w-5 h-5 mr-1 dark:bg-primaryText-dark"
                     />
                     <span className="ml-1 text-xs sm:text-sm font-inter font-normal">
                       Event
                     </span>
-                  </div>
+                  </div> */}
                 </div>
                 <div className="flex flex-col mr-4 ">
                   <p className="dark:text-secondaryText-dark text-sm font-light font-inter mb-1">
@@ -569,7 +596,7 @@ const ChipsModal = () => {
                           />
                         )}
                         {suggestions.length > 0 && (
-                          <div className="absolute top-10  dark:bg-tertiaryBackground-dark text-white text-xs pr-1 mr-2 rounded-lg  w-[90%]">
+                          <div className="absolute top-10 z-[999] dark:bg-tertiaryBackground-dark text-white text-xs pr-1 mr-2 rounded-lg  w-[90%]">
                             <ul>
                               {suggestions.map((suggestion, index) => (
                                 <li

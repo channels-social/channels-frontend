@@ -1,29 +1,32 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import TextField from "@mui/material/TextField";
 import CLogo from "../../assets/icons/logo.svg";
 import axios from "axios";
 import { hostUrl } from "../../utils/globals";
 import OtpInput from "react-otp-input";
-import { closeModal, setLoginMode } from "../../redux/slices/modalSlice";
-import Footer from "./../Footer/Footer";
+import { setLoginMode } from "../../redux/slices/modalSlice";
 import { setAuthCookies } from "./../../services/cookies";
 import { setCredentials } from "../../redux/slices/authSlice";
 import { fetchMyData } from "../../redux/slices/myDataSlice";
+import { setOnboarding } from "../../redux/slices/authSlice";
 import { useGoogleLogin } from "@react-oauth/google";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
-import LoginImage from "../../assets/channel_images/login_cover.svg";
 import googleLogo from "../../assets/channel_images/google_logo.svg";
+import { useLocation } from "react-router-dom";
+import { domainUrl } from "./../../utils/globals";
+import { getCsrfToken } from "../../services/csrfToken";
 
-const AuthPage = () => {
+const AuthPage = ({ isSubdomain }) => {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isOtp, setIsOtp] = useState(false);
+  const location = useLocation();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [forgotEmail, setForgotEmail] = useState("");
@@ -37,6 +40,9 @@ const AuthPage = () => {
   const dispatch = useDispatch();
   const [forgot, setForgot] = useState(false);
   const [buttonEnabled, setButtonEnabled] = useState(false);
+  const [redirectUrl, setRedirectUrl] = useState("");
+  const [redirectDomain, setRedirectDomain] = useState("");
+  const csrfToken = getCsrfToken();
 
   const emailRef = useRef(null);
   const passwordRef = useRef(null);
@@ -49,10 +55,40 @@ const AuthPage = () => {
     forgotEmail: "",
   });
 
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const redirectParam = searchParams.get("redirect");
+    const redirectParamDomain = searchParams.get("redirectDomain");
+    if (redirectParam) {
+      setRedirectUrl(redirectParam);
+    }
+    if (redirectParamDomain) {
+      setRedirectDomain(redirectParamDomain);
+    }
+  }, [location.search]);
+
   const handleOnboardOpen = () => {
-    navigate("/channels/onboarding", {
-      replace: true,
-    });
+    dispatch(setOnboarding(true));
+    if (redirectDomain !== "" && redirectUrl !== "") {
+      navigate(
+        `/channels/onboarding?redirectDomain=${redirectDomain}&redirect=${redirectUrl}`,
+        {
+          replace: true,
+        }
+      );
+    } else if (redirectDomain !== "") {
+      navigate(`/channels/onboarding?redirectDomain=${redirectDomain}`, {
+        replace: true,
+      });
+    } else if (redirectUrl !== "") {
+      navigate(`/channels/onboarding?redirect=${redirectUrl}`, {
+        replace: true,
+      });
+    } else {
+      navigate(`/channels/onboarding`, {
+        replace: true,
+      });
+    }
   };
 
   const clearData = () => {
@@ -108,14 +144,21 @@ const AuthPage = () => {
         name: fullName.trim(),
         email: email.trim(),
       };
-      await axios.post(`${hostUrl}/api/register`, userData).then((response) => {
-        if (response.data.success === true) {
-          setOtpBackend(response.data.otp);
-          setIsOtp(true);
-        } else {
-          setNewError(response.data.message);
-        }
-      });
+      await axios
+        .post(`${hostUrl}/api/register`, userData, {
+          headers: {
+            "X-CSRF-Token": csrfToken,
+          },
+          withCredentials: true,
+        })
+        .then((response) => {
+          if (response.data.success === true) {
+            setOtpBackend(response.data.otp);
+            setIsOtp(true);
+          } else {
+            setNewError(response.data.message);
+          }
+        });
     } catch (error) {
       console.error("Error registering", error);
     }
@@ -141,9 +184,18 @@ const AuthPage = () => {
       setForgotError("Please Enter email!");
     } else {
       try {
-        const response = await axios.post(`${hostUrl}/api/forgot/password`, {
-          email: forgotEmail.trim(),
-        });
+        const response = await axios.post(
+          `${hostUrl}/api/forgot/password`,
+          {
+            email: forgotEmail.trim(),
+          },
+          {
+            headers: {
+              "X-CSRF-Token": csrfToken,
+            },
+            withCredentials: true,
+          }
+        );
         setForgotError(response.data.message);
       } catch (error) {
         setForgotError("Error in validation. Please try again.");
@@ -153,10 +205,19 @@ const AuthPage = () => {
 
   const registerOrLoginUserGoogle = async (userData) => {
     try {
-      return await axios.post(`${hostUrl}/api/google/auth`, {
-        name: userData.name,
-        email: userData.email,
-      });
+      return await axios.post(
+        `${hostUrl}/api/google/auth`,
+        {
+          name: userData.name,
+          email: userData.email,
+        },
+        {
+          headers: {
+            "X-CSRF-Token": csrfToken,
+          },
+          withCredentials: true,
+        }
+      );
     } catch (error) {
       console.error("Failed to register/login user", error);
       throw new Error("Failed to register/login");
@@ -180,9 +241,21 @@ const AuthPage = () => {
         if (response.data.islogin === false) {
           handleOnboardOpen();
         } else {
-          navigate(`/profile/${response.data.user.username}/profile`, {
-            replace: true,
-          });
+          if (redirectDomain !== "" && redirectUrl !== "") {
+            window.location.replace(
+              `https://${redirectDomain}.${domainUrl}${redirectUrl}`
+            );
+          } else if (redirectDomain !== "") {
+            window.location.replace(`https://${redirectDomain}.${domainUrl}`);
+          } else if (redirectUrl !== "") {
+            navigate(`${redirectUrl}`, {
+              replace: true,
+            });
+          } else {
+            navigate(`/user/${response.data.user.username}/profile`, {
+              replace: true,
+            });
+          }
         }
       }
     } catch (error) {
@@ -256,6 +329,7 @@ const AuthPage = () => {
 
   useEffect(() => {
     setButtonEnabled(validateForm2());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fullName, email, password, agreed, isLogin]);
 
   useEffect(() => {
@@ -277,6 +351,7 @@ const AuthPage = () => {
     return () => {
       window.removeEventListener("focus", handleAutofill);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [email, password]);
 
   const handleChangeOtp = async (value) => {
@@ -290,7 +365,12 @@ const AuthPage = () => {
       };
       try {
         await axios
-          .post(`${hostUrl}/api/verify/auth`, userData)
+          .post(`${hostUrl}/api/verify/auth`, userData, {
+            headers: {
+              "X-CSRF-Token": csrfToken,
+            },
+            withCredentials: true,
+          })
           .then((response) => {
             if (response.data.success) {
               // console.log(response.data);
@@ -327,7 +407,12 @@ const AuthPage = () => {
         };
         try {
           await axios
-            .post(`${hostUrl}/api/login`, userData)
+            .post(`${hostUrl}/api/login`, userData, {
+              headers: {
+                "X-CSRF-Token": csrfToken,
+              },
+              withCredentials: true,
+            })
             .then((response) => {
               if (response.data.success === true) {
                 dispatch(
@@ -339,9 +424,23 @@ const AuthPage = () => {
                 setAuthCookies(response.data.token, response.data.user);
                 clearData();
                 fetchMyData();
-                navigate(`/user/${response.data.user.username}/profile`, {
-                  replace: true,
-                });
+                if (redirectDomain !== "" && redirectUrl !== "") {
+                  window.location.replace(
+                    `https://${redirectDomain}.${domainUrl}${redirectUrl}`
+                  );
+                } else if (redirectDomain !== "") {
+                  window.location.replace(
+                    `https://${redirectDomain}.${domainUrl}`
+                  );
+                } else if (redirectUrl !== "") {
+                  navigate(`${redirectUrl}`, {
+                    replace: true,
+                  });
+                } else {
+                  navigate(`/user/${response.data.user.username}/profile`, {
+                    replace: true,
+                  });
+                }
               } else {
                 setNewError(response.data.message);
               }
@@ -360,7 +459,12 @@ const AuthPage = () => {
         };
         try {
           await axios
-            .post(`${hostUrl}/api/register`, userData)
+            .post(`${hostUrl}/api/register`, userData, {
+              headers: {
+                "X-CSRF-Token": csrfToken,
+              },
+              withCredentials: true,
+            })
             .then((response) => {
               if (response.data.success === true) {
                 setOtpBackend(response.data.otp);
@@ -669,13 +773,17 @@ const AuthPage = () => {
                   endAdornment: (
                     <InputAdornment position="end" className="mr-2">
                       <IconButton
-                        className="mr-2 bg-primaryGrey"
+                        className="mr-2 "
                         aria-label="toggle password visibility"
                         onClick={handleClickShowPassword}
                         onMouseDown={handleMouseDownPassword}
                         edge="end"
                       >
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                        {showPassword ? (
+                          <VisibilityOff sx={{ color: "#c4c4c4" }} />
+                        ) : (
+                          <Visibility sx={{ color: "#c4c4c4" }} />
+                        )}
                       </IconButton>
                     </InputAdornment>
                   ),
@@ -757,21 +865,23 @@ const AuthPage = () => {
                   {newError}
                 </p>
               ) : (
-                <p className="text-center text-white">or</p>
+                !isSubdomain && <p className="text-center text-white">or</p>
               )}
             </div>
-            <button
-              onClick={() => googleLogin()}
-              className="w-3/5 px-1.5 py-2 mb-4 text-xs  font-normal items-center
+            {!isSubdomain && (
+              <button
+                onClick={() => googleLogin()}
+                className="w-3/5 px-1.5 py-2 mb-4 text-xs  font-normal items-center
                text-white dark:bg-tertiaryBackground-dark rounded-xl border border-chatDivider-dark"
-            >
-              <img
-                src={googleLogo}
-                alt="Google logo"
-                className="inline w-6 h-6 mr-2"
-              />
-              {isLogin ? "Sign in with Google" : "Sign up with Google"}
-            </button>
+              >
+                <img
+                  src={googleLogo}
+                  alt="Google logo"
+                  className="inline w-6 h-6 mr-2"
+                />
+                {isLogin ? "Sign in with Google" : "Sign up with Google"}
+              </button>
+            )}
             <p className="text-center dark:text-white text-xs mb-10 mt-2">
               {isLogin
                 ? "Don't have an account? "
@@ -786,9 +896,9 @@ const AuthPage = () => {
           </>
         )}
       </div>
-      <div className="hidden sm:flex sm:w-1/2 bg-primary items-center justify-start dark:bg-tertiaryBackground-dark ">
+      <div className="hidden sm:flex sm:w-1/2 bg-primary items-center justify-start dark:bg-onboardBackground-dark ">
         <img
-          src={LoginImage}
+          src="https://chips-social.s3.ap-south-1.amazonaws.com/channelsWebsite/LoginCover.svg"
           alt="Modal Illustration"
           className="w-3/4 lg:w-1/2 h-auto"
         />

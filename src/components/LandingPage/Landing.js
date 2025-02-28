@@ -1,20 +1,9 @@
-import React, { useState, useEffect } from "react";
-import {
-  useLocation,
-  Link,
-  Outlet,
-  useParams,
-  useNavigate,
-} from "react-router-dom";
-
-import PoweredBy from "../../assets/icons/poweredby.svg";
+import React, { useState } from "react";
+import { Outlet } from "react-router-dom";
 import Menu from "../../assets/icons/menu.svg";
-
 import UserSidebar from "./../Sidebar/UserSidebar";
 
 const Landing = () => {
-  const location = useLocation();
-  const { username } = useParams();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -39,7 +28,7 @@ const Landing = () => {
   // }, [channelName, pageName]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col w-full">
       <div className="w-full  dark:bg-secondaryBackground-dark sm:hidden flex">
         <img
           src={Menu}
@@ -48,20 +37,20 @@ const Landing = () => {
           onClick={toggleSidebar}
         />
       </div>
-      <div className="flex flex-row h-screen w-full">
+      <div className="flex flex-row h-screen w-[100%]">
         <div
           className={`fixed top-0 left-0 h-full transition-transform duration-300 z-40 sm:relative sm:translate-x-0  sm:flex ${
             isSidebarOpen ? "translate-x-0 " : "-translate-x-full "
-          } lg:w-1/6 md:w-1/4 sm:w-[30%] w-3/5  dark:bg-primaryBackground-dark`}
+          } lg:w-[250px]  md:w-1/4 sm:w-[30%] w-[250px]  dark:bg-primaryBackground-dark`}
         >
-          <UserSidebar username={username} closeSidebar={closeSidebar} />
+          <UserSidebar closeSidebar={closeSidebar} />
         </div>
 
         {isSidebarOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-40 z-30 sm:hidden"></div>
         )}
 
-        <div className="lg:w-5/6 md:w-3/4 sm:w-[70%] w-full h-full">
+        <div className="lg:w-full-minus-250 md:w-3/4 sm:w-[70%] w-full h-full">
           <Outlet />
         </div>
       </div>

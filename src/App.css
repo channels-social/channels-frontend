@@ -1,19 +1,69 @@
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
+::-webkit-scrollbar {
+  width: 8px;
+  scroll-behavior: smooth;
 }
 
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  /* IE and Edge */
-  scrollbar-width: none;
-  /* Firefox */
+::-webkit-scrollbar:vertical {
+  width: 8px;  /* Controls the thickness of vertical scrollbars */
 }
+
+/* Horizontal Scrollbar (X-axis) */
+::-webkit-scrollbar:horizontal {
+  height: 8px; /* Controls the thickness of horizontal scrollbars */
+}
+
+::-webkit-scrollbar-track {
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: none !important;
+}
+
+.custom-side-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  scroll-behavior: smooth;
+}
+
+.custom-side-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 10px;
+}
+
+.custom-side-scrollbar::-webkit-scrollbar-thumb {
+  background: #3c3c3c;
+  border-radius: 10px;
+}
+
+.custom-side-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+.custom-side-scrollbar::-webkit-scrollbar-button {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  background: none !important;
+}
+
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0px 1000px #2c2c2c inset !important;
+  -webkit-box-shadow: 0 0 0px 1000px transparent inset !important;
   -webkit-text-fill-color: #fff !important;
   transition: background-color 5000s ease-in-out 0s;
 }
@@ -32,34 +82,6 @@ input[type="file"] {
   cursor: pointer;
   font-size: 0;
   position: absolute;
-}
-.custom-scrollbar::-webkit-scrollbar {
-  width: 3px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: #2b2930;
-  border-radius: 25px;
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background: #555;
-  border-radius: 25px;
-}
-
-.custom-scrollbar {
-  scrollbar-width: thin;
-  scrollbar-color: #555 #2b2930;
-  -ms-overflow-style: none;
-}
-
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.no-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
 }
 
 .text-Link {
@@ -97,29 +119,6 @@ input[type="file"] {
   display: none; /* Hides the "What's Your Mood?" section */
 }
 
-/* .vertical-line {
-  width: 1px;
-  background-color: gray;
-}
-
-.cross-button {
-  position: relative;
-  right: 0;
-  margin-left: 10px;
-  padding: 5px 10px;
-  background-color: red;
-  color: white;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
-}
-
-.cross-button.at-bottom {
-  position: absolute;
-  bottom: 10px;
-  top: auto;
-  transform: none;
-} */
 
 .custom-radio {
   position: absolute;
@@ -187,15 +186,14 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .crop-container {
-  width: 100%;  
+  width: 100%;
   min-height: 400px;
 }
-
 
 .react-datepicker {
   font-family: "Helvetica Neue", helvetica, arial, sans-serif;
   font-size: 0.8rem;
-  background-color: #211f26 !important;
+  background-color: #2c2c2c !important;
   color: #000;
   border: 1px solid #36343b !important;
   border-radius: 0.3rem;
@@ -205,16 +203,29 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 
 .react-datepicker__day {
-  color: #cac4d0 !important;
+  color: #c4c4c4 !important;
   display: inline-block;
   width: 1.7rem;
   line-height: 1.7rem;
   text-align: center;
   margin: 0.166rem;
 }
+.react-datepicker__day:hover {
+  color: #202020 !important;
+ 
+}
 .react-datepicker__day--today {
   font-weight: bold;
   color: white !important;
+}
+
+.react-datepicker-popper {
+  z-index: 100 !important; 
+}
+.react-datepicker__day--outside-month {
+  color: #606060 !important;  
+  opacity: 0.5;  
+  pointer-events: none; 
 }
 
 .react-datepicker__header {
@@ -242,14 +253,29 @@ input[type="time"]::-webkit-calendar-picker-indicator {
 }
 .react-datepicker__day--selected {
   border-radius: 0.3rem;
-  background-color: #5a00ff !important;
+  background-color: #1e69ea !important;
 }
+
 .react-datepicker__time-container .react-datepicker__time {
   position: relative;
-  background: #211f26 !important;
+  background: #2c2c2c !important;
   border-bottom-right-radius: 0.3rem;
   color: #cac4d0;
 }
+.react-datepicker__time-container .react-datepicker__time .react-datepicker__time-box {
+  background: #2c2c2c !important;
+}
+
+li.react-datepicker__time-list-item:hover{
+  color:#202020 !important
+}
+
+.custom-calendar-btn {
+  padding: 4px !important;
+  margin: 0 !important;
+  font-size: normal !important;
+}
+
 
 .get-started {
   margin-left: 0px;
@@ -294,6 +320,23 @@ input[type="time"]::-webkit-calendar-picker-indicator {
   opacity: 1 !important;
   border-radius: 50% / 100% !important;
 }
+
+@keyframes flicker {
+  0% {
+    background-color: #202020; /* Light color */
+  }
+  50% {
+    background-color: #333333; /* Slightly darker */
+  }
+  100% {
+    background-color: #202020; /* Back to light */
+  }
+}
+
+.flicker-highlight {
+  animation: flicker 1s linear infinite;
+}
+
 
 @media (max-width: 640px) {
   .get-started {

@@ -1,19 +1,20 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   postRequestAuthenticated,
+  postRequestUnAuthenticated,
   postRequestAuthenticatedWithFile,
 } from "./../../services/rest";
 import { updateChannel } from "./channelItemsSlice";
 import { createGeneralTopic } from "./channelItemsSlice";
+import { removeMember } from "./reorderTopicSlice";
 
 export const removeCover = createAsyncThunk(
   "channel/remove-cover",
-  async (channel, { rejectWithValue }) => {
+  async (channelId, { rejectWithValue }) => {
     try {
-      const response = await postRequestAuthenticated(
-        "/remove/channel/cover",
-        channel
-      );
+      const response = await postRequestAuthenticated("/remove/channel/cover", {
+        channelId,
+      });
       if (response.success) {
         return response.channel;
       } else {
@@ -44,10 +45,10 @@ export const saveCover = createAsyncThunk(
 );
 export const fetchChannel = createAsyncThunk(
   "channel/fetch-channel",
-  async (id, { rejectWithValue }) => {
+  async (channelId, { rejectWithValue }) => {
     try {
-      const response = await postRequestAuthenticated("/fetch/channel", {
-        id: id,
+      const response = await postRequestUnAuthenticated("/fetch/channel", {
+        id: channelId,
       });
       if (response.success) {
         return response.channel;
@@ -89,7 +90,7 @@ export const joinChannel = createAsyncThunk(
         channelId: id,
       });
       if (response.success) {
-        return response.channel;
+        return response;
       } else {
         return rejectWithValue(response.message);
       }
@@ -106,8 +107,9 @@ export const joinChannelInvite = createAsyncThunk(
         "/join/channel/invite",
         data
       );
+      console.log(response);
       if (response.success) {
-        return response.channelId;
+        return response.channel;
       } else {
         return rejectWithValue(response.message);
       }
@@ -121,14 +123,17 @@ const initialState = {
   _id: "",
   name: "",
   visibility: "anyone",
+  editability: "me",
   members: [],
   cover_image: null,
   admins: [],
   paywall: false,
+  requests: [],
   topics: [],
   logo: null,
   description: "",
   channelstatus: "idle",
+  loading: false,
   channelNameError: false,
   isEdit: false,
   code: "",
@@ -159,7 +164,8 @@ export const channelSlice = createSlice({
       state.cover_image = null;
       state.visibility = [];
       state.admins = [];
-      state.editability = [];
+      state.editability = "me";
+      state.requests = [];
       state.members = [];
       state.name = "";
       state.description = "";
@@ -198,18 +204,52 @@ export const channelSlice = createSlice({
         state.topics.unshift(topic._id);
       })
       .addCase(fetchChannel.pending, (state) => {
-        state.channelstatus = "loading";
+        state.loading = true;
       })
       .addCase(fetchChannel.fulfilled, (state, action) => {
-        state.channelstatus = "idle";
+        state.loading = false;
         Object.assign(state, initialState, action.payload);
       })
       .addCase(fetchChannel.rejected, (state, action) => {
+        state.loading = false;
+        state.channelNameError = action.payload || action.error.message;
+      })
+      .addCase(joinChannel.pending, (state) => {
+        state.channelstatus = "loading";
+      })
+      .addCase(joinChannel.fulfilled, (state, action) => {
+        state.channelstatus = "idle";
+        const response = action.payload;
+        if (response.success && response.visit) {
+          if (!state.members?.includes(response.id)) {
+            state.members?.push(response.id);
+          }
+        } else if (response.success) {
+          if (!state.requests.includes(response.id)) {
+            state.requests.push(response.id);
+          }
+        }
+      })
+      .addCase(joinChannel.rejected, (state, action) => {
         state.channelstatus = "idle";
         state.channelNameError = action.payload || action.error.message;
       })
+      .addCase(removeMember.fulfilled, (state, action) => {
+        state.status = "idle";
+        const removeData = action.payload;
+        if (state._id === removeData.channelId) {
+          let memberIndex = state.members.findIndex(
+            (member) => member === removeData.userId
+          );
+          if (memberIndex !== -1) {
+            state.members.splice(memberIndex, 1);
+          }
+        }
+      })
       .addCase(updateChannel.fulfilled, (state, action) => {
-        Object.assign(state, initialState, action.payload);
+        if (action.payload._id === state._id) {
+          Object.assign(state, initialState, action.payload);
+        }
       });
   },
 });

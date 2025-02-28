@@ -35,6 +35,8 @@ import channelItemsReducer from "./../slices/channelItemsSlice";
 import channelReducer from "./../slices/channelSlice";
 import FaqsReducer from "./../slices/faqsSlice";
 import chatReducer from "./../slices/chatSlice";
+import reorderTopicReducer from "./../slices/reorderTopicSlice";
+import eventReducer from "./../slices/eventSlice";
 
 const appReducer = combineReducers({
   auth: authReducer,
@@ -73,6 +75,8 @@ const appReducer = combineReducers({
   faqs: FaqsReducer,
   channel: channelReducer,
   chat: chatReducer,
+  reorderTopic: reorderTopicReducer,
+  event: eventReducer,
 });
 
 const rootReducer = (state, action) => {

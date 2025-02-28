@@ -66,7 +66,7 @@ const initialState = {
   user: "",
   visibility: "anyone",
   channel: "",
-  editability: "me",
+  editability: "anyone",
   allowedVisibleUsers: [],
   _id: "",
   topicstatus: "idle",

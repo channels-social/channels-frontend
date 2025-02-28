@@ -1,33 +1,23 @@
 import React, { useState, useRef, useEffect } from "react";
-import { FaPencilAlt } from "react-icons/fa";
 import ArrowForward from "../../assets/icons/arrow_forward_dark.svg";
-import {
-  updateItemsOrderCategory,
-  clearReorderItems,
-} from "../../redux/slices/pushItemsSlice";
 import { useLocation } from "react-router-dom";
-import Category from "../../assets/icons/category.svg";
 import ArrowBack from "../../assets/icons/arrow_back.svg";
-import ShareIcon from "../../assets/icons/shareIcon.svg";
 import ProfileIcon from "../../assets/icons/profile.svg";
-import ChipIcon from "../../assets/icons/chip_icon.svg";
-import CurationIcon from "../../assets/icons/curation_icon.svg";
-import ProfileView from "./Widgets/ProfileView";
 import ProfileForm from "./FormProfile/ProfileForm";
 import ProfileCarousel from "./Widgets/ProfileCarousel";
 import UnsplashModal from "./../Modals/UnsplashModal";
 import { useDispatch, useSelector } from "react-redux";
 import useModal from "./../hooks/ModalHook";
 import { useParams, useNavigate } from "react-router-dom";
+import { hostUrl } from "../../utils/globals";
+
 import {
   fetchProfile,
   selectProfileStatus,
 } from "./../../redux/slices/profileSlice";
 import ProfileSkeleton from "./../skeleton/profileSkeleton";
-import {
-  updateProfileField,
-  toggleSubscription,
-} from "../../redux/slices/profileSlice";
+import { updateProfileField } from "../../redux/slices/profileSlice";
+import { fetchUserChannels } from "../../redux/slices/channelItemsSlice";
 import { Outlet } from "react-router-dom";
 import EmptyProfileCard from "./Widgets/EmptyProfileCard";
 import { domainUrl } from "./../../utils/globals";
@@ -44,7 +34,6 @@ const Profile = () => {
   const [isUnsplashModalOpen, setIsUnsplashModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDropdownOpen2, setIsDropdownOpen2] = useState(false);
-  const [reorderItems, setReorderItems] = useState(false);
   const dropdownRef = useRef(null);
   const dropdownRef2 = useRef(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,13 +45,21 @@ const Profile = () => {
   const { username } = useParams();
   const profileStatus = useSelector(selectProfileStatus);
   const profileData = useSelector((state) => state.profileData);
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const pushItems = useSelector((state) => state.pushItems);
   const isOwner = myData?.username === username;
   const { items } = useSelector((state) => state.profileItems);
   const [isExpanded, setIsExpanded] = useState(false);
   const location = useLocation();
   const maxLength = 350;
+  const searchParams = new URLSearchParams(location.search);
+  const accept = searchParams.get("accept");
+  const channelId = searchParams.get("channelId");
+  const userId = searchParams.get("userId");
+  const [inviteModal, setInviteModal] = useState(true);
+  const channelName = searchParams.get("channelName");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [scrollPosition, setScrollPosition] = useState(0);
+  const [activeTab, setActiveTab] = useState("");
 
   const tabs = [
     { id: 1, name: "Channels", href: "" },
@@ -70,20 +67,24 @@ const Profile = () => {
     { id: 3, name: "FAQs", href: "#faqs" },
   ];
 
-  const [activeTab, setActiveTab] = useState("");
+  useEffect(() => {
+    window.scrollTo(0, scrollPosition);
+  }, [activeTab]);
 
-  const handleTabClick = (href) => {
-    window.location.hash = href;
+  const handleTabClick = (event, href) => {
+    setScrollPosition(window.scrollY);
     setActiveTab(href);
+    window.history.pushState(null, "", `#${href}`);
   };
 
   useEffect(() => {
-    if (window.location.hash) {
-      setActiveTab(window.location.hash);
+    const hash = window.location.hash.replace("#", "");
+    if (hash) {
+      setActiveTab(hash);
     } else {
       setActiveTab("");
     }
-  }, [location]);
+  }, []); //
 
   const toggleReadMore = () => {
     setIsExpanded(!isExpanded);
@@ -107,8 +108,10 @@ const Profile = () => {
         const response = await postRequestUnAuthenticated(`/username/exist`, {
           username: subdomain,
         });
+        console.log(response);
         if (response.success) {
           dispatch(fetchProfile(username));
+          dispatch(fetchUserChannels(username));
         } else {
           setIsDomainExist(false);
         }
@@ -121,14 +124,6 @@ const Profile = () => {
     };
     checkSubdomainExists(username);
   }, [username, dispatch]);
-
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
-  const toggleDropdown2 = () => {
-    setIsDropdownOpen2(!isDropdownOpen2);
-  };
 
   const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -145,57 +140,131 @@ const Profile = () => {
   const openBottomSheet = () => setIsBottomSheetOpen(true);
   const closeBottomSheet = () => setIsBottomSheetOpen(false);
 
-  const handleCurationOpenModal = () => {
-    setIsDropdownOpen(false);
-    handleOpenModal("modalCurationOpen");
-  };
-  const handleChipOpen = () => {
-    setIsDropdownOpen(false);
-    handleOpenModal("modalChipOpen");
-  };
+  // const handleCurationOpenModal = () => {
+  //   setIsDropdownOpen(false);
+  //   handleOpenModal("modalCurationOpen");
+  // };
+  // const handleChipOpen = () => {
+  //   setIsDropdownOpen(false);
+  //   handleOpenModal("modalChipOpen");
+  // };
 
   const openShareModal = (link) => {
     handleOpenModal("modalShareProfileOpen", link);
     dispatch(setProfileEngagement(profileData._id));
   };
 
-  const handleSubscription = () => {
-    if (isLoggedIn) {
-      dispatch(toggleSubscription(profileData));
-    } else {
-      handleOpenModal("modalLoginOpen");
-    }
-  };
-  const handleSubscribersModal = () => {
-    handleOpenModal("modalMySubscribersOpen", profileData._id);
-  };
+  // const handleSubscription = () => {
+  //   if (isLoggedIn) {
+  //     dispatch(toggleSubscription(profileData));
+  //   } else {
+  //     handleOpenModal("modalLoginOpen");
+  //   }
+  // };
+  // const handleSubscribersModal = () => {
+  //   handleOpenModal("modalMySubscribersOpen", profileData._id);
+  // };
 
   const handleEditCards = () => {
     dispatch(updateProfileField({ name: "activeTab", value: "displayCards" }));
     setIsBottomSheetOpen(true);
   };
+  const handleInviteAccept = () => {
+    setLoading(true);
+    fetch(
+      `${hostUrl}/api/accept/channel/invite?channelId=${channelId}&userId=${userId}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setLoading(false);
 
-  const handleNewsletterPage = () => {
-    navigate(`/${myData?.username}/newsletter`);
+        setInviteModal(false);
+        if (data.success) {
+          setMessage("You have successfully accepted the channel invite!");
+        } else {
+          setMessage(data.message || "Failed to accept the invite.");
+        }
+      })
+      .catch((error) => {
+        setMessage("An error occurred while processing your request.");
+        setInviteModal(false);
+      });
   };
+  const handleDeclineAccept = () => {
+    setLoading(true);
+    fetch(
+      `${hostUrl}/api/decline/channel/invite?channelId=${channelId}&userId=${userId}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setLoading(false);
+        setInviteModal(false);
+        if (data.success) {
+          setMessage("You have successfully declined the channel invite!");
+        } else {
+          setMessage(data.message || "Failed to decline the invite.");
+        }
+      })
+      .catch((error) => {
+        setMessage("An error occurred while processing your request.");
+        setInviteModal(false);
+      });
+  };
+
+  // const handleNewsletterPage = () => {
+  //   navigate(`/${myData?.username}/newsletter`);
+  // };
 
   if (isLoading) {
     return <ProfileSkeleton />;
   }
 
   if (!isDomainExist) {
-    navigate(`/profile/${username}/404`);
+    navigate(`/user/${username}/profile/404`);
     return;
   }
+  const isInvite =
+    inviteModal &&
+    accept === "invitechannel" &&
+    channelName !== "" &&
+    channelId !== "" &&
+    userId !== "";
 
   const hasImages = profileData.imageCards.length !== 0;
-  const isSubscribed = profileData.subscribers?.includes(myData?._id);
+  // const isSubscribed = profileData.subscribers?.includes(myData?._id);
 
   return (
     <div
-      className={`w-full pt-4 px-4 h-screen dark:bg-secondaryBackground-dark overflow-y-auto custom-scrollbar`}
+      className={`w-full pt-4 px-4 h-screen dark:bg-secondaryBackground-dark overflow-y-auto custom-scrollbar relative`}
       onClick={handleClickOutside}
     >
+      {isInvite && (
+        <div
+          className="absolute z-60 top-0 -left-1 w-full flex flex-col dark:bg-primaryBackground-dark  px-4 pt-2 pb-3 border-b
+         dark:border-b-chatDivider-dark"
+        >
+          <p className="dark:text-secondaryText-dark font-normal text-sm">
+            {loading
+              ? "Processing... Please wait."
+              : `This user requests to join the ${channelName} channel. Your decision?`}
+          </p>
+          <div className="flex flex-row mt-2">
+            <button
+              className="cursor-pointer rounded-md py-1 px-2 dark:bg-buttonEnable-dark dark:text-secondaryText-dark font-light text-sm"
+              onClick={handleInviteAccept}
+            >
+              Accept Invite
+            </button>
+            <button
+              className="cursor-pointer ml-3 border rounded-md px-2 py-1 dark:border-secondaryText-dark 
+              dark:text-secondaryText-dark font-light text-sm"
+              onClick={handleDeclineAccept}
+            >
+              Decline
+            </button>
+          </div>
+        </div>
+      )}
       {profileStatus === "loading" ? (
         <ProfileSkeleton />
       ) : (
@@ -204,7 +273,7 @@ const Profile = () => {
             <div
               className={`${
                 isOwner || hasImages ? "md:dark:bg-tertiaryBackground-dark" : ""
-              }  rounded-lg md:px-6 px-0 py-4 sm:py-6 w-full`}
+              }  rounded-lg lg:px-6 md:px-4 px-0 py-4 sm:py-6 w-full`}
             >
               <div
                 className={`flex flex-col rounded-md md:flex-row ${
@@ -225,7 +294,7 @@ const Profile = () => {
                       src={profileData.logo}
                       alt="Profile"
                       className="rounded-full w-24 h-24 border dark:border-white object-cover"
-                      style={{ borderWidth: "3px" }}
+                      style={{ borderWidth: "2px" }}
                     />
                   ) : (
                     <img
@@ -244,7 +313,7 @@ const Profile = () => {
                     >
                       {profileData.name}
                     </p>
-                    <p className="mt-1 text-xs  font-light dark:text-profileColor-dark font-inter">
+                    <p className="mt-1 text-xs font-light dark:text-profileColor-dark font-inter">
                       {profileData.username}.{domainUrl}
                     </p>
                     {/* <p
@@ -308,7 +377,7 @@ const Profile = () => {
                       </p>
                     )}
                     <div
-                      className={`flex flex-row space-x-4  ${
+                      className={`flex flex-row space-x-3  ${
                         isOwner || hasImages
                           ? "md:justify-start justify-center"
                           : "justify-center"
@@ -316,7 +385,6 @@ const Profile = () => {
                     >
                       {isOwner && (
                         <div
-                          target="_blank"
                           onClick={() =>
                             openShareModal(
                               `https://` +
@@ -324,6 +392,7 @@ const Profile = () => {
                                 `.${domainUrl}`
                             )
                           }
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="cursor-pointer px-3 mt-4 font-normal  py-2.5 dark:bg-secondaryText-dark
                            dark:text-primaryBackground-dark text-xs rounded-lg"
@@ -332,25 +401,45 @@ const Profile = () => {
                         </div>
                       )}
 
-                      {/* {!isOwner && (
-                        <button
-                          className={`px-4 mt-4  py-2 ${
-                            isSubscribed ? "bg-dark" : "bg-buttonBackground"
-                          } text-primary text-sm rounded-lg`}
-                          onClick={handleSubscription}
+                      {profileData.customText && profileData.customUrl && (
+                        <a
+                          className={`px-4 mt-4 py-2.5 ${
+                            isOwner
+                              ? "border dark:border-secondaryText-dark dark:text-secondaryText-dark"
+                              : "dark:bg-secondaryText-dark dark:text-primaryBackground-dark"
+                          } 
+                           font-normal text-xs rounded-lg`}
+                          href={profileData.customUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
                         >
-                          {isSubscribed ? "Subscribed" : "Subscribe"}
-                        </button>
-                      )} */}
+                          {profileData.customText}
+                        </a>
+                      )}
+                      {!isOwner && (
+                        <div
+                          onClick={() =>
+                            openShareModal(
+                              `https://` +
+                                profileData.username +
+                                `.${domainUrl}`
+                            )
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="cursor-pointer px-3 mt-4 font-normal py-2.5 border dark:border-secondaryText-dark
+                           dark:text-secondaryText-dark text-xs rounded-lg"
+                        >
+                          Share profile
+                        </div>
+                      )}
                       {isOwner && (
                         <button
                           className={`px-4 mt-4  py-2.5 border dark:border-secondaryText-dark 
                             dark:text-secondaryText-dark font-normal text-xs rounded-lg`}
                           onClick={openBottomSheet}
                         >
-                          {profileData.imageCards.length >= 1 &&
-                          profileData.description !== "" &&
-                          profileData.links >= 1
+                          {profileData.logo && profileData.description !== ""
                             ? "Edit Profile"
                             : "Complete Profile"}
                         </button>
@@ -415,12 +504,12 @@ const Profile = () => {
 
                 {hasImages ? (
                   <div
-                    className={`flex md:ml-5 md:mt-0 mt-4 md:mb-0 justify-center ${
+                    className={`flex lg:ml-5 md:ml-2 md:mt-0 mt-4 md:mb-0 justify-center ${
                       !profileData.description ||
                       profileData.description.length <= 40
                         ? "xl:w-1/2"
                         : " xl:w-3/5"
-                    } h-full w-full md:justify-end mb-2 md:w-3/5`}
+                    } h-full w-full md:justify-end mb-2 lg:w-3/5 md:w-1/2`}
                   >
                     <ProfileCarousel images={profileData.imageCards} />
                   </div>
@@ -442,8 +531,8 @@ const Profile = () => {
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
-                  onClick={() => handleTabClick(tab.href)}
-                  className={`mx-2 px-8 py-3 text-sm transition-colors duration-300 ${
+                  onClick={(event) => handleTabClick(event, tab.href)}
+                  className={`mx-2 xs:px-8 px-4 py-3 text-sm transition-colors duration-300 ${
                     activeTab === tab.href
                       ? "border-b-2 dark:text-secondaryText-dark dark:border-secondaryText-dark"
                       : "dark:text-primaryText-dark "
@@ -458,33 +547,16 @@ const Profile = () => {
               className="w-88px mx-auto border dark:border-chatDivider-dark "
               style={{ height: "0.1px" }}
             ></div>
-            <div className="mt-6">
+            <div className="mt-6 mb-8">
               {activeTab === "" ? (
-                <ChannelsTab />
+                <ChannelsTab gallery={false} />
               ) : activeTab === "#curations" ? (
-                <CurationsTab
-                  isOwner={isOwner}
-                  reorderItems={reorderItems}
-                  items={items}
-                />
+                <CurationsTab isOwner={isOwner} items={items} gallery={false} />
               ) : (
-                <FaqsTab />
+                <FaqsTab username={username} />
               )}
             </div>
 
-            {/* <div className="w-full sm:mt-12 mt-8 p-4 bg-profileBackground rounded-lg border border-categoryBorder flex sm:flex-row flex-col items-center justify-between">
-              <div className="lg:w-1/2 md:w-3/5 sm:3/4  w-full text-textColor text-sm font-light font-inter">
-                Categorising your content will help your audience understand it
-                better. Example: Products, Events, Resources, Hiring,
-                Testimonials, FAQ etc
-              </div>
-              <div
-                className="bg-primary sm:mt-0 mt-3 rounded-md text-center text-buttonText text-sm font-normal font-inter px-3 py-2 cursor-pointer"
-                onClick={handleCategoryOpenModal}
-              >
-                + new category
-              </div>
-            </div> */}
             <div
               className={`flex justify-between items-center ${
                 hasImages ? "mt-2 xs:mt-4" : "mt-1"

@@ -8,12 +8,10 @@ import {
   setScroll,
 } from "./../../../redux/slices/commentChipSlice";
 import { setChipEngagement } from "./../../../redux/slices/chipEngagementSlice";
-import { useNavigate } from "react-router-dom";
 
 const CommentChipReplyItem = ({ item, handleChange, chipId, comment }) => {
   const dispatch = useDispatch();
   const myData = useSelector((state) => state.myData);
-  const navigate = useNavigate();
 
   const toggleUpvoteCommentReply = (commentId, replyId) => {
     const data = {

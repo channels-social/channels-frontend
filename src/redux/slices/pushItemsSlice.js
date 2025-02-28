@@ -156,6 +156,7 @@ const pushItemsSlice = createSlice({
         state.reorderItems.push({ itemId, newCategoryId, type });
       }
     },
+
     clearReorderItems: (state) => {
       state.reorderItems = [];
     },
@@ -189,6 +190,7 @@ const pushItemsSlice = createSlice({
         state.status = "succeeded";
         state.categories = action.payload;
       })
+
       .addCase(updateCategoriesOrder.pending, (state) => {
         state.status = "loading";
       })

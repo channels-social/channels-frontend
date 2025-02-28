@@ -1,30 +1,39 @@
 import React, { useState, useEffect, useRef } from "react";
-import Shape from "../../assets/icons/Shape.png";
-import Test from "../../assets/icons/test.png";
 import Smiley from "../../assets/icons/smiley.svg";
 import ArrowDropDown from "../../assets/icons/arrow_drop_down.svg";
-import ReplyIcon from "../../assets/icons/reply_line.svg";
-import DeleteIcon from "../../assets/icons/Delete.svg";
+import ReplyIcon from "../../assets/icons/reply_icon.svg";
+import EmojiPicker from "emoji-picker-react";
+
 import {
   fetchTopicChats,
   setChatField,
   pushToResource,
-  makeReaction,
+  toggleReaction,
+  addMessage,
 } from "./../../redux/slices/chatSlice";
+import { pdfjs } from "react-pdf";
 import { useDispatch, useSelector } from "react-redux";
 import Profile from "../../assets/icons/profile.svg";
 import documentImage from "../../assets/images/Attachment.svg";
+import {
+  deleteTopicChat,
+  clearChatIdToDelete,
+} from "../../redux/slices/chatSlice";
 
 import useModal from "./../hooks/ModalHook";
 import Linkify from "react-linkify";
 import { useParams } from "react-router-dom";
+import socket from "../../utils/socket";
+import TopicChatSkeleton from "./../skeleton/Topic/TopicChatSkeleton";
+import EventCard from "./widgets/EventCard";
+
+pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/legacy/build/pdf.worker.min.mjs`;
 
 const PageChatData = ({ topicId, isLoggedIn, myData }) => {
-  const [showReactionsSmiley, setShowReactionsSmiley] = useState(false);
   const { handleOpenModal } = useModal();
   const { username } = useParams();
 
-  const handleClick = () => {
+  const handleClick = (document) => {
     handleOpenModal("modalDocumentOpen", document);
   };
 
@@ -37,17 +46,47 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
     chatId: null,
     mediaIndex: null,
   });
-  const [showMediaMenu, setShowMediaMenu] = useState(false);
-  const [showDocumentMenu, setShowDocumentMenu] = useState(false);
+  const [showMediaMenu, setShowMediaMenu] = useState({
+    chatId: null,
+    mediaIndex: null,
+  });
+  const [showDocumentMenu, setShowDocumentMenu] = useState({
+    chatId: null,
+    mediaIndex: null,
+  });
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
+  const dropdownRefs = useRef({});
   const [showReactionPicker, setShowReactionPicker] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [reactions, setReactions] = useState({});
   const reactionRef = useRef(null);
+  const dropdownContainerRef = useRef(null);
   const dispatch = useDispatch();
-  const menuRef = useRef(null);
-  const reactionsData = ["❤️", "😂", "👍", "🎉", "😢"];
+  const [openDropdownId, setOpenDropdownId] = useState(null);
+
+  const reactionsData = ["❤️", "😂", "👍", "😢"];
   const Chats = useSelector((state) => state.chat.chats);
+  const loading = useSelector((state) => state.chat.loading);
+  const chatRefs = useRef(new Map());
+  const [highlightedChatId, setHighlightedChatId] = useState(null);
+
+  const scrollToChat = (chatId) => {
+    const chatElement = chatRefs.current.get(chatId);
+    if (chatElement) {
+      chatElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      setHighlightedChatId(chatId);
+      setTimeout(() => setHighlightedChatId(null), 2500);
+    }
+  };
+
+  const addRef = (chatId, mediaIndex, type) => {
+    const key = `${type}-${chatId}-${mediaIndex}`;
+    if (!dropdownRefs.current[key]) {
+      dropdownRefs.current[key] = React.createRef();
+    }
+    return dropdownRefs.current[key];
+  };
 
   const handleMouseEnterMedia = (chatId, mediaIndex) => {
     setHoveredMedia({ chatId, mediaIndex });
@@ -55,6 +94,11 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
   const handleMouseEnterDocument = (chatId, mediaIndex) => {
     setHoveredDocument({ chatId, mediaIndex });
   };
+
+  const handleToggleDropdown = (id) => {
+    setOpenDropdownId((prevId) => (prevId === id ? null : id));
+  };
+
   const handleShowMediaMenu = (chatId, mediaIndex) => {
     if (
       showMediaMenu.chatId === chatId &&
@@ -62,6 +106,7 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
     ) {
       setShowMediaMenu({ chatId: null, mediaIndex: null });
     } else {
+      setShowDocumentMenu({ chatId: null, mediaIndex: null });
       setShowMediaMenu({ chatId: chatId, mediaIndex: mediaIndex });
     }
   };
@@ -72,6 +117,7 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
     ) {
       setShowDocumentMenu({ chatId: null, mediaIndex: null });
     } else {
+      setShowMediaMenu({ chatId: null, mediaIndex: null });
       setShowDocumentMenu({ chatId: chatId, mediaIndex: mediaIndex });
     }
   };
@@ -83,55 +129,104 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
     setHoveredDocument({ chatId: null, mediaIndex: null });
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (reactionRef.current && !reactionRef.current.contains(event.target)) {
-        setShowReactionPicker(false);
-        setShowReactionsSmiley(false);
-        setShowMenu(false);
-      }
-    };
+  const handleClickOutside = (event) => {
+    let clickedInside = false;
 
+    Object.values(dropdownRefs.current).forEach((ref) => {
+      if (ref.current && ref.current.contains(event.target)) {
+        clickedInside = true;
+      }
+    });
+
+    if (!clickedInside) {
+      setShowMediaMenu({ chatId: null, mediaIndex: null });
+      setShowDocumentMenu({ chatId: null, mediaIndex: null });
+    }
+  };
+
+  const previewConfig = {
+    showPreview: false,
+  };
+
+  useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
   useEffect(() => {
     dispatch(fetchTopicChats(topicId));
   }, [dispatch, topicId]);
 
+  useEffect(() => {
+    const handleChatDeleted = (message) => {
+      if (message?.topicId === topicId) {
+        dispatch(deleteTopicChat(message.chatId));
+      }
+    };
+    socket.on("chat_deleted", handleChatDeleted);
+
+    return () => {
+      socket.off("chat_deleted", handleChatDeleted);
+    };
+  }, [dispatch, topicId, myData?.username]);
+
+  useEffect(() => {
+    const handleReceiveMessage = (message) => {
+      if (message?.topic === topicId && message?.user?.username) {
+        if (message?.user?.username !== myData?.username) {
+          dispatch(addMessage(message));
+        }
+      }
+    };
+    socket.on("receive_message", handleReceiveMessage);
+    return () => {
+      socket.off("receive_message", handleReceiveMessage);
+    };
+  }, [dispatch, topicId, myData?.username]);
+
   const handleMouseLeave = () => {
-    setShowReactionsSmiley(false);
     setShowReactionPicker(false);
     setShowMenu(false);
     setHoveredChatId(null);
+    setShowEmojiPicker(false);
   };
 
   const handleshowReaction = () => {
+    if (showMenu) {
+      setShowMenu(false);
+    }
     setShowReactionPicker(!showReactionPicker);
+  };
+  const handleShowMenu = () => {
+    if (showReactionPicker) {
+      setShowReactionPicker(false);
+    }
+    setShowMenu(!showMenu);
   };
 
   const handleReactionClick = (reaction, chatId) => {
-    setReactions((prevReactions) => {
-      const newReactions = { ...prevReactions };
-      if (!newReactions[chatId]) {
-        newReactions[chatId] = {};
-      }
-      if (newReactions[chatId][reaction]) {
-        delete newReactions[chatId][reaction];
-      } else {
-        newReactions[chatId][reaction] = 1;
-      }
-      return newReactions;
-    });
+    // setReactions((prevReactions) => {
+    //   const newReactions = { ...prevReactions };
+    //   if (!newReactions[chatId]) {
+    //     newReactions[chatId] = {};
+    //   }
+    //   if (newReactions[chatId][reaction]) {
+    //     delete newReactions[chatId][reaction];
+    //   } else {
+    //     newReactions[chatId][reaction] = 1;
+    //   }
+    //   return newReactions;
+    // });
     setShowReactionPicker(false);
+    setShowEmojiPicker(false);
 
     const formDataToSend = new FormData();
     formDataToSend.append("reaction", reaction);
     formDataToSend.append("chatId", chatId);
-    dispatch(makeReaction(formDataToSend));
+    dispatch(toggleReaction(formDataToSend));
   };
 
   const handleReplyClick = (id, username) => {
@@ -141,6 +236,7 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
 
   const handleDeleteChat = (id) => {
     dispatch(setChatField({ field: "chatReplyId", value: id }));
+    dispatch(setChatField({ field: "topicReplyId", value: topicId }));
     handleOpenModal("modalChatDeleteOpen");
   };
   const componentDecorator = (href, text, key) => (
@@ -171,32 +267,82 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
       });
   };
 
-  const isOwner = username === myData.username;
+  const isOwner = username === myData?.username;
 
+  if (loading) {
+    return <TopicChatSkeleton />;
+  }
   return (
-    <div className="w-full h-full ">
+    <div className="w-full h-full max-w-full overflow-x-hidden">
       {Chats.map((chat) => (
         <div
+          ref={(el) => chatRefs.current.set(chat._id, el)}
           key={chat._id}
-          className="flex flex-col relative w-full mb-2"
+          className={`flex flex-col relative w-full mb-2 px-4 py-1 ${
+            hoveredChatId === chat._id
+              ? "dark:bg-primaryBackground-dark bg-opacity-20 "
+              : highlightedChatId === chat._id
+              ? "flicker-highlight"
+              : ""
+          }`}
           onMouseEnter={() => setHoveredChatId(chat._id)}
           onMouseLeave={handleMouseLeave}
         >
+          {chat.replyTo !== null && (
+            <div
+              className="flex flex-row items-center space-x-1 ml-4 mb-1 w-max cursor-pointer"
+              onClick={() => scrollToChat(chat.replyTo._id)}
+            >
+              <img
+                src={ReplyIcon}
+                alt="logo"
+                className="rounded-full w-8 h-auto object-cover"
+              />
+              <img
+                src={
+                  chat.replyTo.user?.logo ? chat.replyTo.user?.logo : Profile
+                }
+                alt="logo"
+                className="rounded-full w-4 h-4 object-cover"
+              />
+              <p className="dark:text-emptyEvent-dark font-normal text-xs">
+                {chat.replyTo.user?.username}
+              </p>
+              <p className="dark:text-emptyEvent-dark font-light text-xs pl-0.5">
+                {chat.replyTo.content
+                  ? chat.replyTo.content.length > 150
+                    ? `${chat.replyTo.content.substring(0, 150)}...`
+                    : chat.replyTo.content
+                  : chat.replyTo.media
+                  ? "Tap to see Attachment"
+                  : chat.replyTo.event
+                  ? "Tap to see Event"
+                  : "Tap to see Poll"}
+              </p>
+            </div>
+          )}
           <div className="flex flex-row w-full relative">
             <img
               src={chat.user?.logo ? chat.user?.logo : Profile}
               alt="logo"
-              className="rounded-full w-8 h-8"
+              className="rounded-full w-8 h-8 object-cover"
             />
             <div className="flex flex-col ml-2 w-full">
-              <p className="dark:text-emptyEvent-dark font-medium text-xs flex items-center relative">
+              <p className="dark:text-emptyEvent-dark font-normal text-sm flex items-center relative">
                 <span>
-                  {chat.user.username}{" "}
-                  <span className="font-light">
-                    {new Date(chat.createdAt).toLocaleString()}
+                  {chat.user?.username}{" "}
+                  <span className="font-light ml-1 text-xs">
+                    {new Date(chat.createdAt).toLocaleString("en-GB", {
+                      day: "2-digit",
+                      month: "2-digit",
+                      year: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                      second: "2-digit",
+                      hour12: false,
+                    })}
                   </span>
                 </span>
-                {/* Smiley and Reply Picker aligned to the right */}
                 {hoveredChatId === chat._id && (
                   <span className="absolute right-0 flex items-center space-x-2">
                     <img
@@ -207,7 +353,7 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
                     />
                     <div
                       className="cursor-pointer relative"
-                      onClick={() => setShowMenu(!showMenu)}
+                      onClick={handleShowMenu}
                     >
                       <img
                         src={ArrowDropDown}
@@ -216,8 +362,8 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
                       />
                       {showMenu && (
                         <div
-                          className="absolute top-6 right-0 w-max rounded-md shadow-lg
-                          dark:bg-dropdown-dark z-50"
+                          className="absolute top-6 right-0 w-max dark:bg-tertiaryBackground-dark border
+           dark:border-modalBorder-dark shadow-lg rounded-lg  z-10"
                         >
                           <div
                             className="py-1"
@@ -228,12 +374,12 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
                             <div
                               className="relative flex flex-row px-4 items-center"
                               onClick={() =>
-                                handleReplyClick(chat._id, chat.user.username)
+                                handleReplyClick(chat?._id, chat.user?.username)
                               }
                             >
-                              <img src={ReplyIcon} alt="reply" />
+                              {/* <img src={ReplyIcon} alt="reply" /> */}
                               <p
-                                className="block ml-2 py-2 text-sm dark:text-primaryText-dark cursor-pointer"
+                                className="block ml-2 py-2 font-normal text-sm dark:text-primaryText-dark cursor-pointer"
                                 role="menuitem"
                               >
                                 Reply
@@ -249,11 +395,11 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
                             >
                               <div
                                 className="relative flex flex-row px-4 items-center"
-                                onClick={() => handleDeleteChat(chat._id)}
+                                onClick={() => handleDeleteChat(chat?._id)}
                               >
-                                <img src={DeleteIcon} alt="reply" />
+                                {/* <img src={DeleteIcon} alt="reply" /> */}
                                 <p
-                                  className="block ml-2 py-2 text-sm dark:text-primaryText-dark cursor-pointer"
+                                  className="block ml-2 font-normal py-2 text-sm dark:text-primaryText-dark cursor-pointer"
                                   role="menuitem"
                                 >
                                   Delete
@@ -268,31 +414,44 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
                 )}
               </p>
               <Linkify componentDecorator={componentDecorator}>
-                <p className="dark:text-secondaryText-dark text-sm font-light my-1">
+                <p className="dark:text-secondaryText-dark text-sm font-light my-1 whitespace-pre-wrap break-words mr-8">
                   {chat.content}
                 </p>
               </Linkify>
-              <div className="flex flex-row space-x-3 overflow-x-auto w-[90%] custom-scrollbar">
+              {chat.event && (
+                <EventCard
+                  width="w-max"
+                  imageHeight="h-32"
+                  chatId={chat._id}
+                  event={chat.event}
+                  color="dark:bg-tertiaryBackground-dark"
+                  openDropdownId={openDropdownId}
+                  handleToggleDropdown={handleToggleDropdown}
+                  btnPadding="px-2"
+                  spacing="space-x-4"
+                />
+              )}
+              <div className="flex flex-row  overflow-x-auto w-[95%] custom-scrollbar">
                 {chat.media.map((media, index) => (
                   <div
-                    className="relative"
+                    className="relative "
+                    key={media._id}
                     onMouseEnter={() => handleMouseEnterMedia(chat._id, index)}
                     onMouseLeave={handleMouseLeaveMedia}
                   >
                     {media.type === "image" ? (
-                      <div className="relative h-36">
+                      <div className="relative h-36 mr-3">
                         <img
                           key={index}
                           src={media.url}
                           alt={media.name}
-                          className="h-36 mt-1 rounded-md object-cover w-auto max-w-52"
+                          className="h-36 mt-1  rounded-md object-cover w-auto max-w-52"
                         />
-                        <div></div>
                       </div>
                     ) : media.type === "video" ? (
                       <video
                         controls
-                        className="h-36 object-cover  rounded-t-xl w-auto max-w-52"
+                        className="h-36 object-cover mr-3 mt-1 rounded-md w-auto max-w-52"
                       >
                         <source src={media.url} type="video/mp4" />
                         Your browser does not support the video tag.
@@ -316,8 +475,9 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
                       showMediaMenu.chatId === chat._id &&
                       showMediaMenu.mediaIndex === index && (
                         <div
-                          className="absolute top-6 right-0 w-max rounded-md shadow-lg
-                          dark:bg-dropdown-dark z-50"
+                          className="absolute top-6 right-0  w-max dark:bg-tertiaryBackground-dark border
+           dark:border-modalBorder-dark shadow-lg rounded-lg  z-10"
+                          ref={addRef(chat._id, index, "media")}
                         >
                           <div
                             className="py-1"
@@ -331,9 +491,9 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
                                 handlePushResource(chat._id, media._id)
                               }
                             >
-                              <img src={ReplyIcon} alt="reply" />
+                              {/* <img src={ReplyIcon} alt="reply" /> */}
                               <p
-                                className="block ml-2 py-2 text-sm dark:text-primaryText-dark cursor-pointer"
+                                className="block ml-2 py-2 font-normal text-sm dark:text-primaryText-dark cursor-pointer"
                                 role="menuitem"
                               >
                                 Push to Resource
@@ -364,25 +524,27 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
                   </div>
                 ))}
               </div>
-              <div className="flex flex-row space-x-3 overflow-x-auto custom-scrollbar mt-1 w-1/4 ">
+              <div
+                className={`flex flex-row overflow-x-auto w-4/5 custom-scrollbar overflow-y-hidden `}
+              >
                 {chat.media.map(
                   (media, index) =>
                     media.type === "document" && (
                       <div
-                        className="w-full rounded-lg dark:bg-tertiaryBackground-dark cursor-pointer relative "
+                        className="w-max rounded-lg dark:bg-tertiaryBackground-dark mt-1.5  relative mr-3 "
                         onMouseEnter={() =>
                           handleMouseEnterDocument(chat._id, index)
                         }
                         onMouseLeave={handleMouseLeaveDocument}
-                        onClick={handleClick}
                       >
                         <div className="flex flex-row items-center justify-start w-full">
                           <img
                             src={documentImage}
                             alt="Document Icon"
-                            className="h-14 w-15 object-fill"
+                            className="h-14 w-15 object-fill cursor-pointer pr-3"
+                            onClick={() => handleClick(media)}
                           />
-                          <div className="flex flex-col my-1 ml-3 w-full-minus-68">
+                          <div className="flex flex-col my-1  w-full-minus-68">
                             <p className="dark:text-secondaryText-dark text-xs overflow-hidden text-ellipsis whitespace-nowrap font-normal">
                               {media.name}
                             </p>
@@ -411,8 +573,9 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
                           showDocumentMenu.chatId === chat._id &&
                           showDocumentMenu.mediaIndex === index && (
                             <div
-                              className="absolute top-6 right-0 w-max rounded-md shadow-lg
-                          dark:bg-dropdown-dark z-50"
+                              className="absolute top-5 right-0 w-max dark:bg-tertiaryBackground-dark border
+           dark:border-modalBorder-dark shadow-lg rounded-lg  z-10 "
+                              ref={addRef(chat._id, index, "document")}
                             >
                               <div
                                 className="py-1"
@@ -421,14 +584,13 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
                                 aria-labelledby="options-menu"
                               >
                                 <div
-                                  className="relative flex flex-row px-4 items-center"
+                                  className="relative flex flex-row px-3 items-center"
                                   onClick={() =>
                                     handlePushResource(chat._id, media._id)
                                   }
                                 >
-                                  <img src={ReplyIcon} alt="reply" />
                                   <p
-                                    className="block ml-2 py-2 text-sm dark:text-primaryText-dark cursor-pointer"
+                                    className="block ml-2 py-1 text-xs dark:text-primaryText-dark cursor-pointer "
                                     role="menuitem"
                                   >
                                     Push to Resource
@@ -445,33 +607,71 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
           </div>
           {/* Reactions Below the Chat */}
           <div className="flex flex-row space-x-2 ml-10 ">
-            {reactions[chat._id] &&
-              Object.entries(reactions[chat._id]).map(
-                ([reaction, count], index) => (
+            {chat.reactions &&
+              chat.reactions.map((reaction, index) => (
+                <div
+                  key={index}
+                  className="flex items-center dark:bg-chatBackground-dark rounded-full px-1 py-0.5 space-x-1 mb-2 cursor-pointer"
+                  onClick={() => handleReactionClick(reaction.type, chat._id)}
+                >
+                  <span className="text-sm mb-0.5">{reaction.type}</span>
+                  <span className="text-xs dark:text-secondaryText-dark pr-1">
+                    {reaction.users.length}
+                  </span>
+                </div>
+              ))}
+          </div>
+
+          {showReactionPicker && hoveredChatId === chat._id && (
+            <div className="flex items-center absolute top-0 right-10 mt-6 space-x-2 p-1 dark:bg-tertiaryBackground-dark rounded-full z-10">
+              {reactionsData.map((reaction, index) =>
+                index === reactionsData.length - 1 ? (
+                  <div className="flex flex-row items-center relative">
+                    <div
+                      key={index}
+                      onClick={() => handleReactionClick(reaction, chat._id)}
+                      className={`flex items-center text-center ${
+                        index === 0 ? "dark:text-[#E63946]" : ""
+                      } justify-center w-8 h-8 rounded-full hover:dark:bg-chatBackground-dark cursor-pointer`}
+                    >
+                      <span className="text-lg text-center mx-auto">
+                        {reaction}
+                      </span>
+                    </div>
+                    <img
+                      src={Smiley}
+                      alt="emoji"
+                      className="cursor-pointer w-6 h-6 mx-0.5"
+                      onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+                    />
+                    {showEmojiPicker && (
+                      <div className="absolute top-6 right-0 bottom-full mb-2">
+                        <EmojiPicker
+                          onEmojiClick={(event, emojiObject) =>
+                            handleReactionClick(event.emoji, chat._id)
+                          }
+                          skinTonesDisabled={true}
+                          theme={"dark"}
+                          height={350}
+                          searchDisabled={true}
+                          lazyLoadEmojis={true}
+                          previewConfig={previewConfig}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ) : (
                   <div
                     key={index}
-                    className="flex items-center dark:bg-chatBackground-dark rounded-full px-1 py-0.5 space-x-1 mb-2 "
+                    onClick={() => handleReactionClick(reaction, chat._id)}
+                    className="flex items-center text-center justify-center w-8 h-8 rounded-full hover:dark:bg-chatBackground-dark cursor-pointer"
                   >
-                    <span className="text-sm">{reaction}</span>
-                    <span className="text-xs dark:text-secondaryText-dark pr-1">
-                      {count}
+                    <span className="text-lg text-center mx-auto">
+                      {reaction}
                     </span>
                   </div>
                 )
               )}
-          </div>
-          {/* Reaction Picker */}
-          {showReactionPicker && hoveredChatId === chat._id && (
-            <div className="flex absolute top-0 right-10 mt-6 space-x-2 p-1 dark:bg-tertiaryBackground-dark rounded-full z-10">
-              {reactionsData.map((reaction, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleReactionClick(reaction, chat._id)}
-                  className="flex items-center w-8 h-8 rounded-full hover:dark:bg-chatBackground-dark cursor-pointer"
-                >
-                  <span className="text-lg">{reaction}</span>
-                </div>
-              ))}
             </div>
           )}
         </div>

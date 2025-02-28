@@ -1,30 +1,20 @@
 import React, { useState, useRef, useEffect } from "react";
-import ProfileView from "./Widgets/ProfileView";
 import ProfileCarousel from "./Widgets/ProfileCarousel";
 import UnsplashModal from "./../Modals/UnsplashModal";
 import ArrowForward from "../../assets/icons/arrow_forward_dark.svg";
 import ArrowBack from "../../assets/icons/arrow_back.svg";
-import AddIcon from "../../assets/icons/add_icon.svg";
-import ChipIcon from "../../assets/icons/chip_icon.svg";
-import CurationIcon from "../../assets/icons/curation_icon.svg";
 import useModal from "./../hooks/ModalHook";
 import { useDispatch, useSelector } from "react-redux";
-import { toggleGallerySubscription } from "../../redux/slices/gallerySlice";
-import { setMyData, updateMyField } from "../../redux/slices/myDataSlice";
 import ProfileIcon from "../../assets/icons/profile.svg";
 import { useLocation } from "react-router-dom";
-import {
-  postRequestAuthenticated,
-  postRequestUnAuthenticated,
-} from "./../../services/rest";
+import { postRequestUnAuthenticated } from "./../../services/rest";
 import {
   fetchGallery,
   selectGalleryStatus,
+  updateGalleryField,
 } from "./../../redux/slices/gallerySlice";
-import ShareIcon from "../../assets/icons/shareIcon.svg";
-import { setActiveTab } from "../../redux/slices/profileSlice";
 import { setProfileEngagement } from "./../../redux/slices/profileEngagementSlice";
-import { FaPencilAlt } from "react-icons/fa";
+import { fetchUserChannels } from "./../../redux/slices/channelItemsSlice";
 import ProfileForm from "./FormProfile/ProfileForm";
 import ProfileSkeleton from "./../skeleton/profileSkeleton";
 import { domainUrl } from "./../../utils/globals";
@@ -32,12 +22,18 @@ import EmptyProfileCard from "./Widgets/EmptyProfileCard";
 import { Outlet, useNavigate } from "react-router-dom";
 import Others from "../../assets/icons/Subtract.svg";
 import Linkify from "react-linkify";
-import {
-  updateItemsOrderCategory,
-  clearReorderItems,
-} from "../../redux/slices/pushItemsSlice";
+import ChannelsTab from "./profileTabs/ChannelsTab";
+import FaqsTab from "./profileTabs/FaqsTab";
+import CurationsTab from "./profileTabs/CurationsTab";
+import { setIsDomain } from "../../redux/slices/authSlice";
 
-const Gallery = ({ onUnsplashClick }) => {
+const Gallery = () => {
+  const tabs = [
+    { id: 1, name: "Channels", href: "" },
+    { id: 2, name: "Curations", href: "#curations" },
+    { id: 3, name: "FAQs", href: "#faqs" },
+  ];
+
   const [isUnsplashModalOpen, setIsUnsplashModalOpen] = useState(false);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
 
@@ -45,7 +41,6 @@ const Gallery = ({ onUnsplashClick }) => {
   const galleryData = useSelector((state) => state.galleryData);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDropdownOpen2, setIsDropdownOpen2] = useState(false);
-  const [reorderItems, setReorderItems] = useState(false);
   const dropdownRef = useRef(null);
   const dropdownRef2 = useRef(null);
   const navigate = useNavigate();
@@ -55,51 +50,69 @@ const Gallery = ({ onUnsplashClick }) => {
   const [isDomainExist, setIsDomainExist] = useState(true);
   const { handleOpenModal } = useModal();
   const location = useLocation();
-
   const [isExpanded, setIsExpanded] = useState(false);
+  const maxLength = 350;
+  const hasImages = galleryData.imageCards.length !== 0;
+  const isOwner = galleryData?.username === myData?.username;
+  const [scrollPosition, setScrollPosition] = useState(0);
 
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const pushItems = useSelector((state) => state.pushItems);
-  const openLoginModal = () => {
-    handleOpenModal("modalLoginOpen");
-  };
-
-  const tabs = [
-    { id: 1, name: "About", href: "" },
-    // { id: 2, name: "Product", href: "#product" },
-    // {
-    //   id: 3,
-    //   name: "Services",
-    //   href: "#services",
-    // },
-  ];
-
-  const [activeTab, setActiveTab] = useState(tabs[0].href);
-
-  const handleTabClick = (href) => {
-    // Navigate to the appropriate tab content
-    window.location.hash = href;
-  };
+  const [activeTab, setActiveTab] = useState("");
 
   useEffect(() => {
-    if (location.hash) {
-      setActiveTab(location.hash);
+    const hash = window.location.hash.replace("#", "");
+    if (hash) {
+      setActiveTab(hash);
     } else {
       setActiveTab("");
     }
-  }, [location]);
+  }, []);
 
   useEffect(() => {
-    const checkSubdomainExists = async (subdomain) => {
+    window.scrollTo(0, scrollPosition);
+  }, [activeTab]);
+
+  const handleTabClick = (event, href) => {
+    setScrollPosition(window.scrollY);
+    setActiveTab(href);
+    window.history.pushState(null, "", `#${href}`);
+  };
+  const getSubdomain = () => {
+    const host = window.location.hostname;
+    const domain = domainUrl;
+    if (host.endsWith(domain)) {
+      const subdomain = host.replace(`.${domain}`, "");
+      return subdomain === host ? null : subdomain;
+    }
+    return null;
+  };
+
+  useEffect(() => {
+    if (galleryData.username === "") {
+      const subdomain = getSubdomain();
+      if (subdomain) {
+        dispatch(setIsDomain(true));
+        dispatch(updateGalleryField({ name: "username", value: subdomain }));
+      }
+    }
+  }, [galleryData.username, dispatch]);
+
+  const toggleReadMore = () => {
+    setIsExpanded(!isExpanded);
+  };
+
+  useEffect(() => {
+    const checkSubdomainExists = async () => {
       try {
         const response = await postRequestUnAuthenticated(`/username/exist`, {
-          username: subdomain,
+          username: galleryData.username,
         });
-        setIsLoading(false);
         if (response.success) {
           dispatch(fetchGallery(galleryData.username));
+          dispatch(fetchUserChannels(galleryData.username));
+          setIsLoading(false);
         } else {
           setIsDomainExist(false);
+          setIsLoading(false);
         }
       } catch (error) {
         console.error("Error checking subdomain:", error);
@@ -112,10 +125,6 @@ const Gallery = ({ onUnsplashClick }) => {
     }
   }, [galleryData.username, dispatch]);
 
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
-  };
-
   const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       setIsDropdownOpen(false);
@@ -125,51 +134,47 @@ const Gallery = ({ onUnsplashClick }) => {
     }
   };
 
-  const { items } = useSelector((state) => state.profileItems);
-
   const openUnsplashModal = () => setIsUnsplashModalOpen(true);
   const closeUnsplashModal = () => setIsUnsplashModalOpen(false);
 
-  const handleSubscribe = async () => {
-    if (isLoggedIn) {
-      dispatch(toggleGallerySubscription(galleryData));
-    } else {
-      openLoginModal();
-    }
-  };
-
-  const openBottomSheet = () => setIsBottomSheetOpen(true);
+  // const openBottomSheet = () => setIsBottomSheetOpen(true);
   const closeBottomSheet = () => setIsBottomSheetOpen(false);
 
-  const handleCurationOpenModal = () => {
-    if (isLoggedIn) {
-      setIsDropdownOpen(false);
-      handleOpenModal("modalCurationOpen");
-    } else {
-      openLoginModal();
-    }
-  };
+  const { items } = useSelector((state) => state.profileItems);
 
-  const toggleDropdown2 = () => {
-    setIsDropdownOpen2(!isDropdownOpen2);
-  };
+  // const handleSubscribe = async () => {
+  //   if (isLoggedIn) {
+  //     dispatch(toggleGallerySubscription(galleryData));
+  //   } else {
+  //     openLoginModal();
+  //   }
+  // };
 
-  const handleChipOpen = () => {
-    if (isLoggedIn) {
-      setIsDropdownOpen(false);
-      handleOpenModal("modalChipOpen");
-    } else {
-      openLoginModal();
-    }
-  };
+  // const handleCurationOpenModal = () => {
+  //   if (isLoggedIn) {
+  //     setIsDropdownOpen(false);
+  //     handleOpenModal("modalCurationOpen");
+  //   } else {
+  //     openLoginModal();
+  //   }
+  // };
+
+  // const toggleDropdown2 = () => {
+  //   setIsDropdownOpen2(!isDropdownOpen2);
+  // };
+
+  // const handleChipOpen = () => {
+  //   if (isLoggedIn) {
+  //     setIsDropdownOpen(false);
+  //     handleOpenModal("modalChipOpen");
+  //   } else {
+  //     openLoginModal();
+  //   }
+  // };
 
   const handleEditCards = () => {
-    if (isLoggedIn) {
-      dispatch(setActiveTab("displayCards"));
-      setIsBottomSheetOpen(true);
-    } else {
-      openLoginModal();
-    }
+    dispatch(updateGalleryField({ name: "activeTab", value: "displayCards" }));
+    setIsBottomSheetOpen(true);
   };
 
   const openShareModal = (link) => {
@@ -177,11 +182,6 @@ const Gallery = ({ onUnsplashClick }) => {
     dispatch(setProfileEngagement(galleryData._id));
   };
 
-  const hasImages = galleryData.imageCards.length !== 0;
-  const isOwner = galleryData?.username === myData?.username;
-  const isSubscribed = galleryData.subscribers?.includes(myData._id);
-
-  const maxLength = 350;
   const componentDecorator = (href, text, key) => (
     <a
       href={href}
@@ -193,48 +193,45 @@ const Gallery = ({ onUnsplashClick }) => {
       {text}
     </a>
   );
-  const toggleReadMore = () => {
-    setIsExpanded(!isExpanded);
-  };
 
-  const handleCategoryOpenModal = () => {
-    setIsDropdownOpen(false);
-    handleOpenModal("modalCreateCategoryOpen");
-  };
+  // const handleCategoryOpenModal = () => {
+  //   setIsDropdownOpen(false);
+  //   handleOpenModal("modalCreateCategoryOpen");
+  // };
 
-  const handleCategoryReorderModal = () => {
-    setIsDropdownOpen2(false);
-    handleOpenModal("modalCategoryReorderOpen");
-  };
+  // const handleCategoryReorderModal = () => {
+  //   setIsDropdownOpen2(false);
+  //   handleOpenModal("modalCategoryReorderOpen");
+  // };
 
-  const handleSubscribersModal = () => {
-    handleOpenModal("modalMySubscribersOpen", galleryData._id);
-  };
+  // const handleSubscribersModal = () => {
+  //   handleOpenModal("modalMySubscribersOpen", galleryData._id);
+  // };
 
-  const handleReorderItems = () => {
-    setIsDropdownOpen2(false);
-    setReorderItems(true);
-  };
+  // const handleReorderItems = () => {
+  //   setIsDropdownOpen2(false);
+  //   setReorderItems(true);
+  // };
 
-  const handleSaveChanges = () => {
-    const items = pushItems.reorderItems;
-    dispatch(updateItemsOrderCategory(items))
-      .unwrap()
-      .then(() => {
-        setReorderItems(false);
-        dispatch(clearReorderItems());
-      })
-      .catch((error) => {
-        alert(error);
-      });
-  };
-  const handleResetChanges = () => {
-    setReorderItems(false);
-  };
+  // const handleSaveChanges = () => {
+  //   const items = pushItems.reorderItems;
+  //   dispatch(updateItemsOrderCategory(items))
+  //     .unwrap()
+  //     .then(() => {
+  //       setReorderItems(false);
+  //       dispatch(clearReorderItems());
+  //     })
+  //     .catch((error) => {
+  //       alert(error);
+  //     });
+  // };
+  // const handleResetChanges = () => {
+  //   setReorderItems(false);
+  // };
 
-  const handleNewsletterPage = () => {
-    navigate(`/${myData?.username}/newsletter`);
-  };
+  // const handleNewsletterPage = () => {
+  //   navigate(`/${myData?.username}/newsletter`);
+  // };
 
   if (isLoading) {
     return <ProfileSkeleton />;
@@ -247,15 +244,15 @@ const Gallery = ({ onUnsplashClick }) => {
 
   return (
     <div
-      className="w-full  pr-4 xs:pr-5 xl:pr-8   h-full"
+      className={`w-full pt-4 px-4 h-screen dark:bg-secondaryBackground-dark overflow-y-auto custom-scrollbar`}
       onClick={handleClickOutside}
     >
       {galleryStatus === "loading" ? (
         <ProfileSkeleton />
       ) : (
         <>
-          <div className="flex flex-row xs:ml-12 justify-center items-center mb-4">
-            <div className="mx-auto -mt-1 ">
+          {/* <div className="flex flex-row xs:ml-12 justify-center items-center mb-4"> */}
+          {/* <div className="mx-auto -mt-1 ">
               {tabs.map((tab) => (
                 <button
                   key={tab.id}
@@ -270,16 +267,16 @@ const Gallery = ({ onUnsplashClick }) => {
                   {tab.name}
                 </button>
               ))}
-            </div>
-            {isOwner && (
+            </div> */}
+          {/* {isOwner && (
               <p
                 className="hidden xs:flex px-2 xs:px-4 w-[85px] xs:w-32 text-center   xs:mb-1 py-1 xs:py-3 rounded-lg text-xs  bg-primary text-buttonText cursor-pointer"
                 onClick={handleNewsletterPage}
               >
                 Send newsletter
               </p>
-            )}
-          </div>
+            )} */}
+          {/* </div> */}
           {/* {isOwner && (
             <button
               className={`xs:bg-dark p-2 flex flex-row absolute right-0 xs:right-16 ${
@@ -295,20 +292,14 @@ const Gallery = ({ onUnsplashClick }) => {
               </p>
             </button>
           )} */}
-          <div
-            className={`py-1 ${
-              isOwner && !hasImages
-                ? "xl:w-4/5 xl:mx-auto"
-                : "xl:w-[94%] xl:mx-auto"
-            }`}
-          >
+          <div className="">
             <div
               className={`${
-                isOwner || hasImages ? "md:bg-profileBackground" : ""
-              } bg-primaryBackground rounded-lg md:px-7 px-0  py-4 sm:py-8 w-full`}
+                isOwner || hasImages ? "md:dark:bg-tertiaryBackground-dark" : ""
+              }  rounded-lg md:px-6 px-0 py-4 sm:py-6 w-full`}
             >
               <div
-                className={`flex flex-col md:flex-row ${
+                className={`flex flex-col rounded-md md:flex-row ${
                   isOwner || hasImages
                     ? "items-center md:justify-between justify-center"
                     : "items-center justify-center"
@@ -325,37 +316,42 @@ const Gallery = ({ onUnsplashClick }) => {
                     <img
                       src={galleryData.logo}
                       alt="Profile"
-                      className="rounded-full w-28 h-28 border border-white object-cover"
+                      className="rounded-full w-24 h-24 border border-white object-cover"
                       style={{ borderWidth: "3px" }}
                     />
                   ) : (
                     <img
                       src={ProfileIcon}
                       alt="Profile"
-                      className="rounded-full w-28 h-28 border bg-buttonBackground border-white object-cover"
+                      className="rounded-full w-24 h-24 dark:bg-chatDivider-dark border dark:border-secondaryText-dark p-6 object-cover"
                       style={{ borderWidth: "2px" }}
                     />
                   )}
                   <div
-                    className={`mt-1 md:ml-1  ${
+                    className={`mt-1   ${
                       isOwner || hasImages ? "profile-text" : "text-center"
                     }`}
                   >
-                    <h1 className="sm:text-2xl text-xl text-white font-normal font-familjen-grotesk">
-                      {galleryData.name}
-                    </h1>
-                    <p className="mt-1 text-xs  font-normal text-viewAll font-inter">
-                      {galleryData.username}.chips.social
-                    </p>
                     <p
+                      className={`sm:text-2xl text-xl  dark:text-secondaryText-dark font-normal font-inter`}
+                    >
+                      {galleryData.name}
+                    </p>
+                    <p className="mt-1 text-xs  font-light dark:text-profileColor-dark font-inter">
+                      {galleryData.username}.{domainUrl}
+                    </p>
+                    {/* <p
                       className="mt-1 text-xs  font-normal text-viewAll font-inter cursor-pointer"
                       onClick={handleSubscribersModal}
                     >
                       {galleryData.subscribers.length} Subscribers
-                    </p>
+                    </p> */}
                     {
                       <Linkify componentDecorator={componentDecorator}>
-                        <p className="mt-2 text-sm font-light text-textColor whitespace-pre-wrap overflow-hidden overflow-wrap break-word">
+                        <p
+                          className="mt-2 text-sm font-light dark:text-description-dark whitespace-pre-wrap 
+                        overflow-hidden overflow-wrap break-word"
+                        >
                           {isExpanded
                             ? galleryData.description
                             : `${galleryData.description.slice(0, maxLength)}${
@@ -366,7 +362,7 @@ const Gallery = ({ onUnsplashClick }) => {
                           {galleryData.description.length > maxLength && (
                             <span
                               onClick={toggleReadMore}
-                              className="text-primary cursor-pointer ml-1"
+                              className="dark:text-secondaryText-dark cursor-pointer ml-1"
                             >
                               {isExpanded ? (
                                 <>
@@ -393,7 +389,7 @@ const Gallery = ({ onUnsplashClick }) => {
                       </Linkify>
                     }
                     {(galleryData.location || galleryData.contact) && (
-                      <p className="mt-2 text-xs text-viewAll">
+                      <p className="mt-2 font-light text-xs dark:text-profileColor-dark">
                         {galleryData.location}
                         {galleryData.contact && galleryData.location
                           ? " | "
@@ -402,24 +398,12 @@ const Gallery = ({ onUnsplashClick }) => {
                       </p>
                     )}
                     <div
-                      className={`flex space-x-4 ${
+                      className={`flex flex-row space-x-4  ${
                         isOwner || hasImages
                           ? "md:justify-start justify-center"
                           : "justify-center"
                       }`}
                     >
-                      {galleryData.customText &&
-                        galleryData.customUrl &&
-                        !isOwner && (
-                          <a
-                            href={galleryData.customUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-5 mt-4  py-2 bg-primary text-buttonText text-sm rounded-lg"
-                          >
-                            {galleryData.customText}
-                          </a>
-                        )}
                       {isOwner && (
                         <p
                           target="_blank"
@@ -431,29 +415,57 @@ const Gallery = ({ onUnsplashClick }) => {
                             )
                           }
                           rel="noopener noreferrer"
-                          className="cursor-pointer px-3 mt-4  py-2.5 bg-primary text-buttonText text-xs rounded-lg"
+                          className="cursor-pointer px-3 mt-4 font-normal  py-2.5 dark:bg-secondaryText-dark
+                           dark:text-primaryBackground-dark text-xs rounded-lg"
                         >
                           Share profile
                         </p>
                       )}
+                      {galleryData.customText && galleryData.customUrl && (
+                        <a
+                          className={`px-4 mt-4 py-2.5 ${
+                            isOwner
+                              ? "border dark:border-secondaryText-dark dark:text-secondaryText-dark"
+                              : "dark:bg-secondaryText-dark dark:text-primaryBackground-dark"
+                          } 
+                           font-normal text-xs rounded-lg`}
+                          href={galleryData.customUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          {galleryData.customText}
+                        </a>
+                      )}
 
                       {!isOwner && (
-                        <button
-                          className={`px-4 mt-4  py-2 ${
-                            isSubscribed ? "bg-dark" : "bg-buttonBackground"
-                          } text-primary text-sm rounded-lg`}
-                          onClick={handleSubscribe}
+                        <div
+                          onClick={() =>
+                            openShareModal(
+                              `https://` +
+                                galleryData.username +
+                                `.${domainUrl}`
+                            )
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="cursor-pointer px-3 mt-4 font-normal py-2.5 border dark:border-secondaryText-dark
+                           dark:text-secondaryText-dark text-xs rounded-lg"
                         >
-                          {isSubscribed ? "Subscribed" : "Subscribe"}
-                        </button>
+                          Share profile
+                        </div>
                       )}
                       {isOwner && (
-                        <button
-                          className={`px-4 mt-4  py-2.5 ${"bg-buttonBackground"} text-primary text-xs rounded-lg`}
-                          onClick={openBottomSheet}
+                        <a
+                          className={`px-4 mt-4  py-2.5 border dark:border-secondaryText-dark 
+                            dark:text-secondaryText-dark font-normal text-xs rounded-lg`}
+                          href={galleryData.customUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
                         >
-                          Edit Profile
-                        </button>
+                          {galleryData.logo && galleryData.description !== ""
+                            ? "Edit Profile"
+                            : "Complete Profile"}
+                        </a>
                       )}
                     </div>
                     <div
@@ -463,10 +475,12 @@ const Gallery = ({ onUnsplashClick }) => {
                           : "justify-center"
                       }`}
                     >
-                      <div
-                        className="w-64 my-3  border border-borderColor "
-                        style={{ height: "0.1px" }}
-                      ></div>
+                      {galleryData.links.length >= 1 && (
+                        <div
+                          className="w-64 my-3  border dark:border-chatDivider-dark "
+                          style={{ height: "0.1px" }}
+                        ></div>
+                      )}
                     </div>
                     <div
                       className={`flex space-x-4 ${
@@ -522,12 +536,12 @@ const Gallery = ({ onUnsplashClick }) => {
                 </div>
                 {hasImages ? (
                   <div
-                    className={`flex md:ml-4 md:mt-0 mt-4 md:mb-0 justify-center ${
+                    className={`flex lg:ml-5 md:ml-2 md:mt-0 mt-4 md:mb-0 justify-center ${
                       !galleryData.description ||
                       galleryData.description.length <= 40
-                        ? "md:w-3/5 xl:w-1/2"
-                        : "md:w-3/5 xl:w-3/5"
-                    } h-full w-full md:justify-end mb-2`}
+                        ? "xl:w-1/2"
+                        : " xl:w-3/5"
+                    }  h-full w-full md:justify-end mb-2 lg:w-3/5 md:w-1/2`}
                   >
                     <ProfileCarousel images={galleryData.imageCards} />
                   </div>
@@ -545,159 +559,40 @@ const Gallery = ({ onUnsplashClick }) => {
                 ) : null}
               </div>
             </div>
-
-            <div className="w-full sm:mt-12 mt-8 p-4 bg-profileBackground rounded-lg border border-categoryBorder flex sm:flex-row flex-col items-center justify-between">
-              <div className="lg:w-1/2 md:w-3/5 sm:3/4  w-full text-textColor text-sm font-light font-inter">
-                Categorising your content will help your audience understand it
-                better. Example: Products, Events, Resources, Hiring,
-                Testimonials, FAQ etc
-              </div>
-              <div
-                className="bg-primary sm:mt-0 mt-3 rounded-md text-buttonText text-sm font-normal font-inter px-3 py-2 cursor-pointer"
-                onClick={handleCategoryOpenModal}
-              >
-                + new category
-              </div>
+            <div className="items-center text-center mt-3">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={(event) => handleTabClick(event, tab.href)}
+                  className={`mx-2 xs:px-8 px-4 py-3 text-sm transition-colors duration-300 ${
+                    activeTab === tab.href
+                      ? "border-b-2 dark:text-secondaryText-dark dark:border-secondaryText-dark"
+                      : "dark:text-primaryText-dark "
+                  }`}
+                  style={{ marginBottom: "-1px" }}
+                >
+                  {tab.name}
+                </button>
+              ))}
+            </div>
+            <div
+              className="w-88px mx-auto border dark:border-chatDivider-dark "
+              style={{ height: "0.1px" }}
+            ></div>
+            <div className="mt-6 mb-8">
+              {activeTab === "" ? (
+                <ChannelsTab gallery={true} />
+              ) : activeTab === "#curations" ? (
+                <CurationsTab isOwner={isOwner} items={items} gallery={true} />
+              ) : (
+                <FaqsTab username={galleryData.username} />
+              )}
             </div>
             <div
               className={`flex justify-between items-center ${
                 hasImages ? "mt-2 xs:mt-4" : "mt-1"
               } -ml-2`}
-            >
-              {isOwner && items.length > 0 && reorderItems === false && (
-                <div
-                  className="flex items-center cursor-pointer"
-                  onClick={toggleDropdown}
-                >
-                  <div className="rounded-md flex justify-center items-center">
-                    <img src={AddIcon} alt="Add" className="w-13 h-12 mt-3" />
-                  </div>
-                  <p className="text-primary font-normal text-xs -ml-1">
-                    Create new
-                  </p>
-                </div>
-              )}
-              {reorderItems === true && (
-                <div className="flex flex-row justify-between items-center w-full">
-                  <div
-                    className="text-buttonText bg-primary cursor-pointer rounded-full px-3 py-1.5 text-sm font-normal ml-2"
-                    onClick={handleSaveChanges}
-                  >
-                    Save Reordering
-                  </div>
-                  <div
-                    className="text-primary underline  cursor-pointer rounded-full px-3 py-1.5 text-sm font-normal ml-2"
-                    onClick={handleResetChanges}
-                  >
-                    Cancel
-                  </div>
-                </div>
-              )}
-              {isDropdownOpen && (
-                <div
-                  ref={dropdownRef}
-                  className="absolute mt-28 ml-3 w-28 rounded-md shadow-lg border border-dividerLine bg-chipBackground ring-1 ring-black ring-opacity-5 z-50"
-                >
-                  <div
-                    className="py-1"
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby="options-menu"
-                  >
-                    <div
-                      className="flex flex-row px-3 items-center"
-                      onClick={handleChipOpen}
-                    >
-                      <img src={ChipIcon} alt="edit" className="w-4 h-4" />
-                      <p
-                        className="block px-2 py-2 text-sm text-textFieldColor cursor-pointer"
-                        role="menuitem"
-                      >
-                        Chip
-                      </p>
-                    </div>
-                    <div
-                      className="flex flex-row px-3 items-center"
-                      onClick={handleCurationOpenModal}
-                    >
-                      <img src={CurationIcon} alt="edit" className="w-4 h-4" />
-                      <p
-                        className="block px-2 py-2 text-sm  text-textFieldColor cursor-pointer"
-                        role="menuitem"
-                      >
-                        Curation
-                      </p>
-                    </div>
-                    {/* <div
-                      className="flex flex-row px-3 items-center"
-                    >
-                      <img src={Category} alt="edit" className="w-4 h-4" />
-                      <p
-                        className="block px-2 py-2 text-sm  text-textFieldColor cursor-pointer"
-                        role="menuitem"
-                      >
-                        Category
-                      </p>
-                    </div> */}
-                  </div>
-                </div>
-              )}
-              <div className="relative flex pr-2">
-                {isOwner && reorderItems === false && items.length > 1 && (
-                  <div
-                    className="flex flex-col space-y-1 cursor-pointer"
-                    onClick={toggleDropdown2}
-                  >
-                    <div className="w-1 h-1 bg-primary rounded-full"></div>
-                    <div className="w-1 h-1 bg-primary rounded-full"></div>
-                    <div className="w-1 h-1 bg-primary rounded-full"></div>
-                  </div>
-                )}
-                {isDropdownOpen2 && (
-                  <div
-                    ref={dropdownRef2}
-                    className="absolute right-0 mt-2 w-max rounded-md shadow-lg border border-dividerLine bg-chipBackground ring-1 ring-black ring-opacity-5 z-50"
-                  >
-                    <div
-                      className="py-1"
-                      role="menu"
-                      aria-orientation="vertical"
-                      aria-labelledby="options-menu"
-                    >
-                      <div
-                        className="flex flex-row px-4 items-center"
-                        onClick={handleCategoryReorderModal}
-                      >
-                        <img src={ShareIcon} alt="edit" className="w-4 h-4" />
-                        <p
-                          className="block ml-1 py-2 text-sm text-textFieldColor cursor-pointer"
-                          role="menuitem"
-                        >
-                          Reorder Category
-                        </p>
-                      </div>
-                      <div
-                        className="flex flex-row px-4 items-center"
-                        onClick={handleReorderItems}
-                      >
-                        <img src={ShareIcon} alt="edit" className="w-4 h-4" />
-                        <p
-                          className="block  ml-1 py-2 text-sm text-deleteIcon cursor-pointer"
-                          role="menuitem"
-                        >
-                          Reorder Items
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-            <ProfileView
-              gallery={false}
-              owner={isOwner}
-              enableReorder={reorderItems}
-            />
+            ></div>
           </div>
           <ProfileForm
             isOpen={isBottomSheetOpen}
@@ -706,7 +601,7 @@ const Gallery = ({ onUnsplashClick }) => {
             gallery={true}
           />
           <UnsplashModal
-            open={isUnsplashModalOpen}
+            isOpen={isUnsplashModalOpen}
             onClose={closeUnsplashModal}
           />
         </>

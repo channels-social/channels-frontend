@@ -111,6 +111,12 @@ const EditChipModal = () => {
     if (chipData.image_urls.length <= 5) {
       const newFiles = [];
       files.forEach((file) => {
+        if (file.size > 8 * 1024 * 1024) {
+          alert(
+            `The file "${file.name}" exceeds the 8 MB size limit and will not be uploaded.`
+          );
+          return;
+        }
         const newFile = {
           id: uuidv4(),
           url: URL.createObjectURL(file),

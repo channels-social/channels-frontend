@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import ArrowBack from "../../assets/icons/arrow_back.svg";
 import ArrowForward from "../../assets/icons/arrow_forward.svg";
 import ArrowForwardDark from "../../assets/icons/arrow_forward_dark.svg";
 import ArrowDropDown from "../../assets/icons/arrow_drop_down.svg";
@@ -28,7 +27,7 @@ const NewsletterForm = () => {
   const [emailError, setEmailError] = useState("");
 
   const newsletter = useSelector((state) => state.newsletter);
-  const { letterstatus, teststatus, records, recordStatus } = useSelector(
+  const { letterstatus, records, recordStatus } = useSelector(
     (state) => state.newsletter
   );
   const myData = useSelector((state) => state.myData);
@@ -45,9 +44,9 @@ const NewsletterForm = () => {
     return () => clearTimeout(timer);
   }, [myData.username, username, navigate]);
 
-  const handleNavigateHome = (value) => {
-    navigate(`/`);
-  };
+  // const handleNavigateHome = (value) => {
+  //   navigate(`/`);
+  // };
 
   const handleChange = (e) => {
     const { name, value } = e.target;

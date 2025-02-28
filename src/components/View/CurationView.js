@@ -174,10 +174,10 @@ const CurationView = () => {
   const isEditable = curation?.visibility === "anyone" || isOwner;
 
   return (
-    <div className="flex flex-col pr-8 -ml-1 w-full">
+    <div className="flex flex-col px-4 pt-4 dark:bg-chatDivider-dark w-full h-full overflow-y-auto custom-scrollbar">
       {/* <div className="flex flex-row justify-between items-center mt-3 relative"> */}
       <div className="flex flex-row items-center space-x-3 w-full">
-        <p className="sm:text-3xl xs:text-2xl text-xl text-white font-normal font-familjen-grotesk">
+        <p className="sm:text-3xl  text-xl text-white font-normal font-familjen-grotesk">
           {curation.name}
         </p>
         {!owner && (
@@ -185,7 +185,7 @@ const CurationView = () => {
             {" "}
             {/* New relative container for positioning */}
             {isSavedMessageVisible && (
-              <div className="absolute -top-7 left-1/2 transform -translate-x-1/2 bg-dark text-white text-xs rounded-lg px-2 py-1">
+              <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-dark text-white text-xs rounded-lg px-2 py-1">
                 {savedMessage}
               </div>
             )}
@@ -275,14 +275,14 @@ const CurationView = () => {
                 </div>} */}
       </div>
       {curation.description && (
-        <p className="text-textColor text-xs mt-2 mb-1 w-full lg:w-1/2 font-normal font-inter">
+        <p className="dark:text-primaryText-dark text-xs mt-2 mb-1 w-full lg:w-1/2 font-normal font-inter">
           {curation.description}
         </p>
       )}
       {curation?.user?.username && (
         <a
           href={`https://${domainUrl}/profile/${curation.user.username}`}
-          className="text-primary inline-block font-normal text-xs mt-2 underline mb-8 w-max"
+          className="dark:text-secondaryText-dark font-normal text-xs mt-2 underline mb-8 w-max"
           style={{ textUnderlineOffset: "2px" }}
         >
           {curation.user.name}

@@ -3,15 +3,16 @@ import Close from "../../../assets/icons/Close.svg";
 import Search from "../../../assets/icons/search.svg";
 import { useSelector, useDispatch } from "react-redux";
 import ArrowDropDown from "../../../assets/icons/arrow_drop_down.svg";
-import ReplyIcon from "../../../assets/icons/reply_line.svg";
 import { useParams } from "react-router-dom";
 import { removeFromResource } from "../../../redux/slices/chatSlice";
 import documentImage from "../../../assets/images/Attachment.svg";
+import useModal from "./../../hooks/ModalHook";
 
 const ResourcePage = () => {
-  // const [selectedTab, setSelectedTab] = useState("Images");
   const [searchQuery, setSearchQuery] = useState("");
   const { username } = useParams();
+  const { handleOpenModal } = useModal();
+
   const [resourceChats, setResourceChats] = useState([]);
   const myData = useSelector((state) => state.myData);
   const Chats = useSelector((state) => state.chat.chats);
@@ -22,6 +23,10 @@ const ResourcePage = () => {
   });
   const [showMediaMenu, setShowMediaMenu] = useState(false);
   const [filterItems, setFilterItems] = useState([]);
+
+  const handleClick = (document) => {
+    handleOpenModal("modalDocumentOpen", document);
+  };
 
   const handleMouseEnterMedia = (mediaId, mediaIndex) => {
     setHoveredMedia({ mediaId, mediaIndex });
@@ -82,7 +87,6 @@ const ResourcePage = () => {
         }))
         .filter((chat) => chat.media.length > 0);
     }
-    console.log("Filtered Chats:", filteredChats);
     setResourceChats(filteredChats);
   }, [Chats, filterItems, searchQuery]);
 
@@ -180,7 +184,7 @@ const ResourcePage = () => {
         <input
           type="text"
           placeholder="Search with file name, sender's name or date"
-          className={` pl-9 pr-3 py-3 mb-2 bg-dark dark:bg-tertiaryBackground-dark dark:text-secondaryText-dark 
+          className={` pl-9 pr-3 py-3 mb-2 bg-dark dark:bg-transparent dark:text-secondaryText-dark 
             placeholder-textFieldColor border-2 dark:border-chatBackground-dark ${"rounded-lg"} text-sm
             placeholder:text-sm placeholder:dark:text-primaryText-dark
             placeholder:text-left focus:outline-none w-full font-inter font-normal flex `}
@@ -196,101 +200,111 @@ const ResourcePage = () => {
       ) : (
         resourceChats.map((chat) => (
           <div className="flex flex-col mt-2 h-full  overflow-y-auto custom-scrollbar">
-            {chat.media.map((media, index) => (
-              <div className="flex flex-row space-x-2 mt-2 overflow-x-auto w-full custom-scrollbar">
-                <div
-                  key={`${chat._id}-${media._id}`}
-                  className="relative flex flex-col"
-                  onMouseEnter={() => handleMouseEnterMedia(media._id, index)}
-                  onMouseLeave={handleMouseLeaveMedia}
-                >
-                  <div className="dark:text-emptyEvent-dark font-extralight text-xs">
-                    {chat.user.username}{" "}
-                    {new Date(chat.createdAt).toLocaleString()}
-                  </div>
-                  {media.type === "image" ? (
-                    <div className="relative h-40">
-                      <img
-                        src={media.url}
-                        alt={media.name}
-                        className="h-36 rounded-md object-cover w-auto max-w-52"
-                      />
-                      <div></div>
-                    </div>
-                  ) : media.type === "video" ? (
-                    <video
-                      controls
-                      className="h-36 object-cover  rounded-t-xl w-auto max-w-52"
+            {chat.media.map(
+              (media, index) =>
+                media.resource === true && (
+                  <div className="flex flex-row space-x-2 mt-2 overflow-x-auto w-full custom-scrollbar">
+                    <div
+                      key={`${chat._id}-${media._id}`}
+                      className="relative flex flex-col"
+                      onMouseEnter={() =>
+                        handleMouseEnterMedia(media._id, index)
+                      }
+                      onMouseLeave={handleMouseLeaveMedia}
                     >
-                      <source src={media.url} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
-                  ) : media.type === "document" ? (
-                    <div className="w-full rounded-lg dark:bg-secondaryBackground-dark cursor-pointer relative mt-2 ">
-                      <div className="flex flex-row items-center justify-start w-full">
-                        <img
-                          src={documentImage}
-                          alt="Document Icon"
-                          className="h-14 w-15 object-fill"
-                        />
-                        <div className="flex flex-col my-1 ml-3 w-full-minus-68">
-                          <p className="dark:text-secondaryText-dark text-xs overflow-hidden text-ellipsis whitespace-nowrap font-normal">
-                            {media.name}
-                          </p>
-                          <p className="dark:text-primaryText-dark mt-1  text-[10px] xs:text-xs font-light font-inter">
-                            {media.size} Kb
-                          </p>
+                      <div className="dark:text-emptyEvent-dark font-extralight text-xs">
+                        {chat.user.username}{" "}
+                        {new Date(chat.createdAt).toLocaleString()}
+                      </div>
+                      {media.type === "image" ? (
+                        <div className="relative h-40">
+                          <img
+                            src={media.url}
+                            alt={media.name}
+                            className="h-36 rounded-md object-cover w-auto max-w-52 flex-shrink-0"
+                          />
+                          <div></div>
                         </div>
-                      </div>
-                    </div>
-                  ) : null}
-                  {isOwner &&
-                    hoveredMedia.mediaId === media._id &&
-                    hoveredMedia.mediaIndex === index && (
-                      <div
-                        className="absolute top-3 right-1 cursor-pointer"
-                        onClick={() => handleShowMediaMenu(chat._id, index)}
-                      >
-                        <img
-                          src={ArrowDropDown}
-                          alt="arrow-dop-down"
-                          className="w-8 h-8"
-                        />
-                      </div>
-                    )}
-                  {isOwner &&
-                    showMediaMenu.chatId === chat._id &&
-                    showMediaMenu.mediaIndex === index && (
-                      <div
-                        className="absolute top-10 right-0 w-max rounded-md shadow-lg
-                            dark:bg-dropdown-dark z-50"
-                      >
-                        <div
-                          className="py-1"
-                          role="menu"
-                          aria-orientation="vertical"
-                          aria-labelledby="options-menu"
+                      ) : media.type === "video" ? (
+                        <video
+                          controls
+                          className="h-36 object-cover  rounded-t-xl w-auto max-w-52"
                         >
-                          <div
-                            className="relative flex flex-row px-4 items-center"
-                            onClick={() =>
-                              handleRemoveResource(chat._id, media._id)
-                            }
-                          >
-                            <img src={ReplyIcon} alt="reply" />
-                            <p
-                              className="block ml-2 py-2 text-sm dark:text-primaryText-dark cursor-pointer"
-                              role="menuitem"
-                            >
-                              Remove from Resource
-                            </p>
+                          <source src={media.url} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                      ) : media.type === "document" ? (
+                        <div className="w-full rounded-lg dark:bg-secondaryBackground-dark relative mt-2 ">
+                          <div className="flex flex-row items-center justify-start w-full">
+                            <img
+                              src={documentImage}
+                              alt="Document Icon"
+                              className="h-14 w-15 object-fill pr-3 cursor-pointer "
+                              onClick={() => handleClick(media)}
+                            />
+                            <div className="flex flex-col my-1  w-full-minus-68">
+                              <p className="dark:text-secondaryText-dark text-xs overflow-hidden text-ellipsis whitespace-nowrap font-normal">
+                                {media.name}
+                              </p>
+                              <p className="dark:text-primaryText-dark mt-1  text-[10px] xs:text-xs font-light font-inter">
+                                {media.size} Kb
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
-                </div>
-              </div>
-            ))}
+                      ) : null}
+                      {isOwner &&
+                        hoveredMedia.mediaId === media._id &&
+                        hoveredMedia.mediaIndex === index && (
+                          <div
+                            className={`absolute ${
+                              media.type === "document"
+                                ? "top-4 right-1"
+                                : "top-3 right-5"
+                            }  cursor-pointer`}
+                            onClick={() => handleShowMediaMenu(chat._id, index)}
+                          >
+                            <img
+                              src={ArrowDropDown}
+                              alt="arrow-dop-down"
+                              className="w-8 h-8"
+                            />
+                          </div>
+                        )}
+                      {isOwner &&
+                        showMediaMenu.chatId === chat._id &&
+                        showMediaMenu.mediaIndex === index && (
+                          <div
+                            className="absolute top-10 right-0 w-max dark:bg-tertiaryBackground-dark border
+           dark:border-modalBorder-dark shadow-lg rounded-lg  z-10"
+                          >
+                            <div
+                              className="py-1"
+                              role="menu"
+                              aria-orientation="vertical"
+                              aria-labelledby="options-menu"
+                            >
+                              <div
+                                className="relative flex flex-row px-4 items-center"
+                                onClick={() =>
+                                  handleRemoveResource(chat._id, media._id)
+                                }
+                              >
+                                {/* <img src={ReplyIcon} alt="reply" /> */}
+                                <p
+                                  className="block ml-2 py-2 text-sm dark:text-primaryText-dark cursor-pointer"
+                                  role="menuitem"
+                                >
+                                  Remove from Resource
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                    </div>
+                  </div>
+                )
+            )}
           </div>
         ))
       )}

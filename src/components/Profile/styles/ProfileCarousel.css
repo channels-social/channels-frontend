@@ -25,7 +25,7 @@
 }
 
 .slick-dots li {
-  margin: 0 5px; /* Space between dots */
+  margin: 0 4px; /* Space between dots */
 }
 
 .slick-dots li button:before {
@@ -34,7 +34,8 @@
   display: block;
   height: 8px;
   width: 8px;
-  background-color: #e4e4e4;
+  background-color: transparent;
+  border: 1px solid #e4e4e4;
   opacity: 1;
   border-radius: 50%;
 }
@@ -43,7 +44,7 @@
   background-color: #e4e4e4;
   height: 8px;
   margin-top: 0px;
-  width: 24px;
+  width: 8px;
   border-radius: 12px;
 }
 

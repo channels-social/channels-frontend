@@ -33,6 +33,7 @@ import { closeModal } from "../../../redux/slices/modalSlice";
 import { updateMyField } from "../../../redux/slices/myDataSlice";
 import { domainUrl } from "./../../../utils/globals";
 import Profile from "../../../assets/icons/profile.svg";
+import { getCsrfToken } from "../../../services/csrfToken";
 
 const initialLinks = [
   {
@@ -133,6 +134,7 @@ const OnboardingModal = () => {
   const [isUsernameLoading, setUsernameLoading] = useState(false);
   const [charCount, setCharCount] = useState(0);
   const maxChars = 500;
+  const csrfToken = getCsrfToken();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -151,7 +153,7 @@ const OnboardingModal = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     handleClose();
-    navigate(`/profile/${auth.user.username}`);
+    navigate(`/user/${auth.user.username}`);
   };
 
   const handleSkip = () => {
@@ -162,7 +164,7 @@ const OnboardingModal = () => {
     } else {
       handleClose();
       setIndex(0);
-      navigate(`/profile/${auth.user.username}`);
+      navigate(`/user/${auth.user.username}`);
     }
   };
 

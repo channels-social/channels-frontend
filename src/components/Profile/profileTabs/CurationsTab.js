@@ -13,7 +13,7 @@ import ShareIcon from "../../../assets/icons/shareIcon.svg";
 import ChipIcon from "../../../assets/icons/chip_icon.svg";
 import CurationIcon from "../../../assets/icons/curation_icon.svg";
 
-const CurationsTab = ({ isOwner, items }) => {
+const CurationsTab = ({ isOwner, items, gallery = false }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isDropdownOpen2, setIsDropdownOpen2] = useState(false);
   const [reorderItems, setReorderItems] = useState(false);
@@ -219,7 +219,7 @@ const CurationsTab = ({ isOwner, items }) => {
       )}
 
       <ProfileView
-        gallery={false}
+        gallery={gallery}
         owner={isOwner}
         enableReorder={reorderItems}
       />

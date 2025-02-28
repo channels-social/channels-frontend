@@ -42,12 +42,12 @@ const PrivacyPolicy = () => {
     <Dialog.Root open={isOpenPrivacy}>
       <Dialog.Portal>
         <Dialog.Overlay
-          className="fixed inset-0 bg-black bg-opacity-70 z-60"
+          className="fixed inset-0 bg-black bg-opacity-70 "
           onClick={handleOverlayClick}
         />
-        <div className="fixed inset-0  flex items-center justify-center">
+        <div className="fixed inset-0 flex items-center justify-center z-[999]">
           <Dialog.Content
-            className="dark:bg-primaryBackground-dark rounded-xl overflow-hidden shadow-xl transform transition-all min-h-[20%] max-h-[75%] overflow-y-auto custom-scrollbar w-3/4 md:w-1/2 lg:w-1/3 py-5 pl-5"
+            className=" dark:bg-primaryBackground-dark rounded-xl overflow-hidden shadow-xl transform transition-all min-h-[20%] max-h-[75%] overflow-y-auto custom-scrollbar w-3/4 md:w-1/2 lg:w-1/3 py-5 pl-5"
             onClick={(e) => e.stopPropagation()}
           >
             <Dialog.Title />

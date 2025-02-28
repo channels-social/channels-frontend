@@ -11,16 +11,20 @@ import {
   createTopic,
   updateTopic,
 } from "../../../redux/slices/createTopicSlice.js";
+import { useNavigate } from "react-router-dom";
 
 const TopicModal = () => {
   const topic = useSelector((state) => state.createTopic);
-  const Topicstatus = useSelector((state) => state.topic.topicstatus);
+  const Topicstatus = useSelector((state) => state.channelItems.topicstatus);
   const [error, setError] = useState("");
   const dispatch = useDispatch();
   const handleClose = () => {
     dispatch(clearCreateTopic());
     dispatch(closeModal("modalTopicOpen"));
   };
+  const myData = useSelector((state) => state.myData);
+
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -42,9 +46,12 @@ const TopicModal = () => {
       formDataToSend.append("channel", topic.channel);
       dispatch(createTopic(formDataToSend))
         .unwrap()
-        .then(() => {
+        .then((topic) => {
           handleClose();
           dispatch(clearCreateTopic());
+          navigate(
+            `/user/${myData.username}/channel/${topic.channel}/c-id/topic/${topic._id}`
+          );
           setError("");
         })
         .catch((error) => {
@@ -121,6 +128,7 @@ const TopicModal = () => {
                   value={topic.name}
                   onChange={handleChange}
                   maxLength={maxChars}
+                  autocomplete="off"
                   placeholder="Enter topic of discussion"
                 />
                 {topicNameError && (
@@ -174,7 +182,7 @@ const TopicModal = () => {
                   </label>
                 </div>
               </div>
-              {/* <div className="mb-4 mt-1">
+              <div className="mb-4 mt-1">
                 <p className="dark:text-white text-sm font-normal font-inter">
                   Who can write in this topic?
                 </p>
@@ -194,12 +202,12 @@ const TopicModal = () => {
                     <input
                       type="radio"
                       name="editability"
-                      value="admins"
+                      value="invite"
                       className="mr-2 custom-radio"
-                      checked={topic.editability === "admins"}
+                      checked={topic.editability === "invite"}
                       onChange={handleChange}
                     />
-                    <span>Admins</span>
+                    <span>Invite only</span>
                   </label>
                   <label className="dark:text-primaryText-dark text-sm font-normal flex items-center">
                     <input
@@ -213,7 +221,7 @@ const TopicModal = () => {
                     <span>Only me</span>
                   </label>
                 </div>
-              </div> */}
+              </div>
 
               {error && (
                 <div className="my-2 text-errorLight font-light text-sm">

@@ -9,6 +9,7 @@ const initialState = {
   modalChipEditOpen: false,
   modalCustomTagOpen: false,
   modalOnboardOpen: false,
+  modalCurationUnsplashOpen: false,
   modalUnsplashModalOpen: false,
   modalChannelUnsplashOpen: false,
   modalChannelCoverOpen: false,
@@ -17,12 +18,17 @@ const initialState = {
   modalPrivacyOpen: false,
   modalTermsOpen: false,
   modalLogoutOpen: false,
+  modalFeedbackOpen: false,
   modalChipDeleteOpen: false,
   modalCurationDeleteOpen: false,
   modalChatDeleteOpen: false,
+  modalRemoveMemberOpen: false,
   modalShareOpen: false,
+  modalEventOpen: false,
+  modalEventCardOpen: false,
   modalShareChipOpen: false,
   modalShareChannelOpen: false,
+  modalShareTopicOpen: false,
   modalShareProfileOpen: false,
   modalTokenExpiryOpen: false,
   modalUnsubscriptionOpen: false,
@@ -32,6 +38,7 @@ const initialState = {
   modalPushtoCategoryOpen: false,
   modalPushtoCurationOpen: false,
   modalCategoryReorderOpen: false,
+  modalTopicReorderOpen: false,
   modalFaqDeleteOpen: false,
   shareLink: "",
   shareUsername: "",
@@ -41,6 +48,9 @@ const initialState = {
   isLoginMode: false,
   profileId: "",
   channelId: "",
+  topicId: "",
+  event: {},
+  eventId: "",
 };
 
 const modalSlice = createSlice({
@@ -49,6 +59,17 @@ const modalSlice = createSlice({
   reducers: {
     setLoginMode: (state, action) => {
       state.isLoginMode = action.payload;
+    },
+    clearEventItem: (state, action) => {
+      state.chatId = "";
+      state.event = {};
+    },
+    setModalModal: (state, action) => {
+      const { field, value } = action.payload;
+      state[field] = value;
+    },
+    clearEventIdToDelete: (state, action) => {
+      state.eventId = "";
     },
     openModal: (state, action) => {
       const { modalName, link } = action.payload;
@@ -66,6 +87,12 @@ const modalSlice = createSlice({
         state.profileId = link;
       }
       if (modalName === "modalShareChannelOpen") {
+        state.channelId = link;
+      }
+      if (modalName === "modalShareTopicOpen") {
+        state.topicId = link;
+      }
+      if (modalName === "modalTopicReorderOpen") {
         state.channelId = link;
       }
       if (modalName === "modalDocumentOpen") {
@@ -91,16 +118,30 @@ const modalSlice = createSlice({
       if (modalName === "modalDocumentOpen") {
         state.document = null;
       }
+      if (modalName === "modalTopicReorderOpen") {
+        state.channelId = "";
+      }
       if (modalName === "modalMySubscribersOpen") {
         state.profileId = "";
       }
       if (modalName === "modalShareChannelOpen") {
         state.channelId = "";
       }
+      if (modalName === "modalShareTopicOpen") {
+        state.topicId = "";
+        state.channelId = "";
+      }
     },
   },
 });
 
-export const { openModal, closeModal, setLoginMode } = modalSlice.actions;
+export const {
+  openModal,
+  closeModal,
+  setLoginMode,
+  setModalModal,
+  clearEventItem,
+  clearEventIdToDelete,
+} = modalSlice.actions;
 
 export default modalSlice.reducer;

@@ -14,18 +14,19 @@ import useModal from "./../hooks/ModalHook";
 import { closeModal } from "../../redux/slices/modalSlice";
 import { createCuration } from "../../redux/slices/profileItemsSlice";
 import { updateCurationPage } from "../../redux/slices/curationPageSlice";
+import Compressor from "compressorjs";
 
 const CurationModal = () => {
-  const categories = [
-    "Technology",
-    "Art & Design",
-    "Entertainment",
-    "Travel",
-    "Fashion & Lifestyle",
-    "Food",
-    "Education",
-    "Social Impact",
-  ];
+  // const categories = [
+  //   "Technology",
+  //   "Art & Design",
+  //   "Entertainment",
+  //   "Travel",
+  //   "Fashion & Lifestyle",
+  //   "Food",
+  //   "Education",
+  //   "Social Impact",
+  // ];
   const { handleOpenModal } = useModal();
 
   const handleOpen = () => {
@@ -71,13 +72,44 @@ const CurationModal = () => {
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        dispatch(setCurationField({ field: "image", value: reader.result }));
-        dispatch(setCurationField({ field: "imageSource", value: "upload" }));
-      };
-      reader.readAsDataURL(file);
+      if (file.size > 20 * 1024 * 1024) {
+        alert(
+          `The file "${file.name}" exceeds the 20 MB size limit and will not be uploaded.`
+        );
+        return;
+      }
+
+      if (file.size >= 7 * 1024 * 1024) {
+        new Compressor(file, {
+          quality: 0.5,
+          maxWidth: 1920,
+          maxHeight: 1080,
+          success(result) {
+            setFile(result);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              dispatch(
+                setCurationField({ field: "image", value: reader.result })
+              );
+              dispatch(
+                setCurationField({ field: "imageSource", value: "upload" })
+              );
+            };
+            reader.readAsDataURL(result);
+          },
+          error(err) {
+            alert("Image compression failed: " + err);
+          },
+        });
+      } else {
+        setFile(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          dispatch(setCurationField({ field: "image", value: reader.result }));
+          dispatch(setCurationField({ field: "imageSource", value: "upload" }));
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -261,6 +293,7 @@ const CurationModal = () => {
                   value={curation.name}
                   onChange={handleChange}
                   maxLength={maxChars}
+                  autocomplete="off"
                   placeholder="Name of this curation"
                 />
                 {curationNameError && (

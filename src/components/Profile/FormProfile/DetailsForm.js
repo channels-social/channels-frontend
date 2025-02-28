@@ -3,6 +3,9 @@ import { React, useState } from "react";
 import { useSelector } from "react-redux";
 import Profile from "../../../assets/icons/profile.svg";
 import ProfileTextField from "../../widgets/ProfileTextField";
+import PhoneInput from "react-phone-input-2";
+import "react-phone-input-2/lib/style.css";
+import "./phoneInputOverrides.css";
 
 const DetailsForm = ({ formData, onFieldChange, handleImageUpload }) => {
   const [charCount, setCharCount] = useState(
@@ -26,6 +29,14 @@ const DetailsForm = ({ formData, onFieldChange, handleImageUpload }) => {
     } else {
       onFieldChange(name, value);
     }
+  };
+
+  const handlePhoneChange = (value, countryData) => {
+    const countryCode = `+${countryData.dialCode}`;
+    const phoneNumber = value.slice(countryData.dialCode.length);
+    const formattedNumber = `${countryCode}-${phoneNumber}`;
+    const name = "contact";
+    onFieldChange(name, formattedNumber);
   };
 
   return (
@@ -81,13 +92,23 @@ const DetailsForm = ({ formData, onFieldChange, handleImageUpload }) => {
             </p>
           )}
         </div>
+        <div className="relative">
+          <label className="absolute left-4 -top-2 text-xs font-light font-inter z-20 dark:bg-tertiaryBackground-dark dark:text-secondaryText-dark">
+            Contact
+          </label>
+          <div className="flex items-center  rounded-md ">
+            <PhoneInput
+              country="in"
+              value={formData.contact}
+              onChange={handlePhoneChange}
+              containerClass="custom-phone-input"
+              dropdownClass="z-50"
+              placeholder="Enter contact number"
+              excludeCountries={["id"]}
+            />
+          </div>
+        </div>
 
-        <ProfileTextField
-          label="Contact"
-          value={formData.contact}
-          onChange={handleChange}
-          name="contact"
-        />
         <ProfileTextField
           label="Location"
           value={formData.location}
@@ -98,7 +119,7 @@ const DetailsForm = ({ formData, onFieldChange, handleImageUpload }) => {
         <div className="relative">
           <label
             className="absolute left-4 -top-2 text-xs font-light font-inter
-           dark:bg-tertiaryBackground-dark dark:text-secondaryText-dark"
+           dark:bg-tertiaryBackground-dark dark:text-secondaryText-dark z-00"
           >
             Description
           </label>

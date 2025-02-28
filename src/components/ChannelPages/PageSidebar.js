@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import ArrowUp from "../../assets/icons/up-arrow.svg";
 import ArrowDown from "../../assets/icons/arrow_drop_down.svg";
 import PoweredBy from "../../assets/icons/poweredby.svg";
@@ -11,7 +11,6 @@ const channels = [
 ];
 
 const PageSidebar = ({ channelName, pageName, closeSidebar }) => {
-  const location = useLocation();
   const navigate = useNavigate();
   const [expandedChannels, setExpandedChannels] = useState(
     Array.from({ length: channels.length }, () => false)

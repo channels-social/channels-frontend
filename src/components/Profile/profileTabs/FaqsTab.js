@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import DropDown from "../../../assets/icons/arrow_drop_down.svg";
 import DropUp from "../../../assets/icons/arrow_drop_up.svg";
-import FAQCover from "../../../assets/channel_images/faq_cover.svg";
+import FAQCover from "../../../assets/images/Faq_empty_state.svg";
 import AddIcon from "../../../assets/icons/addIcon.svg";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import DragDrop from "../../../assets/icons/dragdrop.png";
@@ -30,10 +30,12 @@ const FaqItem = ({
   isReorder,
   provided,
   toggleEditFaq,
+  dropdownRef,
+  isDropdownOpen,
+  setIsDropdownOpen,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
+
   const { handleOpenModal } = useModal();
   const dispatch = useDispatch();
 
@@ -42,8 +44,12 @@ const FaqItem = ({
       setIsDropdownOpen(false);
     }
   };
-  const toggleDropdown = () => {
-    setIsDropdownOpen(!isDropdownOpen);
+  const toggleDropdown = (id) => {
+    // if (isDropdownOpen === id) {
+    //   setIsDropdownOpen(null);
+    // } else {
+    setIsDropdownOpen(id);
+    // }
   };
   const handleDeleteFaq = (id) => {
     dispatch(setFaqData({ field: "faq_id", value: id }));
@@ -81,9 +87,9 @@ const FaqItem = ({
             src={Dots}
             alt="dots"
             className="w-6 h-6 mr-2"
-            onClick={toggleDropdown}
+            onClick={() => toggleDropdown(id)}
           />
-          {isDropdownOpen && (
+          {isDropdownOpen === id && (
             <div
               ref={dropdownRef}
               className="absolute top-6 left-0 mt-1 ml-3 w-28 rounded-md shadow-lg border  dark:border-chatDivider-dark
@@ -140,26 +146,39 @@ const FaqItem = ({
   );
 };
 
-const FaqsTab = () => {
+const FaqsTab = ({ username }) => {
   const [isCreateFaq, setIsCreateFaq] = useState(false);
   const [isReorder, setIsReorder] = useState(false);
   const [isEditFaq, setIsEditFaq] = useState(false);
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const Faq = useSelector((state) => state.faqs);
   const dispatch = useDispatch();
-  const {
-    faqs: initialFaqs,
-    status,
-    error,
-  } = useSelector((state) => state.faqs);
+  const dropdownRef = useRef(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(null);
+  const { faqs: initialFaqs, status } = useSelector((state) => state.faqs);
   const [items, setItems] = useState(initialFaqs);
 
-  useEffect(() => {
-    dispatch(fetchFaqs());
-  }, []);
+  // useEffect(() => {
+  //   dispatch(fetchFaqs(username));
+  // }, [dispatch, username]);
 
   useEffect(() => {
-    setItems(initialFaqs);
-  }, [initialFaqs]);
+    if (initialFaqs.length === 0) {
+      dispatch(fetchFaqs(username));
+    }
+  }, [dispatch, username, initialFaqs.length]);
+
+  useEffect(() => {
+    if (items.length !== initialFaqs.length) {
+      setItems(initialFaqs);
+    }
+  }, [initialFaqs, items.length]);
+
+  const handleClickOutside = (event) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsDropdownOpen(null);
+    }
+  };
 
   const handleDragEnd = (result) => {
     if (!result.destination) return;
@@ -192,18 +211,24 @@ const FaqsTab = () => {
   const closeFaq = () => {
     setIsCreateFaq(false);
     setIsEditFaq(false);
+    dispatch(setFaqData({ field: "question", value: "" }));
+    dispatch(setFaqData({ field: "", value: "" }));
   };
   const handleSaveReorder = () => {
     const items = Faq.reorderItems;
-    dispatch(updateFaqsOrder(items))
-      .unwrap()
-      .then(() => {
-        setIsReorder(false);
-        dispatch(clearReorderItems());
-      })
-      .catch((error) => {
-        alert(error);
-      });
+    if (items.length > 0) {
+      dispatch(updateFaqsOrder(items))
+        .unwrap()
+        .then(() => {
+          setIsReorder(false);
+          dispatch(clearReorderItems());
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    } else {
+      setIsReorder(false);
+    }
   };
 
   const handleCreateFaq = () => {
@@ -240,33 +265,45 @@ const FaqsTab = () => {
     Faq.question === "" || Faq.answer === ""
       ? "dark:text-buttonDisable-dark dark:text-opacity-40 dark:bg-buttonDisable-dark dark:bg-opacity-10"
       : "dark:bg-buttonEnable-dark dark:text-secondaryText-dark";
+
+  if (status === "loading") {
+    return (
+      <div className="dark:text-primaryText-dark text-md font-normal mt-12 items-center flex justify-center">
+        Loading...
+      </div>
+    );
+  }
   return (
-    <div className="flex flex-col">
-      {items.length > 0 && isReorder === false && isEditFaq === false && (
-        <div className="flex flex-row justify-between items-center mt-2 mb-4">
-          <div className="flex items-center cursor-pointer">
-            <div className="rounded-lg mr-1 flex dark:bg-tertiaryBackground-dark p-1  justify-center items-center">
-              <img
-                src={AddIcon}
-                alt="Add"
-                className="w-4 h-4 dark:text-secondaryText-dark"
-              />
-            </div>
-            <p
-              className="dark:text-emptyEvent-dark font-light text-sm "
+    <div className="flex flex-col" onClick={handleClickOutside}>
+      {items.length > 0 &&
+        isReorder === false &&
+        isEditFaq === false &&
+        isLoggedIn &&
+        !isCreateFaq && (
+          <div className="flex flex-row justify-between items-center mt-2 mb-4">
+            <div
+              className="flex items-center cursor-pointer"
               onClick={toggleCreateFaq}
             >
-              Create new
-            </p>
+              <div className="rounded-lg mr-1 flex dark:bg-tertiaryBackground-dark p-1  justify-center items-center">
+                <img
+                  src={AddIcon}
+                  alt="Add"
+                  className="w-4 h-4 dark:text-secondaryText-dark"
+                />
+              </div>
+              <p className="dark:text-emptyEvent-dark font-light text-sm ">
+                Create new
+              </p>
+            </div>
+            <div
+              className="flex flex-col space-y-1 cursor-pointer text-sm font-light dark:text-emptyEvent-dark"
+              onClick={() => setIsReorder(true)}
+            >
+              Reorder
+            </div>
           </div>
-          <div
-            className="flex flex-col space-y-1 cursor-pointer text-sm font-light dark:text-emptyEvent-dark"
-            onClick={() => setIsReorder(true)}
-          >
-            Reorder
-          </div>
-        </div>
-      )}
+        )}
       {isReorder && (
         <div className="flex flex-row justify-between items-center mt-2 mb-4">
           <div
@@ -283,11 +320,11 @@ const FaqsTab = () => {
           </div>
         </div>
       )}
-      <div className="w-full border dark:border-chatDivider-dark p-4 rounded-xl mb-16">
+      <div className="w-full border dark:border-chatDivider-dark p-4 rounded-xl ">
         <div className="dark:text-secondaryText-dark text-xl font-medium font-familjen-grotesk ">
           FAQs
         </div>
-        {items.length === 0 && (
+        {items.length === 0 && isLoggedIn ? (
           <div className="rounded-lg dark:bg-chatDivider-dark p-4 flex flex-row mt-2">
             <img src={FAQCover} alt="faq_cover" className="h-28 w-auto" />
             <div className="flex flex-col ml-3 justify-between">
@@ -309,7 +346,11 @@ const FaqsTab = () => {
               </div>
             </div>
           </div>
-        )}
+        ) : items.length === 0 ? (
+          <div className="text-center dark:text-secondaryText-dark">
+            No Faqs Found.
+          </div>
+        ) : null}
         {(isCreateFaq || isEditFaq) && (
           <div className="dark:bg-tertiaryBackground-dark rounded-lg px-5 py-3 flex flex-col mt-6">
             <input
@@ -322,6 +363,7 @@ const FaqsTab = () => {
               value={Faq.question}
               onChange={handleChange}
               placeholder="Enter question here"
+              autoComplete="off"
             />
             <textarea
               id="answer"
@@ -334,6 +376,7 @@ const FaqsTab = () => {
               rows="1"
               onChange={handleResizeChange}
               placeholder="Write the answer"
+              autoComplete="off"
             />
             <div className="justify-end flex flex-row mt-6 space-x-6">
               <div
@@ -373,6 +416,9 @@ const FaqsTab = () => {
                           isReorder={isReorder}
                           provided={provided}
                           toggleEditFaq={toggleEditFaq}
+                          dropdownRef={dropdownRef}
+                          isDropdownOpen={isDropdownOpen}
+                          setIsDropdownOpen={setIsDropdownOpen}
                         />
                       )}
                     </Draggable>

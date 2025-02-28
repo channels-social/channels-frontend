@@ -93,6 +93,7 @@ const CreateCategoryModal = () => {
                   type="text"
                   value={profileItems.category.name}
                   onChange={handleChange}
+                  autocomplete="off"
                   placeholder="Example: About, Products, Events, FAQ, etc"
                 />
               </div>

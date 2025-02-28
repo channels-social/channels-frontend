@@ -1,0 +1,79 @@
+.custom-phone-input {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background-color: transparent;
+  border: 1px solid #d1d5db; /* Tailwind's border-gray-300 */
+  border-radius: 0.375rem; /* Tailwind's rounded-md */
+  padding: 0.5rem; /* Tailwind's px-4 */
+  font-family: Inter, sans-serif; /* Tailwind's font-inter */
+}
+
+.custom-phone-input input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding-left: 0.5rem; /* Tailwind's pl-2 */
+  background-color: transparent;
+  color: #111827; /* Tailwind's text-gray-900 */
+}
+
+.custom-phone-input .flag-dropdown {
+  border: none;
+  background-color: transparent;
+  padding-right: 0.5rem; /* Tailwind's pr-2 */
+}
+
+.custom-phone-input .flag-dropdown:hover {
+  cursor: pointer;
+}
+
+.react-tel-input .form-control {
+  background: transparent;
+  border: none;
+}
+
+.custom-phone-input input {
+  color: #e4e4e4;
+}
+
+.react-tel-input .flag-dropdown.open {
+  background: transparent;
+}
+.react-tel-input .flag-dropdown.open .selected-flag {
+  background: transparent;
+}
+.react-tel-input .country-list {
+  background-color: #2c2c2c;
+}
+.react-tel-input .country-list .country.highlight {
+  background-color: #202020;
+}
+.flag-dropdown.open:hover {
+  background: transparent;
+}
+.custom-phone-input .flag-dropdown:hover {
+  background: transparent;
+}
+.react-tel-input:hover .flag-dropdown:hover,
+.react-tel-input .flag-dropdown:focus {
+  background: transparent;
+}
+.custom-phone-input:hover {
+  background: transparent;
+}
+.react-tel-input:hover .flag-dropdown.open:hover .selected-flag:hover {
+  background: transparent;
+}
+.react-tel-input .country-list .country-name {
+  color: #c4c4c4;
+}
+.react-tel-input .country-list .country:hover {
+  background: #202020;
+}
+.custom-phone-input .flag-dropdown:hover {
+  background: transparent;
+}
+.react-tel-input .selected-flag:hover {
+  background: transparent;
+}

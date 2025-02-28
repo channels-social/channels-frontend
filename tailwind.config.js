@@ -32,6 +32,9 @@ module.exports = {
         calendarMarkings: {
           dark: "#cac4d0",
         },
+        onboardBackground: {
+          dark: "#d9d9d9",
+        },
         emptyEvent: {
           dark: "#898989",
         },
@@ -76,30 +79,34 @@ module.exports = {
         inter: ["Inter"],
         "familjen-grotesk": ['"Familjen Grotesk"', "sans-serif"],
       },
-      screens: {
-        xs: "470px",
-        xl: "1150px",
-        xxl: "1400px",
-      },
       fontWeight: {
         extralight: 100,
         light: 200,
+        thin: 300,
         normal: 400,
         medium: 500,
         semibold: 600,
         bold: 700,
         extrabold: 800,
       },
+      screens: {
+        xs: "470px",
+        xl: "1150px",
+        xxl: "1400px",
+      },
+
       spacing: {
         "full-minus-60": "calc(100hw - 120px)",
         "left-banner-width": "calc(100vw - 88px)",
         "full-minus-120": "calc(100vw - 72px)",
         "full-minus-12": "calc(100% - 13px)",
         "full-minus-80": "calc(100vw - 80px)",
-        "full-height-30": "calc(100vh - 80px)",
+        "full-height-30": "calc(100vh - 76px)",
         "full-height-70": "calc(100vh - 70px)",
         "full-height-160": "calc(100vh - 170px)",
+        "page-chat-screen": "calc(100vh - 130px)",
         "full-minus-64": "calc(100vw - 72px)",
+        "full-minus-250": "calc(100vw - 250px)",
         "full-minus-68": "calc(100% - 68px)",
         76: "305px",
         "72px": "72px",

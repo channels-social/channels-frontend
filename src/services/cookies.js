@@ -1,4 +1,4 @@
-/*import Cookies from "js-cookie";
+import Cookies from "js-cookie";
 import { domainUrl } from "./../utils/globals";
 
 export const setAuthCookies = (token, user) => {
@@ -11,13 +11,13 @@ export const setAuthCookies = (token, user) => {
   const cookieOptions = {
     domain: `.${domainUrl}`,
     path: "/",
-    expires: 7,
+    expires: 14,
   };
 
   Cookies.set("token", token, cookieOptions);
   Cookies.set("user", JSON.stringify(userData), cookieOptions);
 
-  const expiryTime = new Date().getTime() + 7 * 24 * 60 * 60 * 1000;
+  const expiryTime = new Date().getTime() + 14 * 24 * 60 * 60 * 1000;
   Cookies.set("tokenExpiry", expiryTime, cookieOptions);
 };
 
@@ -58,9 +58,9 @@ export const updateAuthUsername = (newUsername) => {
       path: "/",
     });
   }
-};*/
+};
 
-import Cookies from "js-cookie";
+/*import Cookies from "js-cookie";
 import { domainUrl } from "./../utils/globals";
 
 export const setAuthCookies = (token, user) => {
@@ -108,4 +108,4 @@ export const updateAuthUsername = (newUsername) => {
     user.username = newUsername;
     Cookies.set("user", JSON.stringify(user));
   }
-};
+};*/

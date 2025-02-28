@@ -7,8 +7,6 @@
 // import ProfileItemsSkeleton from './../../skeleton/profileItemsSkeleton';
 // import { fetchGalleryItems } from './../../../redux/slices/profileItemsSlice';
 
-
-
 // const MasonryItem = ({ item, owner }) => {
 //     if (item.type === 'curation') {
 //       return (
@@ -19,22 +17,18 @@
 //     } else if (item.type === 'chip') {
 //       return (
 //         <div className="chip-item my-masonry-grid_item">
-//          {owner ? <Chips item={item}/> :<ProfileChips item={item} />} 
+//          {owner ? <Chips item={item}/> :<ProfileChips item={item} />}
 //         </div>
 //       );
 //     }
 //     return null;
 //   };
 
-
 // const GalleryView = ({owner}) => {
 //   const dispatch = useDispatch();
 
 //   const { items, status, error } = useSelector((state) => state.profileItems);
 //   const galleryData = useSelector((state) => state.galleryData);
-
-  
-
 
 //   useEffect(() => {
 //     if(galleryData.username){
@@ -53,11 +47,11 @@
 //       if (status === 'loading') {
 //         return <ProfileItemsSkeleton/>
 //       }
-    
+
 //       if (status === 'failed') {
 //         return <div>Error: {error}</div>;
 //       }
-    
+
 //   return (
 //     <div className="ml-8 w-full">
 //         <ResponsiveMasonry
@@ -74,7 +68,6 @@
 //     </Masonry>
 //     </ResponsiveMasonry>
 
-      
 //     </div>
 //   )
 // }

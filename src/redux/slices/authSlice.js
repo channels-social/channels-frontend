@@ -1,14 +1,16 @@
-import { createSlice } from '@reduxjs/toolkit';
-import { getUserData,getAuthToken } from './../../services/cookies';
+import { createSlice } from "@reduxjs/toolkit";
+import { getUserData, getAuthToken } from "./../../services/cookies";
 
 const initialState = {
   user: null,
   token: null,
   isLoggedIn: false,
+  isOnboarding: false,
+  isSubdomain: false,
 };
 
 const authSlice = createSlice({
-  name: 'auth',
+  name: "auth",
   initialState,
   reducers: {
     setCredentials: (state, action) => {
@@ -16,6 +18,13 @@ const authSlice = createSlice({
       state.user = user;
       state.token = token;
       state.isLoggedIn = true;
+    },
+    setOnboarding: (state, action) => {
+      state.isOnboarding = action.payload;
+    },
+
+    setIsDomain: (state, action) => {
+      state.isSubdomain = action.payload;
     },
     logOut: (state) => {
       state.user = null;
@@ -25,8 +34,8 @@ const authSlice = createSlice({
     initializeAuth: (state) => {
       const token = getAuthToken();
       const user = getUserData();
-    
-     if (token && user) {
+
+      if (token && user) {
         state.token = token;
         state.user = user;
         state.isLoggedIn = true;
@@ -42,5 +51,12 @@ const authSlice = createSlice({
   },
 });
 
-export const { setCredentials, logOut, initializeAuth,updateUser } = authSlice.actions;
+export const {
+  setCredentials,
+  logOut,
+  initializeAuth,
+  updateUser,
+  setOnboarding,
+  setIsDomain,
+} = authSlice.actions;
 export default authSlice.reducer;

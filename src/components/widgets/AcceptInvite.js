@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { hostUrl } from "../../utils/globals";
+import { useNavigate } from "react-router-dom";
+import Logo from "../../assets/icons/channels_logo.svg";
 
 const AcceptInvite = () => {
   const [searchParams] = useSearchParams();
   const [message, setMessage] = useState("Processing your request...");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const channelId = searchParams.get("channelId");
@@ -28,8 +31,23 @@ const AcceptInvite = () => {
   }, [searchParams]);
 
   return (
-    <div style={{ textAlign: "center", padding: "20px" }}>
-      <h2>{message}</h2>
+    <div className="flex flex-col items-start w-full h-full mt-4 ">
+      <img
+        src={Logo}
+        alt="logo"
+        className="ml-4 h-8 text-start items-start justify-start"
+      />
+      <div className="dark:text-secondaryText-dark  justify-center flex flex-col mx-auto mt-10 ">
+        <h2>{message}</h2>
+        <div
+          className={`py-2 mt-4 px-3 cursor-pointer mx-auto dark:text-secondaryText-dark dark:bg-buttonEnable-dark w-max
+                 
+                   rounded-lg text-xs sm:text-sm font-inter`}
+          onClick={() => navigate("/")}
+        >
+          Back to home
+        </div>
+      </div>
     </div>
   );
 };

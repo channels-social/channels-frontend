@@ -15,6 +15,8 @@ import {
   setCreateChannelField,
   createClearChannel,
 } from "../../../redux/slices/createChannelSlice.js";
+import { useNavigate } from "react-router-dom";
+import Compressor from "compressorjs";
 
 const ChannelModal = () => {
   const { handleOpenModal } = useModal();
@@ -22,6 +24,7 @@ const ChannelModal = () => {
   const Channelstatus = useSelector(
     (state) => state.createChannel.channelstatus
   );
+  const myData = useSelector((state) => state.myData);
 
   const handleClose = () => {
     dispatch(createClearChannel());
@@ -38,34 +41,101 @@ const ChannelModal = () => {
   const [file, setFile] = useState(null);
   const [logoFile, setLogoFile] = useState(null);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        dispatch(
-          setCreateChannelField({ field: "cover_image", value: reader.result })
+      if (file.size > 20 * 1024 * 1024) {
+        alert(
+          `The file "${file.name}" exceeds the 20 MB size limit and will not be uploaded.`
         );
-        dispatch(
-          setCreateChannelField({ field: "imageSource", value: "upload" })
-        );
-      };
-      reader.readAsDataURL(file);
+        return;
+      }
+
+      if (file.size >= 7 * 1024 * 1024) {
+        new Compressor(file, {
+          quality: 0.5,
+          maxWidth: 1920,
+          maxHeight: 1080,
+          success(result) {
+            setFile(result);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              dispatch(
+                setCreateChannelField({
+                  field: "cover_image",
+                  value: reader.result,
+                })
+              );
+              dispatch(
+                setCreateChannelField({ field: "imageSource", value: "upload" })
+              );
+            };
+            reader.readAsDataURL(result);
+          },
+          error(err) {
+            alert("Image compression failed: " + err);
+          },
+        });
+      } else {
+        setFile(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          dispatch(
+            setCreateChannelField({
+              field: "cover_image",
+              value: reader.result,
+            })
+          );
+          dispatch(
+            setCreateChannelField({ field: "imageSource", value: "upload" })
+          );
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
+
   const handleLogoUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
-      setLogoFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        dispatch(
-          setCreateChannelField({ field: "logo", value: reader.result })
+      if (file.size > 20 * 1024 * 1024) {
+        alert(
+          `The file "${file.name}" exceeds the 20 MB size limit and will not be uploaded.`
         );
-      };
-      reader.readAsDataURL(file);
+        return;
+      }
+
+      if (file.size > 7 * 1024 * 1024) {
+        new Compressor(file, {
+          quality: 0.5,
+          maxWidth: 1920,
+          maxHeight: 1080,
+          success(result) {
+            setLogoFile(result);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+              dispatch(
+                setCreateChannelField({ field: "logo", value: reader.result })
+              );
+            };
+            reader.readAsDataURL(result);
+          },
+          error(err) {
+            alert("Image compression failed: " + err);
+          },
+        });
+      } else {
+        setLogoFile(file);
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          dispatch(
+            setCreateChannelField({ field: "logo", value: reader.result })
+          );
+        };
+        reader.readAsDataURL(file);
+      }
     }
   };
 
@@ -91,37 +161,22 @@ const ChannelModal = () => {
   const checkChannelName = async (name) => {
     setNameError("");
     if (name !== "") {
-      dispatch(
-        setCreateChannelField({ field: "channelstatus", value: "loading" })
-      );
       try {
         const response = await postRequestAuthenticated("/check/channel/name", {
           name,
         });
         if (response.success) {
-          dispatch(
-            setCreateChannelField({ field: "channelstatus", value: "idle" })
-          );
           setNameError("");
           return true;
         } else {
-          dispatch(
-            setCreateChannelField({ field: "channelstatus", value: "idle" })
-          );
           setNameError("Name already exist.");
           return false;
         }
       } catch (error) {
-        dispatch(
-          setCreateChannelField({ field: "channelstatus", value: "idle" })
-        );
         setNameError(error);
         return false;
       }
     } else {
-      dispatch(
-        setCreateChannelField({ field: "channelstatus", value: "idle" })
-      );
       setNameError("Name can't be empty");
       return false;
     }
@@ -131,7 +186,9 @@ const ChannelModal = () => {
     e.preventDefault();
     setError("");
     setNameError("");
-
+    dispatch(
+      setCreateChannelField({ field: "channelstatus", value: "loading" })
+    );
     const isNameUnique = await checkChannelName(channel.name);
     if (!isNameUnique) {
       return;
@@ -153,11 +210,12 @@ const ChannelModal = () => {
       formDataToSend.append("imageSource", channel.imageSource);
       dispatch(createChannel(formDataToSend))
         .unwrap()
-        .then(() => {
+        .then((channel) => {
           handleClose();
           dispatch(createClearChannel());
           setFile(null);
           setError("");
+          navigate(`/user/${myData.username}/channel/${channel._id}`);
         })
         .catch((error) => {
           alert(error);
@@ -175,13 +233,21 @@ const ChannelModal = () => {
       formDataToSend.append("_id", channel._id);
       formDataToSend.append("visibility", channel.visibility);
       formDataToSend.append("description", channel.description);
-      if (logoFile && channel.logo) {
+
+      if (logoFile) {
         formDataToSend.append("logo", logoFile);
+      } else if (channel.logo) {
+        formDataToSend.append("logo", channel.logo);
+      } else {
+        formDataToSend.append("logo", "");
       }
+
       if (file && channel.imageSource === "upload") {
         formDataToSend.append("cover_image", file);
-      } else if (channel.cover_image && channel.imageSource === "unsplash") {
+      } else if (channel.cover_image) {
         formDataToSend.append("cover_image", channel.cover_image);
+      } else {
+        formDataToSend.append("cover_image", "");
       }
       formDataToSend.append("imageSource", channel.imageSource);
       dispatch(updateChannel(formDataToSend))
@@ -204,9 +270,11 @@ const ChannelModal = () => {
   const handleImageClear = () => {
     dispatch(setCreateChannelField({ field: "cover_image", value: null }));
     dispatch(setCreateChannelField({ field: "imageSource", value: "" }));
+    setFile(null);
   };
   const handleLogoClear = () => {
     dispatch(setCreateChannelField({ field: "logo", value: null }));
+    setLogoFile(null);
   };
 
   const [charCount, setCharCount] = useState(0);
@@ -240,7 +308,7 @@ const ChannelModal = () => {
               </div>
               <div className="mb-4">
                 <div className="flex flex-row justify-between">
-                  <p className="dark:text-white text-sm font-normal font-inter">
+                  <p className="dark:text-white text-sm font-light font-inter">
                     Name of the channel
                   </p>
                   <div className="dark:text-subtitle-dark text-xs font-light font-inter">
@@ -256,6 +324,7 @@ const ChannelModal = () => {
                   value={channel.name}
                   onChange={handleChange}
                   maxLength={maxChars}
+                  autocomplete="off"
                   placeholder="Enter the name of your community here"
                 />
                 {nameError && (
@@ -267,10 +336,10 @@ const ChannelModal = () => {
                 )}
               </div>
               <div className="relative mb-2">
-                <p className="dark:text-white text-sm font-normal font-inter">
+                <p className="dark:text-white text-sm font-light font-inter">
                   Describe this channel
                 </p>
-                <p className="dark:text-subtitle-dark text-xs font-normal font-inter mb-2">
+                <p className="dark:text-subtitle-dark text-xs font-light font-inter mb-2">
                   A good description can get you focused audience.
                 </p>
                 <textarea
@@ -288,7 +357,7 @@ const ChannelModal = () => {
                 </div>
               </div>
               <div className="mb-4 mt-1">
-                <p className="dark:text-white text-sm font-normal font-inter">
+                <p className="dark:text-white text-sm font-light font-inter">
                   Who can access this channel?
                 </p>
                 <div className="flex mt-3 items-center space-x-6">
@@ -346,7 +415,7 @@ const ChannelModal = () => {
                 </div>
               </div>
               <div className="mb-4">
-                <p className="dark:text-white text-sm font-normal font-inter">
+                <p className="dark:text-white text-sm font-light font-inter">
                   Add your community's logo{" "}
                   <span className="italic">(optional)</span>
                 </p>
@@ -355,7 +424,7 @@ const ChannelModal = () => {
                     <div className="flex flex-col items-center justify-center">
                       <img src={Upload} alt="Upload" className="w-5 h-5 mb-2" />
                       <p className="dark:text-secondaryText-dark text-xs font-light font-inter">
-                        Upload logo
+                        Upload image
                       </p>
                       <input
                         type="file"
@@ -386,7 +455,7 @@ const ChannelModal = () => {
               </div>
 
               <div className="mb-4">
-                <p className="dark:text-white text-sm font-normal font-inter">
+                <p className="dark:text-white text-sm font-light font-inter">
                   Add cover image to this channel
                 </p>
                 {!channel.cover_image && (
@@ -489,7 +558,7 @@ const ChannelModal = () => {
                 </div>
               )}
               <button
-                className={`w-full mt-3 py-2.5 font-normal text-sm rounded-full ${buttonClass}`}
+                className={`w-full mt-3 py-2.5 font-normal text-sm rounded-lg ${buttonClass}`}
                 disabled={isNameEmpty}
                 onClick={
                   channel.isEdit ? handleEditChannel : handleCreateChannel

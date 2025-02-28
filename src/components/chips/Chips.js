@@ -117,27 +117,29 @@ const Chips = ({ item }) => {
           <Initicon text={item.user.name} size={42} />
         )}
       </div>
-      <p className="dark:text-secondaryText-dark text-sm mt-1 font-normal pr-4">
+      <p className="dark:text-profileColor-dark text-sm mt-1 font-normal pr-4">
         {item.user?.name}
       </p>
       <div className="flex flex-col space-y-2.5">
         {
           <Linkify componentDecorator={componentDecorator}>
-            <p className="dark:text-secondaryText-dark pr-1 text-sm font-light font-inter whitespace-pre-wrap overflow-hidden overflow-wrap break-word">
-              {isExpanded
-                ? item.text
-                : `${item.text.slice(0, maxLength)}${
-                    item.text.length > maxLength ? "..." : ""
-                  }`}
-              {item.text.length > maxLength && (
-                <span
-                  onClick={toggleReadMore}
-                  className="text-primary cursor-pointer ml-1"
-                >
-                  {isExpanded ? "<- Show Less" : "Read More ->"}
-                </span>
-              )}
-            </p>
+            <div className="w-full pr-1 overflow-hidden">
+              <p className="dark:text-secondaryText-dark text-sm font-light font-inter whitespace-pre-wrap break-words">
+                {isExpanded
+                  ? item.text
+                  : `${item.text.slice(0, maxLength)}${
+                      item.text.length > maxLength ? "..." : ""
+                    }`}
+                {item.text.length > maxLength && (
+                  <span
+                    onClick={toggleReadMore}
+                    className="dark:text-white cursor-pointer ml-1"
+                  >
+                    {isExpanded ? "<- Show Less" : "Read More ->"}
+                  </span>
+                )}
+              </p>
+            </div>
           </Linkify>
         }
         {item.date.date && item.date.event && <DateTimeCard item={item.date} />}

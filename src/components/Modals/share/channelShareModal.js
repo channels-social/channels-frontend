@@ -25,7 +25,7 @@ const ChannelShareModal = () => {
   };
   const isOpen = useSelector((state) => state.modals.modalShareChannelOpen);
   const channelId = useSelector((state) => state.modals.channelId);
-  const username = useSelector((state) => state.myData.username);
+  const username = useSelector((state) => state.modals.shareUsername);
   let shareUrl;
   if (code) {
     shareUrl = `https://${domainUrl}/user/${username}/channel/${channelId}?code=${code}`;
@@ -44,23 +44,25 @@ const ChannelShareModal = () => {
 
   const socialMediaLinks = [
     {
-      icon: <FaFacebookF className="text-primary w-6 h-6" />,
+      icon: <FaFacebookF className="dark:text-secondaryText-dark w-6 h-6" />,
       url: `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`,
     },
     {
-      icon: <FaTwitter className="text-primary w-6 h-6" />,
+      icon: <FaTwitter className="dark:text-secondaryText-dark w-6 h-6" />,
       url: `https://twitter.com/intent/tweet?url=${shareUrl}`,
     },
     {
-      icon: <FaTelegramPlane className="text-primary w-6 h-6" />,
+      icon: (
+        <FaTelegramPlane className="dark:text-secondaryText-dark w-6 h-6" />
+      ),
       url: `https://t.me/share/url?url=${shareUrl}`,
     },
     {
-      icon: <FaLinkedin className="text-primary w-6 h-6" />,
+      icon: <FaLinkedin className="dark:text-secondaryText-dark w-6 h-6" />,
       url: `https://www.linkedin.com/shareArticle?mini=true&url=${shareUrl}`,
     },
     {
-      icon: <FaWhatsapp className="text-primary w-6 h-6" />,
+      icon: <FaWhatsapp className="dark:text-secondaryText-dark w-6 h-6" />,
       url: `https://api.whatsapp.com/send?text=${shareUrl}`,
     },
   ];
@@ -88,7 +90,7 @@ const ChannelShareModal = () => {
               />
             </div>
             <p className="dark:text-secondaryText-dark text-md mt-2 font-light font-inter">
-              Share this profile via
+              Share this channel via
             </p>
             <div className="flex justify-start items-center  mt-4 flex-wrap">
               {socialMediaLinks.map((social, index) => (

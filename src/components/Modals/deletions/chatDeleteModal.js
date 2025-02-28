@@ -7,12 +7,13 @@ import {
   deleteTopicChat,
   clearChatIdToDelete,
 } from "../../../redux/slices/chatSlice";
-import { useNavigate } from "react-router-dom";
+import socket from "../../../utils/socket";
 
 const DeleteChatModal = () => {
   const dispatch = useDispatch();
   const isOpen = useSelector((state) => state.modals.modalChatDeleteOpen);
   const chatIdToDelete = useSelector((state) => state.chat.chatReplyId);
+  const topicIdToDelete = useSelector((state) => state.chat.topicReplyId);
 
   if (!isOpen) return null;
 
@@ -25,6 +26,7 @@ const DeleteChatModal = () => {
     dispatch(deleteTopicChat(chatIdToDelete))
       .unwrap()
       .then(() => {
+        socket.emit("delete_message", { chatIdToDelete, topicIdToDelete });
         dispatch(closeModal("modalChatDeleteOpen"));
         dispatch(clearChatIdToDelete());
       })

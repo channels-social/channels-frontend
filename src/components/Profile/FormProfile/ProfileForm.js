@@ -9,13 +9,9 @@ import {
   setImageCards,
   removeImageCard,
 } from "../../../redux/slices/imageCardsSlice";
-import {
-  postRequestAuthenticated,
-  postRequestUnAuthenticated,
-} from "./../../../services/rest";
+import { postRequestAuthenticated } from "./../../../services/rest";
 import { v4 as uuidv4 } from "uuid";
 import {
-  fetchProfile,
   setActiveTab,
   updateProfileField,
   setProfileData,
@@ -24,13 +20,12 @@ import { updateProfile } from "./../../../redux/slices/myDataSlice";
 import { useNavigate } from "react-router-dom";
 import { updateAuthUsername } from "../../../services/cookies";
 import { domainUrl } from "./../../../utils/globals";
+import Compressor from "compressorjs";
 
 const ProfileForm = ({ isOpen, onClose, onUnsplashClick, gallery = false }) => {
   const modalRef = useRef(null);
   const myData = useSelector((state) => state.myData);
-  const Updatestatus = useSelector((state) => state.myData.updatestatus);
   const profileData = useSelector((state) => state.profileData);
-  // const usernameError = useSelector((state) => state.profileData.usernameError);
   const imageCards = useSelector((state) => state.imageCards);
   const [localFormData, setLocalFormData] = useState(myData);
   const dispatch = useDispatch();
@@ -86,9 +81,9 @@ const ProfileForm = ({ isOpen, onClose, onUnsplashClick, gallery = false }) => {
               );
               dispatch(setProfileData(user));
               setLoading(false);
-              dispatch(setImageCards(myData.imageCards || []));
               dispatch(setMyData(user));
               dispatch(setActiveTab("profileDetails"));
+              dispatch(setImageCards(myData.imageCards || []));
               setFile(null);
               setFileObjects([]);
               onClose();
@@ -128,18 +123,46 @@ const ProfileForm = ({ isOpen, onClose, onUnsplashClick, gallery = false }) => {
       [name]: value,
     }));
   };
+
   const handleUploadImageCards = (event) => {
     const files = Array.from(event.target.files);
     if (imageCards.length <= 5) {
       const newFiles = [];
       files.forEach((file) => {
-        const newImage = {
-          id: uuidv4(),
-          url: URL.createObjectURL(file),
-          source: "upload",
-        };
-        dispatch(addImageCard(newImage));
-        newFiles.push(file);
+        if (file.size > 20 * 1024 * 1024) {
+          alert(
+            `The file "${file.name}" exceeds the 20 MB size limit and will not be uploaded.`
+          );
+          return;
+        }
+
+        if (file.size >= 7 * 1024 * 1024) {
+          new Compressor(file, {
+            quality: 0.5,
+            maxWidth: 1920,
+            maxHeight: 1080,
+            success(result) {
+              const newImage = {
+                id: uuidv4(),
+                url: URL.createObjectURL(result),
+                source: "upload",
+              };
+              dispatch(addImageCard(newImage));
+              newFiles.push(result);
+            },
+            error(err) {
+              alert("Image compression failed: " + err);
+            },
+          });
+        } else {
+          const newImage = {
+            id: uuidv4(),
+            url: URL.createObjectURL(file),
+            source: "upload",
+          };
+          dispatch(addImageCard(newImage));
+          newFiles.push(file);
+        }
       });
       setFileObjects([...fileObjects, ...newFiles]);
     } else {

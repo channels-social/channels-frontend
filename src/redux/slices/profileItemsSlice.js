@@ -169,12 +169,11 @@ export const fetchGalleryItems = createAsyncThunk(
   async (username, { rejectWithValue }) => {
     try {
       const response = await postRequestUnAuthenticated(
-        "/gallery/chips/curations",
+        "/gallery/category/chips/curations",
         { username }
       );
-      // console.log(response);
       if (response.success) {
-        return response.items;
+        return response.categorizedItems;
       } else {
         return rejectWithValue(response.message);
       }
@@ -291,6 +290,18 @@ export const profileItemsSlice = createSlice({
         state.status = "failed";
         state.error = action.error.message;
       })
+      .addCase(fetchGalleryItems.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchGalleryItems.fulfilled, (state, action) => {
+        state.status = "success";
+        state.items = action.payload;
+        state.fetchedOnce = true;
+      })
+      .addCase(fetchGalleryItems.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
       .addCase(fetchlimitedProfileItems.pending, (state) => {
         state.status = "loading";
       })
@@ -400,17 +411,7 @@ export const profileItemsSlice = createSlice({
           }
         }
       })
-      .addCase(fetchGalleryItems.pending, (state) => {
-        state.status = "loading";
-      })
-      .addCase(fetchGalleryItems.fulfilled, (state, action) => {
-        state.status = "succeeded";
-        state.items = action.payload;
-      })
-      .addCase(fetchGalleryItems.rejected, (state, action) => {
-        state.status = "failed";
-        state.error = action.error.message;
-      })
+
       .addCase(createChipComment.fulfilled, (state, action) => {
         const updatedComment = action.payload;
         const categoryId = updatedComment.profile_category || "";

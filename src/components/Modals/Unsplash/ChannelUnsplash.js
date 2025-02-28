@@ -86,7 +86,7 @@ const ChannelUnsplash = () => {
         />
         <div className="fixed z-50 inset-0 flex items-center justify-center">
           <Dialog.Content
-            className="dark:bg-tertiaryBackground-dark rounded-xl overflow-hidden shadow-xl transform transition-all w-3/4 h-3/4 lg:w-1/4 sm:w-1/2 pt-5 pl-5 flex flex-col"
+            className="dark:bg-tertiaryBackground-dark rounded-xl overflow-hidden shadow-xl transform transition-all w-3/4 h-3/4 lg:w-1/2 sm:w-1/2 pt-5 pl-5 flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             <Dialog.Title />

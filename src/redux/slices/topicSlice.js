@@ -25,6 +25,46 @@ export const fetchTopic = createAsyncThunk(
   }
 );
 
+export const createTopicInvite = createAsyncThunk(
+  "topic/create-topic-invite",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await postRequestAuthenticated(
+        "/create/topic/invite",
+        data
+      );
+      console.log(response);
+      if (response.success) {
+        return response.invite;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const joinTopicInvite = createAsyncThunk(
+  "topic/join-topic-invite",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await postRequestAuthenticated(
+        "/join/topic/invite",
+        data
+      );
+      console.log(response);
+      if (response.success) {
+        return response.topic;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const initialState = {
   name: "",
   user: "",
@@ -35,6 +75,8 @@ const initialState = {
   _id: "",
   topicstatus: "idle",
   topicNameError: false,
+  loading: false,
+  code: "",
 };
 
 export const topicSlice = createSlice({

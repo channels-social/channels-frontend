@@ -29,9 +29,12 @@ import CurationChips from "./../chips/CurationChips";
 import ProfileItemsSkeleton from "./../skeleton/profileItemsSkeleton";
 import { domainUrl } from "./../../utils/globals";
 import { setCurationEngagement } from "./../../redux/slices/curationEngagementSlice";
+import useWindowSize from "../../utils/sizeHook";
 
 const ProfileChipsView = () => {
   const navigate = useNavigate();
+  const { width } = useWindowSize();
+
   const [isSavedMessageVisible, setSavedMessageVisible] = useState(false);
   const [savedMessage, setSavedMessage] = useState("");
 
@@ -166,7 +169,7 @@ const ProfileChipsView = () => {
   };
 
   const handleNavigationHome = () => {
-    navigate(`/user/${username}/profile`);
+    navigate(`/user/${username}/profile#curations`);
   };
 
   const handleEmptyCuration = () => {
@@ -196,7 +199,7 @@ const ProfileChipsView = () => {
   const isEditable = curation?.visibility === "anyone" || isOwner;
 
   return (
-    <div className="flex flex-col pr-4 pl-4 dark:bg-tertiaryBackground-dark h-full">
+    <div className="flex flex-col px-4 w-full dark:bg-chatDivider-dark h-full overflow-y-auto custom-scrollbar">
       <div
         className="flex flex-row items-center cursor-pointer mt-2"
         onClick={handleNavigationHome}
@@ -212,7 +215,7 @@ const ProfileChipsView = () => {
       </div>
       {/* <div className="flex flex-row justify-between items-center mt-3 relative"> */}
       <div className="flex flex-row items-center space-x-3 w-full mt-2">
-        <p className="sm:text-3xl text-xl text-white font-normal font-familjen-grotesk">
+        <p className="sm:text-3xl  text-xl text-white font-normal font-familjen-grotesk">
           {curation.name}
         </p>
         {!owner && (
@@ -220,7 +223,7 @@ const ProfileChipsView = () => {
             {" "}
             {/* New relative container for positioning */}
             {isSavedMessageVisible && (
-              <div className="absolute -top-7 left-1/2 transform -translate-x-1/2 bg-dark text-white text-xs rounded-lg px-2 py-1">
+              <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-dark text-white text-xs rounded-lg px-2 py-1">
                 {savedMessage}
               </div>
             )}
@@ -340,7 +343,15 @@ const ProfileChipsView = () => {
         <ProfileItemsSkeleton />
       ) : chips.length > 0 ? (
         <ResponsiveMasonry
-          columnsCountBreakPoints={{ 300: 1, 500: 2, 800: 3, 1060: 4 }}
+          columnsCountBreakPoints={{
+            300: 1,
+            500: 2,
+            650: 1,
+            850: 2,
+            1150: 3,
+            1500: 4,
+            default: 4,
+          }}
         >
           <Masonry gutter="18px">
             {chips.map((item, index) => (
@@ -351,13 +362,13 @@ const ProfileChipsView = () => {
       ) : (
         <div className="flex items-center justify-center mt-20">
           <div
-            className="container rounded-md bg-dark pl-4 pr-4 pt-3 pb-3 flex flex-col min-w-fit max-w-72 ml-auto mb-36"
+            className="container rounded-md dark:bg-tertiaryBackground-dark pl-4 pr-4 pt-3 pb-3 flex flex-col min-w-fit max-w-72 ml-auto mb-36"
             style={{ marginRight: "auto" }}
           >
             <h3 className=" dark:text-secondaryText-dark text-sm">
               (. ❛ ᴗ ❛.) Seems like this curation is empty
             </h3>
-            <div className="mt-2 rounded-md dark:bg-secondaryBackground-dark pl-5 pt-4 pb-4 cursor-pointer">
+            <div className="mt-2 rounded-md dark:bg-primaryBackground-dark pl-5 pt-4 pb-4 cursor-pointer">
               <p
                 className=" dark:text-secondaryText-dark text-xs font-light"
                 onClick={handleEmptyCuration}

@@ -5,6 +5,8 @@ import {
   postRequestAuthenticatedWithFile,
 } from "./../../services/rest";
 import { createTopic, updateTopic } from "./createTopicSlice";
+import { updateTopicsOrder, removeMember } from "./reorderTopicSlice";
+import { joinChannel } from "./channelSlice";
 
 export const createChannel = createAsyncThunk(
   "channel/create-channel",
@@ -32,7 +34,6 @@ export const updateChannel = createAsyncThunk(
         "/update/channel",
         channelData
       );
-      console.log(response);
       if (response.success) {
         return response.channel;
       } else {
@@ -76,17 +77,54 @@ export const fetchMyChannels = createAsyncThunk(
     }
   }
 );
+export const fetchUserChannels = createAsyncThunk(
+  "channel/fetch-user-channels",
+  async (username, { rejectWithValue }) => {
+    try {
+      const response = await postRequestUnAuthenticated(
+        "/fetch/user/channels",
+        { username }
+      );
+      if (response.success) {
+        return response.channels;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+export const fetchCommunityChannel = createAsyncThunk(
+  "channel/fetch-community-channels",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await postRequestUnAuthenticated(
+        "/fetch/community/channel"
+      );
+      if (response.success) {
+        return response.channel;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 const channelItemsSlice = createSlice({
   name: "channelItems",
   initialState: {
     channels: [],
+    userChannels: [],
     selectedChannel: null,
     channelstatus: "idle",
     topicstatus: false,
     selectedPage: null,
     loading: false,
     error: null,
+    communityChannel: null,
   },
   reducers: {
     setSelectedChannel: (state, action) => {
@@ -141,24 +179,76 @@ const channelItemsSlice = createSlice({
         if (index !== -1) {
           state.channels[index] = channel;
         }
+        let index2 = state.userChannels.findIndex(
+          (item) => item._id === channel._id
+        );
+        if (index2 !== -1) {
+          state.userChannels[index] = channel;
+        }
       })
       .addCase(updateChannel.rejected, (state, action) => {
         state.channelstatus = "idle";
         state.channelNameError = action.payload || action.error.message;
       })
+
+      .addCase(joinChannel.fulfilled, (state, action) => {
+        state.channelstatus = "idle";
+        const response = action.payload;
+        if (response.success && response.visit) {
+          const channelId = response.channel._id;
+          let index = state.channels.findIndex(
+            (item) => item._id === channelId
+          );
+          if (index === -1) {
+            state.channels.push(response.channel);
+          }
+        }
+      })
       .addCase(fetchMyChannels.pending, (state) => {
-        state.channelstatus = "loading";
+        state.loading = true;
       })
       .addCase(fetchMyChannels.fulfilled, (state, action) => {
-        state.channelstatus = "idle";
+        state.loading = false;
         state.channels = action.payload;
       })
       .addCase(fetchMyChannels.rejected, (state, action) => {
-        state.channelstatus = "idle";
+        state.loading = false;
+        state.channelNameError = action.payload || action.error.message;
+      })
+      .addCase(fetchUserChannels.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchUserChannels.fulfilled, (state, action) => {
+        state.loading = false;
+        state.userChannels = action.payload;
+      })
+      .addCase(fetchUserChannels.rejected, (state, action) => {
+        state.loading = false;
+        state.channelNameError = action.payload || action.error.message;
+      })
+      .addCase(fetchCommunityChannel.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchCommunityChannel.fulfilled, (state, action) => {
+        state.loading = false;
+        state.communityChannel = action.payload;
+      })
+      .addCase(fetchCommunityChannel.rejected, (state, action) => {
+        state.loading = false;
         state.channelNameError = action.payload || action.error.message;
       })
       .addCase(createTopic.pending, (state) => {
         state.topicstatus = "loading";
+      })
+      .addCase(updateTopicsOrder.fulfilled, (state, action) => {
+        state.status = "idle";
+        const topicData = action.payload;
+        const channelId = topicData.channelId;
+        const topics = topicData.topics;
+        let index = state.channels.findIndex((item) => item._id === channelId);
+        if (index !== -1) {
+          state.channels[index].topics = topics;
+        }
       })
       .addCase(createTopic.fulfilled, (state, action) => {
         state.topicstatus = "idle";
@@ -182,6 +272,21 @@ const channelItemsSlice = createSlice({
             (item) => item._id === topic._id
           );
           state.channels[index].topics[topicIndex].name = topic.name;
+        }
+      })
+      .addCase(removeMember.fulfilled, (state, action) => {
+        state.status = "idle";
+        const removeData = action.payload;
+        let channelIndex = state.channels.findIndex(
+          (channel) => channel._id === removeData.channelId
+        );
+        if (channelIndex !== -1) {
+          let memberIndex = state.channels[channelIndex].members.findIndex(
+            (member) => member === removeData.userId
+          );
+          if (memberIndex !== -1) {
+            state.channels[channelIndex].members.splice(memberIndex, 1);
+          }
         }
       })
       .addCase(createTopic.rejected, (state, action) => {

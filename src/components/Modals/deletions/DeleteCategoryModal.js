@@ -46,7 +46,7 @@ const DeleteCategoryModal = () => {
             <Dialog.Title></Dialog.Title>
             <div className="flex flex-col p-5">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="ark:text-secondaryText-dark text-lg font-normal fonr-inter">
+                <h2 className="dark:text-secondaryText-dark text-lg font-normal fonr-inter">
                   Delete Category
                 </h2>
                 <img

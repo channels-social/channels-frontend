@@ -87,6 +87,8 @@ const initialState = {
   subscribers: [],
   status: "idle",
   error: null,
+  activeTab: "profileDetails",
+  usernameError: false,
 };
 
 const gallerySlice = createSlice({

@@ -8,14 +8,11 @@ import {
   clearFaqIdtoDelete,
   deleteFaq,
 } from "./../../../redux/slices/faqsSlice";
-import { useNavigate } from "react-router-dom";
 
 const DeleteFaqModal = () => {
   const dispatch = useDispatch();
   const isOpen = useSelector((state) => state.modals.modalFaqDeleteOpen);
   const faqIdToDelete = useSelector((state) => state.faqs.faq_id);
-  const myData = useSelector((state) => state.myData);
-  const navigate = useNavigate();
 
   if (!isOpen) return null;
 

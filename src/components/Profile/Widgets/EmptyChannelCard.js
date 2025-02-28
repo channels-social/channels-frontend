@@ -1,5 +1,4 @@
 import React from "react";
-import EmptyChannel from "../../../assets/images/empty_channel.svg";
 import useModal from "./../../hooks/ModalHook";
 
 const EmptyChannelCard = () => {
@@ -9,8 +8,12 @@ const EmptyChannelCard = () => {
     handleOpenModal("modalChannelOpen");
   };
   return (
-    <div className="dark:bg-chatDivider-dark rounded-lg p-4  w-full flex flex-row">
-      <img src={EmptyChannel} alt="empty-channel" className="h-40 w-auto " />
+    <div className="dark:bg-chatDivider-dark rounded-lg p-4  w-full flex flex-col xs:flex-row">
+      <img
+        src="https://chips-social.s3.ap-south-1.amazonaws.com/channelsWebsite/channelEmptyCard.svg"
+        alt="empty-channel"
+        className="h-40 w-auto xs:mb-0 mb-3"
+      />
       <div className="ml-4 flex flex-col justify-between">
         <p className="dark:text-secondaryText-dark font-light text-xs">
           Hellooo 👋
@@ -28,7 +31,7 @@ const EmptyChannelCard = () => {
           to get started.
         </p>
         <div
-          className="border rounded-lg w-max p-2 text-xs font-normal dark:border-primaryText-dark dark:text-secondaryText-dark"
+          className="border rounded-lg w-max xs:mt-2 mt-3 cursor-pointer p-2 text-xs font-normal dark:border-primaryText-dark dark:text-secondaryText-dark"
           onClick={handleChannelModal}
         >
           Create your first Channel
