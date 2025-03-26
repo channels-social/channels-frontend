@@ -110,7 +110,10 @@ const ChannelsTab = ({ gallery = false }) => {
     );
   }
   return userChannels.map((channel) => (
-    <div className="p-3 rounded-lg mt-4 border dark:border-chatDivider-dark justify-start flex xs:flex-row flex-col items-start">
+    <div
+      key={channel._id}
+      className="p-3 rounded-lg mt-4 border dark:border-chatDivider-dark justify-start flex xs:flex-row flex-col items-start"
+    >
       {channel.logo ? (
         <img
           src={channel.logo}

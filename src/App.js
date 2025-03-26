@@ -61,13 +61,20 @@ import ShareModal from "./components/Modals/share/ShareModal";
 import CurationView from "./components/View/CurationView";
 import { ProtectedOnboardingRoute } from "./components/Onboarding/Protectedonboardroute";
 import TopicReorderModal from "./components/Modals/Topic/TopicReorderModal";
-import GoogleAuth from "./components/auth/GoogleAuth";
 import EventModal from "./components/Modals/Event/EventModal";
 import RemoveMemberModal from "./components/Modals/deletions/removeMemberModal";
 import EventUnsplashModal from "./components/Modals/Unsplash/EventUnsplashModal";
 import EventCardModal from "./components/Modals/Event/EventCardModal";
 import DeleteEventModal from "./components/Modals/deletions/eventDeletionModal";
 import TopicShareModal from "./components/Modals/share/topicShareModal";
+import EmbedHomePage from "./components/EmbedChannels/views/EmbedHomePage";
+import PrivacyPage from "./components/Footer/Modals/PrivacyPage";
+import ResetPassword from "./utils/ResetPassword";
+import EmbedAuthPage from "./components/EmbedChannels/views/EmbedAuthPage";
+import EmbedOnboardPage from "./components/EmbedChannels/views/EmbedOnboardPage";
+import GoogleAuthPopup from "./components/EmbedChannels/views/EmbedGoogleAuth";
+import GoogleAuthCallback from "./components/EmbedChannels/utility/Callback";
+import Integration from "./components/Integration/Integration";
 
 const clientId =
   "391369792833-72medeq5g0o5sklosb58k7c98ps72foj.apps.googleusercontent.com";
@@ -191,6 +198,7 @@ const App = () => {
                 path="/get-started"
                 element={<AuthPage isSubdomain={hasSubdomain} />}
               />
+
               <Route
                 path="/channels/onboarding"
                 element={
@@ -203,6 +211,7 @@ const App = () => {
                 <Route index element={<Navigate to="welcome" replace />} />
                 <Route path="welcome" element={<Welcome />} />
                 <Route path="profile" element={<Profile />} />
+
                 <Route path="curation/:curId" element={<ProfileChipsView />} />
                 <Route path="channel/:channelId" element={<ChannelPage />} />
                 <Route
@@ -210,13 +219,41 @@ const App = () => {
                   element={<PageHome />}
                 />
               </Route>
+
+              <Route path="/api/integration" element={<Landing />}>
+                <Route path="channels" element={<Integration />} />
+              </Route>
+              <Route path="/auth-login" element={<EmbedAuthPage />} />
+              <Route
+                path="/embed/google-auth/login"
+                element={<GoogleAuthPopup />}
+              />
+              <Route
+                path="/auth/google/callback"
+                element={<GoogleAuthCallback />}
+              />
               <Route
                 path="/user/:username/curation/:curId"
                 element={<ProfileChipsView />}
               />
               <Route path="/accept-invite" element={<AcceptInvite />} />
+              <Route path="/privacy/privacy-policy" element={<PrivacyPage />} />
               <Route path="/query/feedback/channels" element={<QueryPage />} />
               <Route path="*" element={<Page404 />} />
+              <Route
+                path="/reset-password/:token"
+                element={<ResetPassword />}
+              />
+
+              <Route path="/embed/channels" element={<EmbedHomePage />}>
+                <Route path="channel/:channelId" element={<ChannelPage />} />
+                {/* <Route path="auth-login" element={<EmbedAuthPage />} /> */}
+                <Route path="onboarding" element={<EmbedOnboardPage />} />
+                <Route
+                  path="channel/:channelId/c-id/topic/:topicId"
+                  element={<PageHome />}
+                />
+              </Route>
             </Route>
           )}
         </Routes>

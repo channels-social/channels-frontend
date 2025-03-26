@@ -11,7 +11,7 @@ import { setAuthCookies } from "./../../services/cookies";
 import { setCredentials } from "../../redux/slices/authSlice";
 import { fetchMyData } from "../../redux/slices/myDataSlice";
 import { setOnboarding } from "../../redux/slices/authSlice";
-import { useGoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin, useGoogleOneTapLogin } from "@react-oauth/google";
 import InputAdornment from "@mui/material/InputAdornment";
 import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
@@ -20,6 +20,7 @@ import googleLogo from "../../assets/channel_images/google_logo.svg";
 import { useLocation } from "react-router-dom";
 import { domainUrl } from "./../../utils/globals";
 import { getCsrfToken } from "../../services/csrfToken";
+import GoogleOneTapLogin from "./GoogleAuth";
 
 const AuthPage = ({ isSubdomain }) => {
   const navigate = useNavigate();
@@ -163,21 +164,7 @@ const AuthPage = ({ isSubdomain }) => {
       console.error("Error registering", error);
     }
   };
-  const fetchUserDetails = async (accessToken) => {
-    try {
-      const response = await axios.get(
-        "https://www.googleapis.com/oauth2/v2/userinfo",
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-      return response.data;
-    } catch (error) {
-      setNewError("Auth failed. Please try again");
-    }
-  };
+
   const handleforgotPassword = async () => {
     setForgotError("");
     if (!forgotEmail) {
@@ -202,7 +189,21 @@ const AuthPage = ({ isSubdomain }) => {
       }
     }
   };
-
+  const fetchUserDetails = async (accessToken) => {
+    try {
+      const response = await axios.get(
+        "https://www.googleapis.com/oauth2/v2/userinfo",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      setNewError("Auth failed. Please try again");
+    }
+  };
   const registerOrLoginUserGoogle = async (userData) => {
     try {
       return await axios.post(
@@ -263,6 +264,47 @@ const AuthPage = ({ isSubdomain }) => {
       setNewError("Error Registering. Please try again");
     }
   };
+  const handleTapGoogleSuccess = async (tokenResponse) => {
+    try {
+      const userData = JSON.parse(atob(tokenResponse.credential.split(".")[1]));
+      const response = await registerOrLoginUserGoogle(userData);
+      window.google?.accounts.id.cancel();
+      if (response.data.success) {
+        dispatch(
+          setCredentials({
+            user: response.data.user,
+            token: response.data.token,
+          })
+        );
+        setAuthCookies(response.data.token, response.data.user);
+        clearData();
+        fetchMyData();
+
+        if (response.data.islogin === false) {
+          handleOnboardOpen();
+        } else {
+          if (redirectDomain !== "" && redirectUrl !== "") {
+            window.location.replace(
+              `https://${redirectDomain}.${domainUrl}${redirectUrl}`
+            );
+          } else if (redirectDomain !== "") {
+            window.location.replace(`https://${redirectDomain}.${domainUrl}`);
+          } else if (redirectUrl !== "") {
+            navigate(`${redirectUrl}`, {
+              replace: true,
+            });
+          } else {
+            navigate(`/user/${response.data.user.username}/profile`, {
+              replace: true,
+            });
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Error during login process:", error);
+      setNewError("Error Registering. Please try again");
+    }
+  };
 
   const googleLogin = useGoogleLogin({
     onSuccess: handleGoogleSuccess,
@@ -270,6 +312,14 @@ const AuthPage = ({ isSubdomain }) => {
       setNewError("Validation failed. Please try again.");
       console.log("Login failed");
     },
+  });
+
+  const oneTapGoogleLogin = useGoogleOneTapLogin({
+    onSuccess: handleTapGoogleSuccess,
+    onError: () => {
+      console.log("One Tap Login Failed");
+    },
+    prompt_parent_id: "one-tap-container", // Ensures placement
   });
 
   const handleMouseDownPassword = (e) => {
@@ -481,8 +531,10 @@ const AuthPage = ({ isSubdomain }) => {
       }
     }
   };
+
   return (
     <div className="flex flex-col sm:flex-row h-full">
+      <GoogleOneTapLogin handleTapGoogleSuccess={handleTapGoogleSuccess} />
       <div className="dark:bg-primaryBackground-dark  pl-3 pt-4 sm:pb-0 pb-4">
         <img src={CLogo} alt="logo" />
       </div>
@@ -575,7 +627,7 @@ const AuthPage = ({ isSubdomain }) => {
               >
                 Continue
               </button>
-              <p className="text-errorLight font-normal mt-4 text-xs font-inter">
+              <p className="dark:text-error-dark font-normal mt-4 text-xs font-inter">
                 {forgotError}
               </p>
             </div>
@@ -629,7 +681,7 @@ const AuthPage = ({ isSubdomain }) => {
                 Entered wrong email?
                 <button
                   onClick={handleToggleOtp}
-                  className="text-secondaryText underline ml-1 font-base font-inter font-normal"
+                  className="dark:text-secondaryText-dark underline ml-1 font-base font-inter font-normal"
                 >
                   Change
                 </button>

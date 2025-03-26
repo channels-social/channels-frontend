@@ -23,11 +23,13 @@ import {
   clearChat,
   createTopicChat,
   clearMedia,
+  markAsRead,
 } from "../../redux/slices/chatSlice";
 import { setEventField } from "../../redux/slices/eventSlice";
 import { updateWhatsAppNumber } from "../../redux/slices/myDataSlice";
 import useModal from "./../hooks/ModalHook";
 import PhoneInput from "react-phone-input-2";
+import { visitTopic } from "../../redux/slices/topicSlice";
 
 const PageChat = ({ topicId, topic, channelId, isLoggedIn, myData }) => {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -60,9 +62,16 @@ const PageChat = ({ topicId, topic, channelId, isLoggedIn, myData }) => {
     }
     previousChatLength.current = Chats.length;
   }, [Chats]);
-  const handleCheckboxChange = () => {
-    setIsChecked((prev) => !prev);
-  };
+
+  // const handleCheckboxChange = () => {
+  //   setIsChecked((prev) => !prev);
+  // };
+
+  useEffect(() => {
+    if (!topic.channel.members.includes(myData._id)) {
+      dispatch(visitTopic(topicId));
+    }
+  }, [topicId]);
 
   useEffect(() => {
     if (myData.whatsapp_number === "") {
@@ -237,7 +246,10 @@ const PageChat = ({ topicId, topic, channelId, isLoggedIn, myData }) => {
 
   useEffect(() => {
     socket.on("connect", () => {
-      // console.log("Connected to server:");
+      if (myData._id) {
+        socket.emit("identify_user", myData._id);
+        dispatch(markAsRead(topicId));
+      }
     });
 
     return () => {

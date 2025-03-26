@@ -200,7 +200,7 @@ const UserSidebar = ({ closeSidebar }) => {
                 <div className="">
                   {channel.topics.map(
                     (topic, topicIndex) =>
-                      (topic.visibility === "anyone" ||
+                      (channel.visibility === "anyone" ||
                         channel.user._id === myData._id) && (
                         <div key={topic._id}>
                           <Link

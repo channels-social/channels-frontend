@@ -1,13 +1,14 @@
-import React, { forwardRef } from "react";
+import React, { forwardRef, useEffect } from "react";
 import Logo from "../../assets/icons/channels_logo.svg";
 import Linkedin from "../../assets/icons/Linkedin.svg";
 import Instagram from "../../assets/icons/instagram.svg";
 import useModal from "./../hooks/ModalHook";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { domainUrl } from "./../../utils/globals";
 
 const Footer = forwardRef((props, ref) => {
   const navigate = useNavigate();
+  const location = useLocation();
 
   const { handleOpenModal } = useModal();
 
@@ -15,6 +16,7 @@ const Footer = forwardRef((props, ref) => {
     handleOpenModal("modalTermsOpen");
   };
   const handlePrivacyOpen = () => {
+    navigate("/privacy-policy");
     handleOpenModal("modalPrivacyOpen");
   };
 

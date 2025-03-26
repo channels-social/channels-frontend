@@ -148,6 +148,27 @@ export const toggleReaction = createAsyncThunk(
     }
   }
 );
+export const markAsRead = createAsyncThunk(
+  "channelChat/mark-as-read",
+  async (topicId, { rejectWithValue }) => {
+    try {
+      const response = await postRequestAuthenticated("/mark/as/read", {
+        topicId,
+      });
+      if (response.success) {
+        const data = {
+          chatId: response.chatId,
+          reaction: response.reaction,
+        };
+        return data;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 // export const removeReaction = createAsyncThunk(
 //   "channelChat/remove-reaction",
 //   async (data, { rejectWithValue }) => {

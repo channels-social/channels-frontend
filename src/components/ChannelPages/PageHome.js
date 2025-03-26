@@ -4,7 +4,11 @@ import { useParams, useLocation, useSearchParams } from "react-router-dom";
 import PageForm from "./PageForm";
 import PageChat from "./PageChat";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchTopic, setTopicField } from "../../redux/slices/topicSlice";
+import {
+  fetchTopic,
+  setTopicField,
+  visitTopic,
+} from "../../redux/slices/topicSlice";
 import { fetchChannel } from "../../redux/slices/channelSlice";
 import EmptyTopicPage from "./widgets/EmptyTopicPage";
 import TopicHomeSkeleton from "./../skeleton/Topic/TopicHomeSkeleton";
@@ -46,7 +50,7 @@ const PageHome = () => {
 
   const isChannelMember = channel.members.includes(myData._id);
   const isTopicOwner = topic.user === myData._id;
-  const isInvitedToTopic = topic.allowedVisibleUsers.includes(myData._id);
+  const isInvitedToTopic = topic.channel.members.includes(myData._id);
   const isGuest = !isLoggedIn;
 
   if (isLoading) {
@@ -68,8 +72,10 @@ const PageHome = () => {
   const isUnauthorized =
     isGuest ||
     (!isChannelMember && !isTopicOwner) ||
-    (topic.visibility === "me" && !isTopicOwner) ||
-    (topic.visibility === "invite" && !isInvitedToTopic && !isTopicOwner);
+    (topic.channel.visibility === "me" && !isTopicOwner) ||
+    (topic.channel.visibility === "invite" &&
+      !isInvitedToTopic &&
+      !isTopicOwner);
 
   if (isUnauthorized) {
     return <EmptyTopicPage />;

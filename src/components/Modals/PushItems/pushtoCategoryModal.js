@@ -132,7 +132,7 @@ const PushtoCategoryModal = () => {
                 {filteredCategories?.map(
                   (category, index) =>
                     category._id !== pushItems.exisitingCategoryId && (
-                      <div className="flex flex-col mb-4">
+                      <div className="flex flex-col mb-4" key={index}>
                         <div
                           className={`flex flex-row items-center cursor-pointer ${
                             selectedCategoryId === category._id

@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { removeAuthCookies } from "./../../services/cookies";
 import { logOut } from "../../redux/slices/authSlice";
 import { closeModal } from "../../redux/slices/modalSlice";
+import { googleLogout } from "@react-oauth/google";
 
 const LogoutModal = () => {
   const dispatch = useDispatch();
@@ -15,6 +16,11 @@ const LogoutModal = () => {
   const handleLogout = () => {
     dispatch(logOut());
     removeAuthCookies();
+    googleLogout();
+    setTimeout(() => {
+      window.google?.accounts.id.prompt();
+    }, 2000);
+
     navigate("/", { replace: true });
   };
   const handleClose = () => {

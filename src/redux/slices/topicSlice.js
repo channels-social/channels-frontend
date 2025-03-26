@@ -64,6 +64,24 @@ export const joinTopicInvite = createAsyncThunk(
     }
   }
 );
+export const visitTopic = createAsyncThunk(
+  "topic/visit-topic",
+  async (topicId, { rejectWithValue }) => {
+    try {
+      const response = await postRequestAuthenticated("/visit/topic", {
+        topicId: topicId,
+      });
+      console.log(response);
+      if (response.success) {
+        return response.topic;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 const initialState = {
   name: "",
@@ -72,6 +90,7 @@ const initialState = {
   channel: "",
   editability: "me",
   allowedVisibleUsers: [],
+  allowedEditUsers: [],
   _id: "",
   topicstatus: "idle",
   topicNameError: false,
@@ -97,6 +116,7 @@ export const topicSlice = createSlice({
       state.topicstatus = "idle";
       state.topicNameError = false;
       state.allowedVisibleUsers = [];
+      state.allowedEditUsers = [];
     },
   },
   extraReducers: (builder) => {
@@ -115,6 +135,10 @@ export const topicSlice = createSlice({
       .addCase(fetchTopic.rejected, (state, action) => {
         state.topicstatus = "idle";
         state.topicNameError = action.payload || action.error.message;
+      })
+      .addCase(visitTopic.fulfilled, (state, action) => {
+        Object.assign(state, initialState, action.payload);
+        state.topicstatus = "idle";
       });
   },
 });

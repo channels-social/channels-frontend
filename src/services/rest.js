@@ -7,13 +7,13 @@ import { getCsrfToken } from "../services/csrfToken";
 export const postRequestAuthenticated = async (endpoint, data) => {
   try {
     const authToken = getAuthToken();
-    const csrfToken = getCsrfToken();
+    // const csrfToken = getCsrfToken();
     if (authToken) {
       const url = `${hostUrl}/api${endpoint}`;
       const response = await axios.post(url, data, {
         headers: {
           "auth-token": authToken,
-          "X-CSRF-Token": csrfToken,
+          // "X-CSRF-Token": csrfToken,
           "Content-Type": "application/json",
         },
         withCredentials: true,
@@ -47,13 +47,13 @@ export const postRequestAuthenticated = async (endpoint, data) => {
 export const postRequestAuthenticatedWithFile = async (endpoint, data) => {
   try {
     const authToken = getAuthToken();
-    const csrfToken = getCsrfToken();
+    // const csrfToken = getCsrfToken();
     if (authToken) {
       const url = `${hostUrl}/api${endpoint}`;
       const response = await axios.post(url, data, {
         headers: {
           "auth-token": authToken,
-          "X-CSRF-Token": csrfToken,
+          // "X-CSRF-Token": csrfToken,
           "Content-Type": "multipart/form-data",
         },
         withCredentials: true,
@@ -90,12 +90,12 @@ export const postRequestUnAuthenticatedWithFile = async (
   headers = {}
 ) => {
   try {
-    const csrfToken = getCsrfToken();
+    // const csrfToken = getCsrfToken();
     const url = `${hostUrl}/api${endpoint}`;
     const response = await axios.post(url, data, {
       headers: {
         ...headers,
-        "X-CSRF-Token": csrfToken,
+        // "X-CSRF-Token": csrfToken,
         "Content-Type": "multipart/form-data",
       },
       withCredentials: true,
@@ -124,12 +124,12 @@ export const postRequestUnAuthenticated = async (
   headers = {}
 ) => {
   try {
-    const csrfToken = getCsrfToken();
+    // const csrfToken = getCsrfToken();
     const url = `${hostUrl}/api${endpoint}`;
     const response = await axios.post(url, data, {
       headers: {
         ...headers,
-        "X-CSRF-Token": csrfToken,
+        // "X-CSRF-Token": csrfToken,
         "Content-Type": "application/json",
       },
       withCredentials: true,

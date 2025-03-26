@@ -41,7 +41,6 @@ const TopicModal = () => {
     if (name !== "") {
       const formDataToSend = new FormData();
       formDataToSend.append("name", name);
-      formDataToSend.append("visibility", topic.visibility);
       formDataToSend.append("editability", topic.editability);
       formDataToSend.append("channel", topic.channel);
       dispatch(createTopic(formDataToSend))
@@ -67,7 +66,6 @@ const TopicModal = () => {
       const formDataToSend = new FormData();
       formDataToSend.append("name", name);
       formDataToSend.append("_id", topic._id);
-      formDataToSend.append("visibility", topic.visibility);
       formDataToSend.append("editability", topic.editability);
       dispatch(updateTopic(formDataToSend))
         .unwrap()
@@ -142,7 +140,7 @@ const TopicModal = () => {
                 )}
               </div>
 
-              <div className="mb-4 mt-1">
+              {/* <div className="mb-4 mt-1">
                 <p className="dark:text-white text-sm font-normal font-inter">
                   Who can view this topic?
                 </p>
@@ -181,7 +179,7 @@ const TopicModal = () => {
                     <span>Only me</span>
                   </label>
                 </div>
-              </div>
+              </div> */}
               <div className="mb-4 mt-1">
                 <p className="dark:text-white text-sm font-normal font-inter">
                   Who can write in this topic?
