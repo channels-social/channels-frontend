@@ -3,20 +3,35 @@ import { getAuthToken } from "./cookies";
 import { hostUrl } from "./../utils/globals";
 import { useSelector } from "react-redux";
 import { getCsrfToken } from "../services/csrfToken";
+import StorageManager from "./../components/EmbedChannels/utility/storage_manager";
+
+const isEmbeddedOrExternal = () => {
+  if (typeof window === "undefined") return false;
+  const domain = window.location.hostname;
+  return !(
+    domain === "channels.social" ||
+    // domain === "localhost" ||
+    domain.endsWith(".channels.social")
+  );
+};
 
 export const postRequestAuthenticated = async (endpoint, data) => {
+  const externalToken = localStorage.getItem("auth-token");
+  const authToken = getAuthToken();
+  const selectedToken = !isEmbeddedOrExternal() ? authToken : externalToken;
+  // console.log(selectedToken);
+  // console.log(!isEmbeddedOrExternal());
+
   try {
-    const authToken = getAuthToken();
-    // const csrfToken = getCsrfToken();
-    if (authToken) {
+    if (selectedToken) {
       const url = `${hostUrl}/api${endpoint}`;
       const response = await axios.post(url, data, {
         headers: {
-          "auth-token": authToken,
+          "auth-token": selectedToken,
           // "X-CSRF-Token": csrfToken,
           "Content-Type": "application/json",
         },
-        withCredentials: true,
+        withCredentials: !isEmbeddedOrExternal(),
       });
 
       if (response.status === 200) {
@@ -45,18 +60,20 @@ export const postRequestAuthenticated = async (endpoint, data) => {
   }
 };
 export const postRequestAuthenticatedWithFile = async (endpoint, data) => {
+  const externalToken = localStorage.getItem("auth-token");
+  const authToken = getAuthToken();
+  const selectedToken = !isEmbeddedOrExternal() ? authToken : externalToken;
+
   try {
-    const authToken = getAuthToken();
-    // const csrfToken = getCsrfToken();
-    if (authToken) {
+    if (selectedToken) {
       const url = `${hostUrl}/api${endpoint}`;
       const response = await axios.post(url, data, {
         headers: {
-          "auth-token": authToken,
+          "auth-token": !isEmbeddedOrExternal() ? authToken : externalToken,
           // "X-CSRF-Token": csrfToken,
           "Content-Type": "multipart/form-data",
         },
-        withCredentials: true,
+        withCredentials: !isEmbeddedOrExternal(),
       });
 
       if (response.status === 200) {
@@ -98,7 +115,7 @@ export const postRequestUnAuthenticatedWithFile = async (
         // "X-CSRF-Token": csrfToken,
         "Content-Type": "multipart/form-data",
       },
-      withCredentials: true,
+      withCredentials: !isEmbeddedOrExternal(),
     });
 
     if (response.status === 200) {
@@ -132,7 +149,7 @@ export const postRequestUnAuthenticated = async (
         // "X-CSRF-Token": csrfToken,
         "Content-Type": "application/json",
       },
-      withCredentials: true,
+      withCredentials: !isEmbeddedOrExternal(),
     });
 
     if (response.status === 200) {

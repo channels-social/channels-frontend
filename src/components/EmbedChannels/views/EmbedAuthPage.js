@@ -3,11 +3,13 @@ import { useDispatch } from "react-redux";
 import axios from "axios";
 import { hostUrl } from "../../../utils/globals";
 import OtpInput from "react-otp-input";
-import { setCredentials } from "../../../redux/slices/authSlice";
+import { setEmbedCredentials } from "../embedSlices/embedAuthSlice";
 import googleLogo from "../../../assets/channel_images/google_logo.svg";
 import { getCsrfToken } from "../../../services/csrfToken";
 import StorageManager from "./../utility/storage_manager";
 import { domainUrl } from "./../../../utils/globals";
+import DateTimeCard from "./../../chips/widgets/DateTime";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const EmbedAuthPage = ({ initialEmail = "" }) => {
   const [isLogin, setIsLogin] = useState(false);
@@ -20,6 +22,10 @@ const EmbedAuthPage = ({ initialEmail = "" }) => {
   const dispatch = useDispatch();
   const csrfToken = getCsrfToken();
   const currentDomain = window.location.origin;
+  const location = useLocation();
+  const [redirectUrl, setRedirectUrl] = useState("");
+  const [redirectDomain, setRedirectDomain] = useState("");
+  const navigate = useNavigate();
 
   const clearData = () => {
     setFullName("");
@@ -28,6 +34,14 @@ const EmbedAuthPage = ({ initialEmail = "" }) => {
     setOtpBackend("");
     setNewError("");
   };
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const redirectParam = searchParams.get("redirect");
+    if (redirectParam) {
+      setRedirectUrl(redirectParam);
+    }
+  }, [location.search]);
 
   const handleSendOtp = async () => {
     setNewError("");
@@ -45,7 +59,7 @@ const EmbedAuthPage = ({ initialEmail = "" }) => {
         })
         .then((response) => {
           if (response.data.success) {
-            setOtpBackend(response.data.top);
+            setOtpBackend(response.data.otp);
             setShowOtp(true);
           } else {
             setNewError(response.data.message);
@@ -71,19 +85,38 @@ const EmbedAuthPage = ({ initialEmail = "" }) => {
             headers: {
               "X-CSRF-Token": csrfToken,
             },
-            withCredentials: true,
+            // withCredentials: true,
           })
           .then((response) => {
             if (response.data.success) {
+              const user = response.data.user;
+              const partialUser = {
+                name: user.name,
+                username: user.username,
+                email: user.email,
+                contact: user.contact,
+                whatsapp_number: user.whatsapp_number,
+              };
+              console.log(user);
+              StorageManager.setItem("user", JSON.stringify(partialUser));
               StorageManager.setItem("auth-token", response.data.token);
-              StorageManager.setItem("user", response.data.user);
+              console.log(user);
               dispatch(
-                setCredentials({
+                setEmbedCredentials({
                   user: response.data.user,
                   token: response.data.token,
                 })
               );
               clearData();
+              if (redirectUrl !== "") {
+                navigate(`/embed/channels${redirectUrl}`, {
+                  replace: true,
+                });
+              } else {
+                navigate(`/embed/channels`, {
+                  replace: true,
+                });
+              }
             } else {
               setNewError(response.data.message);
             }
@@ -98,26 +131,57 @@ const EmbedAuthPage = ({ initialEmail = "" }) => {
   };
 
   const handleGoogleAuthPopup = () => {
+    const data = StorageManager.getItem("embedData");
+    const embedData = JSON.parse(data);
+    const originalDomain = embedData.domain;
+
+    console.log(originalDomain);
     setNewError("");
-    const authUrl = `http://${domainUrl}/embed/google-auth/login?domain=${window.location.origin}`;
+    const authUrl = `http://localhost:3001/embed/google-auth/login?domain=${window.location.origin}&hostDomain=${originalDomain}`;
     const popup = window.open(
       authUrl,
       "_blank",
       "width=500,height=600,left=100,top=100"
     );
     const handleMessage = (event) => {
-      if (event.origin !== "https://channels.social") return;
+      const allowedOrigin =
+        process.env.NODE_ENV === "development"
+          ? "http://localhost:3001"
+          : "https://channels.social";
+
+      if (event.origin !== allowedOrigin) return;
+      console.log(event.data);
 
       const { success, user, token } = event.data;
       if (success) {
+        const partialUser = {
+          name: user.name,
+          email: user.email,
+          username: user.username,
+          contact: user.contact,
+          whatsapp_number: user.whatsapp_number,
+        };
+
         StorageManager.setItem("auth-token", token);
-        StorageManager.setItem("user", user);
+        console.log(token);
+        StorageManager.setItem("user", JSON.stringify(partialUser));
         dispatch(
-          setCredentials({
+          setEmbedCredentials({
             user,
             token,
           })
         );
+        console.log(redirectUrl);
+        // /user/yashu2312/channel/67875bb770b2eb72ee58eb79
+        if (redirectUrl !== "") {
+          navigate(`/embed/channels${redirectUrl}`, {
+            replace: true,
+          });
+        } else {
+          navigate(`/embed/channels`, {
+            replace: true,
+          });
+        }
       }
       window.removeEventListener("message", handleMessage);
     };
@@ -126,7 +190,7 @@ const EmbedAuthPage = ({ initialEmail = "" }) => {
   };
 
   return (
-    <div className="flex items-center justify-center h-full">
+    <div className="flex items-center justify-center h-full pb-10">
       <div className="max-w-[450px] w-[90%] xs:w-3/4 sm:w-3/5 md:1/2 lg:w-1/3 xl:w-[30%] flex flex-col items-center dark:bg-primaryBackground-dark">
         <h3 className="text-2xl sm:text-4xl text-center font-medium tracking-wider dark:text-secondaryText-dark font-inter">
           Sign In

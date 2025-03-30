@@ -38,7 +38,7 @@ import chatReducer from "./../slices/chatSlice";
 import reorderTopicReducer from "./../slices/reorderTopicSlice";
 import eventReducer from "./../slices/eventSlice";
 
-const appReducer = combineReducers({
+export const appReducer = {
   auth: authReducer,
   network: networkReducer,
   profileData: profileReducer,
@@ -77,13 +77,15 @@ const appReducer = combineReducers({
   chat: chatReducer,
   reorderTopic: reorderTopicReducer,
   event: eventReducer,
-});
+};
+
+const combinedReducer = combineReducers(appReducer);
 
 const rootReducer = (state, action) => {
   if (action.type === logOut.type) {
     state = undefined;
   }
-  return appReducer(state, action);
+  return combinedReducer(state, action);
 };
 
 export default rootReducer;

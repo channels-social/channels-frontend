@@ -48,9 +48,9 @@ const PageHome = () => {
   const isLoading =
     topicStatus === "loading" || channel.loading === true || loading;
 
-  const isChannelMember = channel.members.includes(myData._id);
+  const isChannelMember = channel?.members?.includes(myData._id);
   const isTopicOwner = topic.user === myData._id;
-  const isInvitedToTopic = topic.channel.members.includes(myData._id);
+  const isInvitedToTopic = topic?.channel?.members?.includes(myData._id);
   const isGuest = !isLoggedIn;
 
   if (isLoading) {
@@ -82,7 +82,7 @@ const PageHome = () => {
   }
 
   return (
-    <div className="w-full h-screen dark:bg-secondaryBackground-dark flex flex-row ">
+    <div className="w-full h-full dark:bg-secondaryBackground-dark flex flex-row ">
       <div className="flex flex-col w-full h-full">
         <PageHeader
           channelName={channelName}

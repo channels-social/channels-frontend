@@ -3,30 +3,33 @@ import * as Dialog from "@radix-ui/react-dialog";
 import Close from "../../assets/icons/Close.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { removeAuthCookies } from "./../../services/cookies";
-import { logOut } from "../../redux/slices/authSlice";
+import { logOutEmbed } from "../EmbedChannels/embedSlices/embedAuthSlice";
 import { closeModal } from "../../redux/slices/modalSlice";
 import { googleLogout } from "@react-oauth/google";
+import StorageManager from "./../EmbedChannels/utility/storage_manager";
 import { clearMyData } from "../../redux/slices/myDataSlice";
 
-const LogoutModal = () => {
+const EmbedLogoutModal = () => {
   const dispatch = useDispatch();
-  const isOpen = useSelector((state) => state.modals.modalLogoutOpen);
+  const isOpen = useSelector((state) => state.modals.modalEmbedLogoutOpen);
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    dispatch(logOut());
-    removeAuthCookies();
-    dispatch(clearMyData());
+    dispatch(logOutEmbed());
     googleLogout();
-    setTimeout(() => {
-      window.google?.accounts.id.prompt();
-    }, 2000);
-
-    navigate("/", { replace: true });
+    dispatch(clearMyData());
+    handleClose();
+    const data = StorageManager.getItem("embedFetchedData");
+    const dataId = JSON.parse(data);
+    const channelId = dataId.selectedChannel;
+    const username = dataId.username;
+    console.log(channelId);
+    navigate(`/embed/channels/user/${username}/channel/${channelId}`, {
+      replace: true,
+    });
   };
   const handleClose = () => {
-    dispatch(closeModal("modalLogoutOpen"));
+    dispatch(closeModal("modalEmbedLogoutOpen"));
   };
   if (!isOpen) return null;
   return (
@@ -49,7 +52,7 @@ const LogoutModal = () => {
                 />
               </div>
               <div className="mt-2 dark:text-secondaryText-dark font-normal font-inter">
-                Do you really want to logout?
+                Do you really want to logout from channels?
               </div>
               <div className="flex flex-row mt-5 space-x-8">
                 <button
@@ -72,4 +75,4 @@ const LogoutModal = () => {
     </Dialog.Root>
   );
 };
-export default LogoutModal;
+export default EmbedLogoutModal;

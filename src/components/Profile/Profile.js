@@ -108,7 +108,6 @@ const Profile = () => {
         const response = await postRequestUnAuthenticated(`/username/exist`, {
           username: subdomain,
         });
-        console.log(response);
         if (response.success) {
           dispatch(fetchProfile(username));
           dispatch(fetchUserChannels(username));

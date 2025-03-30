@@ -10,9 +10,11 @@ export const fetchTopics = createAsyncThunk(
   "reorderTopics/fetchChannelTopics",
   async (channelId, { rejectWithValue }) => {
     try {
+      console.log(channelId);
       const response = await postRequestAuthenticated("/fetch/channel/topics", {
         channelId,
       });
+      console.log(response);
       if (response.success) {
         return response.topics;
       } else {

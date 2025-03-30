@@ -105,6 +105,7 @@ const UserSidebar = ({ closeSidebar }) => {
   if (loading) {
     return <SidebarSkeleton />;
   }
+
   if (error) return <p>Error loading channels: {error}</p>;
   return (
     <div className="flex flex-col justify-between h-screen w-full overflow-y-auto custom-side-scrollbar">

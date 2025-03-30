@@ -1,38 +1,18 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import StorageManager from "../utility/storage_manager";
 import { postRequestUnAuthenticated } from "./../../../services/rest";
-import { createAsyncThunk } from "@reduxjs/toolkit";
 
-export const checkAutoLogin = createAsyncThunk(
-  "embed-auth/check-auto-login",
-  async (data, { dispatch, rejectWithValue }) => {
-    try {
-      const response = await postRequestUnAuthenticated(
-        "/check/auto/login",
-        data
-      );
-      if (response.success) {
-        const data = {
-          token: response.token,
-          user: response.user,
-        };
-        dispatch(setEmbedCredentials(data));
-      }
-    } catch (error) {
-      console.error("Failed to check auto login:", error);
-    }
-  }
-);
-
+// Initial State
 const initialState = {
   user: StorageManager.getItem("user")
     ? JSON.parse(StorageManager.getItem("user"))
     : null,
-  token: StorageManager.getItem("auth_token") || null,
-  isLoggedIn: !!StorageManager.getItem("auth_token"),
+  token: StorageManager.getItem("auth-token") || null,
+  isLoggedIn: !!StorageManager.getItem("auth-token"),
   isOnboarding: false,
 };
 
+// Slice
 const embedAuthSlice = createSlice({
   name: "embedAuth",
   initialState,
@@ -50,15 +30,16 @@ const embedAuthSlice = createSlice({
       state.token = null;
       state.isLoggedIn = false;
 
-      StorageManager.removeItem("auth_token");
+      StorageManager.removeItem("auth-token");
       StorageManager.removeItem("user");
     },
     setOnboarding: (state, action) => {
       state.isOnboarding = action.payload;
     },
     initializeEmbedAuth: (state) => {
-      const storedToken = StorageManager.getItem("auth_token");
+      const storedToken = StorageManager.getItem("auth-token");
       const storedUser = StorageManager.getItem("user");
+      console.log(storedToken);
 
       if (storedToken && storedUser) {
         state.token = storedToken;
@@ -75,4 +56,31 @@ const embedAuthSlice = createSlice({
 
 export const { setEmbedCredentials, logOutEmbed, initializeEmbedAuth } =
   embedAuthSlice.actions;
+
+export const checkAutoLogin = createAsyncThunk(
+  "embed-auth/check-auto-login",
+  async (data, { dispatch, rejectWithValue }) => {
+    try {
+      const response = await postRequestUnAuthenticated(
+        "/check/auto/login",
+        data
+      );
+      console.log(response);
+      if (response.success) {
+        const data = {
+          token: response.token,
+          user: response.user,
+        };
+        dispatch(setEmbedCredentials(data));
+        return data;
+      } else {
+        return rejectWithValue(response.message || "Auto login failed");
+      }
+    } catch (error) {
+      console.error("Failed to check auto login:", error);
+      return rejectWithValue(error.message || "Network error");
+    }
+  }
+);
+
 export default embedAuthSlice.reducer;

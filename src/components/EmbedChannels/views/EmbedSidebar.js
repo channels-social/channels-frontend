@@ -15,14 +15,9 @@ import useModal from "./../../hooks/ModalHook";
 import Close from "../../../assets/icons/Close.svg";
 import SidebarSkeleton from "./../../skeleton/SidebarSkeleton";
 import { domainUrl } from "./../../../utils/globals";
+import StorageManager from "./../utility/storage_manager";
 
-const EmbedSidebar = ({
-  closeSidebar,
-  channels,
-  selectedChannel,
-  selectedTopic,
-  loading,
-}) => {
+const EmbedSidebar = ({ closeSidebar, loading }) => {
   const location = useLocation();
   const { handleOpenModal } = useModal();
   const navigate = useNavigate();
@@ -30,13 +25,13 @@ const EmbedSidebar = ({
   const dispatch = useDispatch();
   const myData = useSelector((state) => state.myData);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const isSubdomain = useSelector((state) => state.auth.isSubdomain);
+  const auth = useSelector((state) => state.auth);
   const [expandedCommunityChannel, setExpandedCommunityChannel] =
     useState(false);
   const [expandedChannels, setExpandedChannels] = useState({});
 
-  const galleryUsername = useSelector((state) => state.galleryData.username);
   const domain = window.location.href;
+  const embedHome = useSelector((state) => state.embedHome);
 
   const handleChannelModal = () => {
     handleOpenModal("modalChannelOpen");
@@ -49,17 +44,18 @@ const EmbedSidebar = ({
   };
   const toggleChannel = (id, username) => {
     closeSidebar();
-    navigate(`/user/${username}/channel/${id}`);
+    navigate(`/embed/channels/user/${username}/channel/${id}`);
   };
 
   useEffect(() => {
+    if (!embedHome.channels || embedHome.channels.length === 0) return;
     const initialExpandedState = {};
-    channels.forEach((channel) => {
-      initialExpandedState[channel._id] = channel._id === selectedChannel;
+    embedHome.channels.forEach((channel) => {
+      initialExpandedState[channel._id] =
+        channel._id === embedHome.selectedChannel;
     });
     setExpandedChannels(initialExpandedState);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, selectedChannel, channels.length]);
+  }, [embedHome.channels, embedHome.selectedChannel]);
 
   const toggleChannelExpanded = (channelId) => {
     if (expandedCommunityChannel === true) {
@@ -73,33 +69,21 @@ const EmbedSidebar = ({
 
   const handleLogout = () => {
     closeSidebar();
-    handleOpenModal("modalLogoutOpen");
+    handleOpenModal("modalEmbedLogoutOpen");
   };
 
   const handleLogin = () => {
-    const loginWindow = window.open(
-      `https://channels.social/embed/channels/auth-login?redirectDomain=${domain}`,
-      "LoginPopup",
-      "width=600,height=600"
-    );
-
-    const messageListener = (event) => {
-      if (event.origin !== "https://channels.social") return;
-
-      const { success, user, token } = event.data;
-      if (success && token) {
-        dispatch(setEmbedCredentials({ user, token }));
-        StorageManager.setItem("auth_token", token);
-        StorageManager.setItem("user", JSON.stringify(user));
-
-        loginWindow.close();
-
-        window.location.reload();
+    const data = StorageManager.getItem("embedFetchedData");
+    const dataId = JSON.parse(data);
+    const channelId = dataId.selectedChannel;
+    const username = dataId.username;
+    closeSidebar();
+    navigate(
+      `/embed/channels/get-started?redirect=/user/${username}/channel/${channelId}`,
+      {
+        replace: true,
       }
-      window.removeEventListener("message", messageListener);
-    };
-
-    window.addEventListener("message", messageListener);
+    );
   };
 
   if (loading) {
@@ -126,15 +110,16 @@ const EmbedSidebar = ({
           />
         </div>
 
-        <nav className="mt-2">
-          {channels.map((channel, channelIndex) => (
+        <div className="mt-2">
+          {embedHome.channels.map((channel, channelIndex) => (
             <div key={channel._id} className="flex flex-col">
               <div className="border border-[1] dark:border-tertiaryBackground-dark my-2"></div>
               <div
                 className={`flex flex-row justify-between px-6 mb-1 items-center cursor-pointer
                ${
-                 location.pathname ===
-                 `/user/${channel?.user?.username}/channel/${channel._id}`
+                 location.pathname.includes(
+                   `/embed/channels/user/${channel?.user?.username}/channel/${channel._id}`
+                 )
                    ? "dark:text-secondaryText-dark dark:bg-tertiaryBackground-dark rounded-lg mx-3 py-1"
                    : "dark:text-primaryText-dark"
                }
@@ -165,7 +150,7 @@ const EmbedSidebar = ({
                         channel.user._id === myData._id) && (
                         <div key={topic._id}>
                           <Link
-                            to={`/user/${channel.user.username}/channel/${channel._id}/c-id/topic/${topic._id}`}
+                            to={`/embed/channels/user/${channel.user.username}/channel/${channel._id}/c-id/topic/${topic._id}`}
                             className={`block ${
                               location.pathname ===
                               `/user/${channel.user.username}/channel/${channel._id}/c-id/topic/${topic._id}`
@@ -207,10 +192,9 @@ const EmbedSidebar = ({
               </p>
             </div>
           )}
-        </nav>
+        </div>
       </div>
       <div className="mb-2 mt-2">
-        <div className="border border-[1] dark:border-tertiaryBackground-dark my-2"></div>
         {isLoggedIn && (
           <p
             className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6 dark:text-primaryText-dark`}

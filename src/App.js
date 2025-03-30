@@ -10,10 +10,12 @@ import {
   Navigate,
 } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+import embedStore from "./redux/store/embedStore";
 import PageHome from "./components/ChannelPages/PageHome";
 import ThemeHandler from "./utils/ThemeHandler";
 import Onboarding from "./components/Onboarding/Onboarding";
 import { Helmet } from "react-helmet";
+import { Provider } from "react-redux";
 import Logo from "./assets/icons/logo.svg";
 import Footer from "./components/Footer/Footer";
 import AuthPage from "./components/auth/AuthPage";
@@ -75,6 +77,7 @@ import EmbedOnboardPage from "./components/EmbedChannels/views/EmbedOnboardPage"
 import GoogleAuthPopup from "./components/EmbedChannels/views/EmbedGoogleAuth";
 import GoogleAuthCallback from "./components/EmbedChannels/utility/Callback";
 import Integration from "./components/Integration/Integration";
+import Modals from "./utils/modals";
 
 const clientId =
   "391369792833-72medeq5g0o5sklosb58k7c98ps72foj.apps.googleusercontent.com";
@@ -118,6 +121,7 @@ const App = () => {
       </div>
     );
   };
+
   const SubdomainLayout = () => {
     const location = useLocation();
     const allowedPaths = ["/get-started", "/channels/onboarding"];
@@ -143,6 +147,7 @@ const App = () => {
     );
   };
 
+  const isMainApp = window.location.hostname.endsWith("channels.social");
   return (
     <Router>
       <GoogleOAuthProvider clientId={clientId}>
@@ -193,7 +198,16 @@ const App = () => {
             </>
           ) : (
             <Route element={<MainLayout />}>
+              <Route
+                path="/embed/google-auth/login"
+                element={<GoogleAuthPopup />}
+              />
+              <Route
+                path="/auth/google/callback"
+                element={<GoogleAuthCallback />}
+              />
               <Route path="/" element={<HomePage />} />
+
               <Route
                 path="/get-started"
                 element={<AuthPage isSubdomain={hasSubdomain} />}
@@ -223,15 +237,8 @@ const App = () => {
               <Route path="/api/integration" element={<Landing />}>
                 <Route path="channels" element={<Integration />} />
               </Route>
-              <Route path="/auth-login" element={<EmbedAuthPage />} />
-              <Route
-                path="/embed/google-auth/login"
-                element={<GoogleAuthPopup />}
-              />
-              <Route
-                path="/auth/google/callback"
-                element={<GoogleAuthCallback />}
-              />
+              {/* <Route path="/auth-login" element={<EmbedAuthPage />} /> */}
+
               <Route
                 path="/user/:username/curation/:curId"
                 element={<ProfileChipsView />}
@@ -245,19 +252,32 @@ const App = () => {
                 element={<ResetPassword />}
               />
 
-              <Route path="/embed/channels" element={<EmbedHomePage />}>
-                <Route path="channel/:channelId" element={<ChannelPage />} />
+              <Route
+                path="/embed/channels/*"
+                element={
+                  <Provider store={embedStore}>
+                    <EmbedHomePage />
+                  </Provider>
+                }
+              >
+                <Route
+                  path="user/:username/channel/:channelId"
+                  element={<ChannelPage />}
+                />
+                <Route path="get-started" element={<EmbedAuthPage />} />
+
                 {/* <Route path="auth-login" element={<EmbedAuthPage />} /> */}
                 <Route path="onboarding" element={<EmbedOnboardPage />} />
                 <Route
-                  path="channel/:channelId/c-id/topic/:topicId"
+                  path="user/:username/channel/:channelId/c-id/topic/:topicId"
                   element={<PageHome />}
                 />
               </Route>
             </Route>
           )}
         </Routes>
-        <ChannelModal />
+        <Modals />
+        {/* <ChannelModal />
         <PrivacyPolicy />
         <TermsofService />
         <ChannelUnsplash />
@@ -290,7 +310,7 @@ const App = () => {
         <DeleteCategoryModal />
         <EventUnsplashModal />
         <EventCardModal />
-        <DeleteEventModal />
+        <DeleteEventModal /> */}
       </GoogleOAuthProvider>
     </Router>
   );

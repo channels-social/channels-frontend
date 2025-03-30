@@ -38,7 +38,6 @@ export const createTopicChat = createAsyncThunk(
         "/create/channel/chat",
         data
       );
-      console.log(response);
       if (response.success) {
         return response.chat;
       } else {

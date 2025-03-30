@@ -11,7 +11,6 @@
    const cookieOptions = {
      domain: `.${domainUrl}`,
      path: "/",
-     expires: 14,
    };
 
    Cookies.set("token", token, cookieOptions);

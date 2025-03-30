@@ -75,7 +75,7 @@ const PageHeader = ({
     dispatch(createTopicInvite(formDataToSend))
       .unwrap()
       .then((invite) => {
-        console.log(invite.code);
+        // console.log(invite.code);
         dispatch(setTopicField({ field: "code", value: invite.code }));
         setTimeout(() => {
           handleOpenModal("modalShareTopicOpen", id);

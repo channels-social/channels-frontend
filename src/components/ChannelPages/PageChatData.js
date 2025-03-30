@@ -272,6 +272,9 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
   if (loading) {
     return <TopicChatSkeleton />;
   }
+  console.log(Chats);
+  console.log(myData);
+
   return (
     <div className="w-full h-full max-w-full overflow-x-hidden">
       {Chats.map((chat) => (

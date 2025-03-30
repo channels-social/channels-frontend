@@ -18,6 +18,7 @@ const initialState = {
   modalPrivacyOpen: false,
   modalTermsOpen: false,
   modalLogoutOpen: false,
+  modalEmbedLogoutOpen: false,
   modalFeedbackOpen: false,
   modalChipDeleteOpen: false,
   modalCurationDeleteOpen: false,

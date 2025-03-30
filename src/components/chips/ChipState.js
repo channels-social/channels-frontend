@@ -64,7 +64,7 @@ const ChipState = () => {
 
   const owner = username === myData?.username;
   // const isSubscribed = profileData.subscribers?.includes(myData?._id);
-  console.log(chipItemData.chip);
+  // console.log(chipItemData.chip);
   return (
     <div className="w-[98%] flex flex-col sm:flex-row bg-primaryBackground min-h-screen ">
       <div className="sm:w-1/2 w-full sm:relative">

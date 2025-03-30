@@ -15,7 +15,9 @@
   }
 
   const apiKey = getApiKeyFromScript();
-  const domain = window.location.hostname;
+  // const domain = window.location.hostname;
+  const domain = "channelsbychips.site";
+  const targetOrigin = "http://localhost:3001";
 
   if (!apiKey) {
     console.error("❌ Missing API key in script URL.");
@@ -23,12 +25,14 @@
   }
 
   window.ChannelsWidget = function (params = {}) {
-    fetch("https:channels.social/api/verify-api-key", {
+    fetch(`http://localhost:3000/api/verify/api/key`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ apiKey, domain }),
     })
-      .then((response) => response.json())
+      .then((response) => {
+        return response.json();
+      })
       .then((data) => {
         if (!data.valid) {
           console.error("❌ Invalid API key or unauthorized domain.");
@@ -36,6 +40,7 @@
         }
 
         window.openChannelsWidget = function (params = {}) {
+          // console.log("⚡ openChannelsWidget called with:", params);
           const embedData = {
             apiKey: apiKey,
             domain: domain,
@@ -43,16 +48,39 @@
             email: params.email || null,
             selectedTopic: params.selectedTopic || null,
             autoJoin: params.autoJoin || false,
+            channels: params.channels || [],
           };
-          StorageManager.setItem("embedData", JSON.stringify(embedData));
-          if (window.history.pushState) {
-            window.history.pushState({}, "", "/embed/channels");
-            window.dispatchEvent(new Event("popstate"));
-          } else {
-            window.location.href = "/embed/channels";
-          }
+          let attempts = 0;
+          const maxAttempts = 20;
+
+          const tryToSendMessage = () => {
+            const iframe = document.querySelector("iframe.channels-frame");
+            if (!iframe) {
+              if (attempts < maxAttempts) {
+                attempts++;
+                setTimeout(tryToSendMessage, 100); // Try again after 100ms
+              } else {
+                console.log("❌ Iframe not found after max attempts.");
+              }
+              return;
+            }
+
+            iframe.addEventListener("load", () => {
+              // console.log("✅ Sending embedData to iframe...");
+              iframe.contentWindow.postMessage(
+                {
+                  type: "embedData",
+                  source: "channels-widget",
+                  payload: embedData,
+                },
+                "http://localhost:3001"
+              );
+            });
+          };
+
+          tryToSendMessage();
         };
       })
-      .catch((error) => console.error("❌ Error verifying API key:", error));
+      .catch((error) => console.log("❌ Error verifying API key:", error));
   };
 })();

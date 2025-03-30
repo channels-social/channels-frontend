@@ -36,6 +36,7 @@ const Integration = () => {
   useEffect(() => {
     const checkInitialKey = async () => {
       try {
+        setError("");
         const response = await postRequestAuthenticated(
           "/check/initial/api/key"
         );
@@ -81,11 +82,13 @@ const Integration = () => {
   };
 
   const handleCopy = () => {
+    setError("");
     setCopied(true);
     setTimeout(() => setCopied(false), 1000);
   };
 
   const downloadJson = (apiKey) => {
+    setError("");
     if (!apiKey) {
       alert("API key is empty!");
       return;
@@ -103,6 +106,7 @@ const Integration = () => {
   };
 
   const handleDownload = () => {
+    setError("");
     const link = document.createElement("a");
     link.href = `https://api.channels.social/api/download/verification-file?token=${encodeURIComponent(
       verificationToken
@@ -118,9 +122,10 @@ const Integration = () => {
     try {
       setLoadingVerify(true);
       const response = await postRequestAuthenticated(
-        ".domain/verification/method",
+        "/domain/verification/method",
         { verificationMethod: activeTab }
       );
+      console.log(response);
       setLoadingVerify(false);
       if (response.success) {
         setSuccessMessage(response.message);
@@ -135,7 +140,7 @@ const Integration = () => {
     }
   };
 
-  const metaData = `<meta name="channels-verification" content="${verificationToken}"`;
+  const metaData = `<meta name="channels-verification" content="${verificationToken}"/>`;
 
   return (
     <div className="flex flex-col px-10 pt-10 overflow-y-auto h-full">
@@ -359,7 +364,7 @@ const Integration = () => {
           </p>
           <p
             className="text-blue-400 cursor-pointer mt-2"
-            onClick={downloadJson(apiKey)}
+            onClick={() => downloadJson(apiKey)}
           >
             Download as JSON
           </p>
@@ -370,10 +375,7 @@ const Integration = () => {
             {apiKey}
           </div>
           <CopyToClipboard text={apiKey} onCopy={handleCopy}>
-            <div
-              className="w-max cursor-pointer dark:text-secondaryText-dark mt-6 dark:bg-buttonEnable-dark rounded-lg text-center px-12 py-2"
-              onClick={handleVerify}
-            >
+            <div className="w-max cursor-pointer dark:text-secondaryText-dark mt-6 dark:bg-buttonEnable-dark rounded-lg text-center px-12 py-2">
               Copy
             </div>
           </CopyToClipboard>

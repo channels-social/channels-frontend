@@ -65,7 +65,7 @@ const TopicsTab = ({ channelId, isOwner }) => {
           </div>
         </div>
       )}
-      <div className="mt-0 mx-1">
+      <div className="mx-1">
         {reorderTopics.length === 0 ? (
           <div className="dark:text-secondaryText-dark text-center mt-12 justify-center items-center">
             No topics found.

@@ -68,7 +68,7 @@ const PageChat = ({ topicId, topic, channelId, isLoggedIn, myData }) => {
   // };
 
   useEffect(() => {
-    if (!topic.channel.members.includes(myData._id)) {
+    if (!topic.channel.members?.includes(myData._id)) {
       dispatch(visitTopic(topicId));
     }
   }, [topicId]);
@@ -273,7 +273,6 @@ const PageChat = ({ topicId, topic, channelId, isLoggedIn, myData }) => {
 
     const links = extractLinks(channelChat.content);
     const formDataToSend = new FormData();
-    console.log(fileObjects);
     formDataToSend.append("content", channelChat.content);
     formDataToSend.append("media", JSON.stringify(channelChat.media));
     formDataToSend.append("mentions", JSON.stringify(channelChat.mentions));
@@ -365,7 +364,7 @@ const PageChat = ({ topicId, topic, channelId, isLoggedIn, myData }) => {
       : "dark:bg-secondaryText-dark dark:text-primaryBackground-dark";
 
   return (
-    <div className=" w-full relative flex flex-col h-full-height-30 ">
+    <div className=" w-full relative flex flex-col sm:h-full-height-30 h-full-height-96 ">
       {/* {notificationDropdown && (
         <div
           className="absolute z-[99] top-0 w-full items-center dark:bg-primaryBackground-dark border-b

@@ -53,7 +53,6 @@ export const joinTopicInvite = createAsyncThunk(
         "/join/topic/invite",
         data
       );
-      console.log(response);
       if (response.success) {
         return response.topic;
       } else {
@@ -71,7 +70,6 @@ export const visitTopic = createAsyncThunk(
       const response = await postRequestAuthenticated("/visit/topic", {
         topicId: topicId,
       });
-      console.log(response);
       if (response.success) {
         return response.topic;
       } else {
@@ -87,7 +85,7 @@ const initialState = {
   name: "",
   user: "",
   visibility: "anyone",
-  channel: "",
+  channel: {},
   editability: "me",
   allowedVisibleUsers: [],
   allowedEditUsers: [],
@@ -106,11 +104,10 @@ export const topicSlice = createSlice({
       const { field, value } = action.payload;
       state[field] = value;
     },
-
     clearTopic: (state) => {
       state.name = "";
       state.visibility = "anyone";
-      state.channel = "";
+      state.channel = {};
       state.editability = "anyone";
       state._id = "";
       state.topicstatus = "idle";
@@ -127,6 +124,7 @@ export const topicSlice = createSlice({
       .addCase(fetchTopic.fulfilled, (state, action) => {
         Object.assign(state, initialState, action.payload);
         state.topicstatus = "idle";
+        state.channel = action.payload.channel;
       })
       .addCase(updateTopic.fulfilled, (state, action) => {
         Object.assign(state, initialState, action.payload);
@@ -139,6 +137,7 @@ export const topicSlice = createSlice({
       .addCase(visitTopic.fulfilled, (state, action) => {
         Object.assign(state, initialState, action.payload);
         state.topicstatus = "idle";
+        state.channel = action.payload.channel;
       });
   },
 });

@@ -38,6 +38,8 @@ import { fetchTopics } from "../../redux/slices/reorderTopicSlice.js";
 import TopicsTab from "./Tabs/TopicsTab";
 import MembersTab from "./Tabs/MembersTab";
 import Compressor from "compressorjs";
+import { useStore } from "react-redux";
+import { getAppPrefix } from "./../EmbedChannels/utility/embedHelper";
 
 const ChannelPage = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -46,6 +48,7 @@ const ChannelPage = () => {
   const { handleOpenModal } = useModal();
   const dispatch = useDispatch();
   const channel = useSelector((state) => state.channel);
+
   const loading = useSelector((state) => state.channel.loading);
   const channelstatus = useSelector((state) => state.channel.channelstatus);
   const [file, setFile] = useState(null);
@@ -56,7 +59,7 @@ const ChannelPage = () => {
   const galleryUsername = useSelector((state) => state.galleryData.username);
   const params = useParams();
   const { channelId } = params;
-  const username = fromGallery ? galleryUsername : params.username;
+  const username = fromGallery ? galleryUsername : params.username || "";
 
   const [searchParams] = useSearchParams();
   const inviteCode = searchParams.get("code");
@@ -89,6 +92,7 @@ const ChannelPage = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
   //
+
   useEffect(() => {
     dispatch(fetchChannel(channelId));
     dispatch(fetchTopics(channelId));
@@ -219,12 +223,13 @@ const ChannelPage = () => {
       handleOpenModal("modalChannelOpen");
     }, 500);
   };
-
   const handleJoinChannel = (channel) => {
     if (isLoggedIn) {
       if (channel?.members?.includes(myData?._id)) {
         navigate(
-          `/user/${username}/channel/${channel._id}/c-id/topic/${channel.topics[0]}`
+          `${getAppPrefix()}/user/${username}/channel/${
+            channel._id
+          }/c-id/topic/${channel.topics[0]}`
         );
       } else if (channel?.requests?.includes(myData?._id)) {
         return;
@@ -233,7 +238,17 @@ const ChannelPage = () => {
           .unwrap()
           .then((response) => {
             if (response.visit) {
-              navigate(`c-id/topic/${channel.topics[0]}`);
+              if (response.channel.topics.length > 0) {
+                navigate(
+                  `${getAppPrefix()}/user/${username}/channel/${
+                    channel._id
+                  }/c-id/topic/${response.channel.topics[0]}`
+                );
+              } else {
+                navigate(
+                  `${getAppPrefix()}/user/${username}/channel/${channel._id}`
+                );
+              }
             }
           })
           .catch((error) => {
@@ -247,7 +262,9 @@ const ChannelPage = () => {
         );
       } else {
         navigate(
-          `/get-started?redirect=/user/${username}/channel/${channel._id}`
+          `${getAppPrefix()}/get-started?redirect=/user/${username}/channel/${
+            channel._id
+          }`
         );
       }
     }
@@ -383,7 +400,7 @@ const ChannelPage = () => {
               </div>
             ) : (
               <div
-                className={`py-2 px-3 cursor-pointer dark:text-secondaryText-dark 
+                className={`py-2 px-3 cursor-pointer dark:text-secondaryText-dark text-center
                   ${
                     channel.requests?.includes(myData._id)
                       ? "dark:bg-chatBackground-dark"
@@ -419,12 +436,12 @@ const ChannelPage = () => {
       </div>
       <div className="flex flex-col mx-3">
         <div className="border-t my-4 dark:border-t-chatDivider-dark "></div>
-        {channel.topics.length === 0 && (
+        {channel.topics.length !== 0 && (
           <p className="mt-2 text-xl dark:text-white font-inter font-normal">
             Topics
           </p>
         )}
-        {channel.topics.length === 0 && (
+        {channel.topics.length === 0 && channel.user === myData._id && (
           <div className="mt-2 flex flex-row space-x-3">
             <div className="p-4 dark:bg-chatDivider-dark rounded-lg flex-col justify-start items-start w-max">
               <div className="flex-col justify-start items-start  flex">
@@ -473,28 +490,33 @@ const ChannelPage = () => {
         </div> */}
         {(isOwner || channel.members.includes(myData._id)) && (
           <div className="items-center text-center mt-3">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => handleTabClick(tab.href)}
-                className={`mx-2 xs:px-12 px-8 py-3 text-sm transition-colors duration-300 ${
-                  activeTab === tab.href
-                    ? "border-b-2 dark:text-secondaryText-dark dark:border-secondaryText-dark"
-                    : "dark:text-primaryText-dark "
-                }`}
-              >
-                {tab.name}
-              </button>
-            ))}
+            {tabs.map((tab) => {
+              if (tab.name === "Members" && !isOwner) return null;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => handleTabClick(tab.href)}
+                  className={`mx-2 xs:px-12 px-8 py-3 text-sm transition-colors duration-300 ${
+                    activeTab === tab.href
+                      ? "border-b-2 dark:text-secondaryText-dark dark:border-secondaryText-dark"
+                      : "dark:text-primaryText-dark "
+                  }`}
+                >
+                  {tab.name}
+                </button>
+              );
+            })}
           </div>
         )}
         {(isOwner || channel.members.includes(myData._id)) && (
           <div
-            className="w-80 mx-auto border dark:border-chatDivider-dark "
+            className={`${
+              isOwner ? "w-80" : "w-32"
+            } mx-auto border dark:border-chatDivider-dark`}
             style={{ height: "0.1px" }}
           ></div>
         )}
-        {(isOwner || channel.members.includes(myData._id)) && (
+        {(isOwner || channel.members.includes(myData?._id)) && (
           <div className="mt-4 mb-6 h-full">
             {activeTab === "" ? (
               <TopicsTab channelId={channelId} isOwner={isOwner} />

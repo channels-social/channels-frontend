@@ -71,12 +71,9 @@ const AuthPage = ({ isSubdomain }) => {
   const handleOnboardOpen = () => {
     dispatch(setOnboarding(true));
     if (redirectDomain !== "" && redirectUrl !== "") {
-      navigate(
-        `/channels/onboarding?redirectDomain=${redirectDomain}&redirect=${redirectUrl}`,
-        {
-          replace: true,
-        }
-      );
+      navigate(`/channels/onboarding?redirectDomain=${redirectDomain}& `, {
+        replace: true,
+      });
     } else if (redirectDomain !== "") {
       navigate(`/channels/onboarding?redirectDomain=${redirectDomain}`, {
         replace: true,
@@ -498,7 +495,7 @@ const AuthPage = ({ isSubdomain }) => {
               setLoading(false);
             });
         } catch (error) {
-          console.error("Error registering", error);
+          console.log("Error registering", error);
           setNewError("Error in logging in. Please try again.");
           setLoading(false);
         }

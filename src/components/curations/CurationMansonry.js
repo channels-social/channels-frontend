@@ -9,7 +9,7 @@ const CurationMansonry = ({ curation, owner, gallery }) => {
   const dispatch = useDispatch();
 
   const handleChipsPage = () => {
-    console.log(gallery);
+    // console.log(gallery);
     dispatch(setCurationEngagement(curation._id));
     if (gallery) {
       navigate(`/curation/${curation._id}`, { state: { owner } });
