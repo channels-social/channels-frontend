@@ -244,19 +244,25 @@ const PageChat = ({ topicId, topic, channelId, isLoggedIn, myData }) => {
     setShowAddMenu(false);
   };
 
-  useEffect(() => {
-    socket.on("connect", () => {
-      if (myData._id) {
-        socket.emit("identify_user", myData._id);
-        dispatch(markAsRead(topicId));
-      }
-    });
+  // useEffect(() => {
+  //   socket.on("connect", () => {
+  //     if (myData._id) {
+  //       socket.emit("identify_user", myData._id);
+  //       dispatch(markAsRead(topicId));
+  //     }
+  //   });
 
-    return () => {
-      // socket.disconnect();
-      socket.off("connect");
-    };
-  }, [topicId]);
+  //   return () => {
+  //     // socket.disconnect();
+  //     socket.off("connect");
+  //   };
+  // }, [topicId]);
+
+  useEffect(() => {
+    if (myData._id && topicId) {
+      dispatch(markAsRead(topicId));
+    }
+  }, [topicId, myData._id]);
 
   useEffect(() => {
     if (channelChat.media.length > 0 && inputRef.current) {
@@ -344,6 +350,9 @@ const PageChat = ({ topicId, topic, channelId, isLoggedIn, myData }) => {
     const formattedNumber = `${countryCode}${phoneNumber}`;
     setWhatsAppNumber(formattedNumber);
   };
+  const handleCheckboxChange = () => {
+    setIsChecked(true);
+  };
 
   const handleSave = () => {
     dispatch(updateWhatsAppNumber(whatsAppNumber))
@@ -389,7 +398,7 @@ const PageChat = ({ topicId, topic, channelId, isLoggedIn, myData }) => {
             onClick={() => setNotificationDropdown(false)}
           />
         </div>
-      )} */}
+      )}
       {isChecked && (
         <div
           className="absolute z-[99] top-11 dark:bg-primaryBackground-dark border-b
@@ -421,7 +430,7 @@ const PageChat = ({ topicId, topic, channelId, isLoggedIn, myData }) => {
             </button>
           </div>
         </div>
-      )}
+      )} */}
       <div
         className=" dark:bg-secondaryBackground-dark w-full h-full overflow-y-auto pt-1"
         ref={chatContainerRef}

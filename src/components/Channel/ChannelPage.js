@@ -94,8 +94,10 @@ const ChannelPage = () => {
   //
 
   useEffect(() => {
-    dispatch(fetchChannel(channelId));
-    dispatch(fetchTopics(channelId));
+    if (channelId) {
+      dispatch(fetchChannel(channelId));
+      dispatch(fetchTopics(channelId));
+    }
   }, [channelId, dispatch]);
 
   const closeDropdown = (event) => {
@@ -393,7 +395,7 @@ const ChannelPage = () => {
           <div className="flex flex-row space-x-4 mt-2">
             {isOwner ? (
               <div
-                className="py-2 px-3 cursor-pointer dark:text-secondaryText-dark dark:bg-buttonEnable-dark rounded-lg text-xs sm:text-sm font-inter"
+                className="py-2 px-3 cursor-pointer dark:text-secondaryText-dark dark:bg-buttonEnable-dark rounded-lg text-sm font-inter"
                 onClick={() => handleOwnerShareChannel(channel._id)}
               >
                 Share join link
@@ -406,7 +408,7 @@ const ChannelPage = () => {
                       ? "dark:bg-chatBackground-dark"
                       : "dark:bg-buttonEnable-dark"
                   }
-                   rounded-lg text-xs sm:text-sm font-inter`}
+                   rounded-lg text-sm font-inter`}
                 onClick={() => handleJoinChannel(channel)}
               >
                 {channel.requests?.includes(myData._id)
@@ -428,7 +430,7 @@ const ChannelPage = () => {
                 className="border dark:border-primaryText-dark py-2 px-3 rounded-lg cursor-pointer dark:text-secondaryText-dark text-sm font-inter"
                 onClick={() => handleShareChannel(channel._id)}
               >
-                Share
+                Share Invite
               </div>
             )}
           </div>
@@ -436,7 +438,7 @@ const ChannelPage = () => {
       </div>
       <div className="flex flex-col mx-3">
         <div className="border-t my-4 dark:border-t-chatDivider-dark "></div>
-        {channel.topics.length !== 0 && (
+        {isLoggedIn && channel.topics.length === 0 && (
           <p className="mt-2 text-xl dark:text-white font-inter font-normal">
             Topics
           </p>
@@ -511,7 +513,7 @@ const ChannelPage = () => {
         {(isOwner || channel.members.includes(myData._id)) && (
           <div
             className={`${
-              isOwner ? "w-80" : "w-32"
+              isOwner ? "w-80" : "w-28"
             } mx-auto border dark:border-chatDivider-dark`}
             style={{ height: "0.1px" }}
           ></div>

@@ -78,6 +78,7 @@ import GoogleAuthPopup from "./components/EmbedChannels/views/EmbedGoogleAuth";
 import GoogleAuthCallback from "./components/EmbedChannels/utility/Callback";
 import Integration from "./components/Integration/Integration";
 import Modals from "./utils/modals";
+import AdminHome from "./components/Admin/AdminHome";
 
 const clientId =
   "391369792833-72medeq5g0o5sklosb58k7c98ps72foj.apps.googleusercontent.com";
@@ -206,6 +207,8 @@ const App = () => {
                 path="/auth/google/callback"
                 element={<GoogleAuthCallback />}
               />
+              <Route path="/admin/:username/home" element={<AdminHome />} />
+
               <Route path="/" element={<HomePage />} />
 
               <Route
@@ -268,6 +271,7 @@ const App = () => {
 
                 {/* <Route path="auth-login" element={<EmbedAuthPage />} /> */}
                 <Route path="onboarding" element={<EmbedOnboardPage />} />
+                <Route path="user/:username/profile" element={<Profile />} />
                 <Route
                   path="user/:username/channel/:channelId/c-id/topic/:topicId"
                   element={<PageHome />}

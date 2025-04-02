@@ -272,8 +272,6 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
   if (loading) {
     return <TopicChatSkeleton />;
   }
-  console.log(Chats);
-  console.log(myData);
 
   return (
     <div className="w-full h-full max-w-full overflow-x-hidden">
@@ -324,7 +322,11 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
               </p>
             </div>
           )}
-          <div className="flex flex-row w-full relative">
+          <div
+            className={`flex w-full relative  px-4 ${
+              chat.user?._id === myData?._id ? "justify-end" : "justify-start"
+            }`}
+          >
             <img
               src={chat.user?.logo ? chat.user?.logo : Profile}
               alt="logo"
@@ -341,7 +343,6 @@ const PageChatData = ({ topicId, isLoggedIn, myData }) => {
                       year: "numeric",
                       hour: "2-digit",
                       minute: "2-digit",
-                      second: "2-digit",
                       hour12: false,
                     })}
                   </span>

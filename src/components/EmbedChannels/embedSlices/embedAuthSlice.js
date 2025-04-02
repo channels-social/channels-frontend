@@ -39,7 +39,6 @@ const embedAuthSlice = createSlice({
     initializeEmbedAuth: (state) => {
       const storedToken = StorageManager.getItem("auth-token");
       const storedUser = StorageManager.getItem("user");
-      console.log(storedToken);
 
       if (storedToken && storedUser) {
         state.token = storedToken;
@@ -65,7 +64,6 @@ export const checkAutoLogin = createAsyncThunk(
         "/check/auto/login",
         data
       );
-      console.log(response);
       if (response.success) {
         const data = {
           token: response.token,

@@ -35,6 +35,7 @@
       })
       .then((data) => {
         if (!data.valid) {
+          alert("❌ Invalid API key or unauthorized domain.");
           console.error("❌ Invalid API key or unauthorized domain.");
           return;
         }

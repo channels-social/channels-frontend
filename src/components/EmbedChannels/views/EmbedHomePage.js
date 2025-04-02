@@ -3,6 +3,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import EmbedSidebar from "./EmbedSidebar";
 import Menu from "../../../assets/icons/menu.svg";
+import Profile from "../../../assets/icons/profile.svg";
 import StorageManager from "../utility/storage_manager";
 import { postRequestUnAuthenticated } from "./../../../services/rest";
 import { fetchMyData, clearMyData } from "../../../redux/slices/myDataSlice";
@@ -27,19 +28,19 @@ const EmbedHomePage = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const auth = useSelector((state) => state.auth);
+  const myData = useSelector((state) => state.myData);
   const embedHome = useSelector((state) => state.embedHome);
   const dispatch = useDispatch();
 
   const fetchData = async () => {
     setLoading(true);
-    const storedFetchedData = StorageManager.getItem("embedFetchedData");
-    // console.log(storedFetchedData);
-    if (storedFetchedData) {
-      const parsedData = JSON.parse(storedFetchedData);
-      navigateToChannel(parsedData);
-      setLoading(false);
-      return;
-    }
+    // const storedFetchedData = StorageManager.getItem("embedFetchedData");
+    // if (storedFetchedData) {
+    //   const parsedData = JSON.parse(storedFetchedData);
+    //   navigateToChannel(parsedData);
+    //   setLoading(false);
+    //   return;
+    // }
     try {
       const storedEmbedData = StorageManager.getItem("embedData");
       if (!storedEmbedData) return;
@@ -73,7 +74,6 @@ const EmbedHomePage = () => {
           })
         );
         dispatch(setEmbedItem({ field: "username", value: response.username }));
-
         navigateToChannel(response);
       } else {
         console.warn("⚠️ Failed to fetch embed data:", response);
@@ -107,6 +107,8 @@ const EmbedHomePage = () => {
             if (data) {
               const user = data.user;
               const partialUser = {
+                _id: user._id,
+                username: user.username,
                 name: user.name,
                 email: user.email,
                 contact: user.contact,
@@ -175,7 +177,7 @@ const EmbedHomePage = () => {
   const navigateToChannel = (data) => {
     if (data.selectedChannel && data.selectedTopic) {
       navigate(
-        `/embed/channels/user${data.username}/channel/${data.selectedChannel}/c-id/topic/${data.selectedTopic}`
+        `/embed/channels/user/${data.username}/channel/${data.selectedChannel}/c-id/topic/${data.selectedTopic}`
       );
     } else if (data.selectedChannel) {
       navigate(
@@ -192,13 +194,24 @@ const EmbedHomePage = () => {
 
   return (
     <div className="flex flex-col h-screen w-full overflow-hidden">
-      <div className="w-full dark:bg-secondaryBackground-dark sm:hidden flex items-center px-6 h-10">
+      <div
+        className="w-full dark:bg-secondaryBackground-dark sm:hidden px-6 h-10 
+      shadow-md flex flex-row justify-between items-center"
+      >
         <img
           src={Menu}
           alt="menu"
           className="h-6 w-6 cursor-pointer"
           onClick={toggleSidebar}
         />
+        <div
+          className="rounded-full border dark:border-emptyEvent-dark p-0.5"
+          onClick={() =>
+            navigate(`/embed/channels/user/${myData.username}/profile`)
+          }
+        >
+          <img src={Profile} alt="menu" className="h-5 w-5 cursor-pointer" />
+        </div>
       </div>
       <div className="flex flex-1 overflow-hidden">
         <div

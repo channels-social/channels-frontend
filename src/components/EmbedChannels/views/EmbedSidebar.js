@@ -32,6 +32,7 @@ const EmbedSidebar = ({ closeSidebar, loading }) => {
 
   const domain = window.location.href;
   const embedHome = useSelector((state) => state.embedHome);
+  const { username } = useParams();
 
   const handleChannelModal = () => {
     handleOpenModal("modalChannelOpen");
@@ -148,7 +149,10 @@ const EmbedSidebar = ({ closeSidebar, loading }) => {
                     (topic, topicIndex) =>
                       (channel.visibility === "anyone" ||
                         channel.user._id === myData._id) && (
-                        <div key={topic._id}>
+                        <div
+                          key={topic._id}
+                          className="flex flex-row items-center"
+                        >
                           <Link
                             to={`/embed/channels/user/${channel.user.username}/channel/${channel._id}/c-id/topic/${topic._id}`}
                             className={`block ${
@@ -161,6 +165,11 @@ const EmbedSidebar = ({ closeSidebar, loading }) => {
                           >
                             # {topic.name}
                           </Link>
+                          {topic.unreadCount > 0 && (
+                            <div className="rounded-full w-5 h-5 text-center dark:bg-buttonEnable-dark dark:text-secondaryText-dark text-[10px] pt-0.5">
+                              {topic.unreadCount}
+                            </div>
+                          )}
                         </div>
                       )
                   )}
@@ -181,7 +190,7 @@ const EmbedSidebar = ({ closeSidebar, loading }) => {
           ))}
           <div className="border border-[1] dark:border-tertiaryBackground-dark my-2"></div>
 
-          {isLoggedIn && (
+          {isLoggedIn && username === myData.username && (
             <div
               className="flex items-center px-6 py-2 mb-2 cursor-pointer rounded-lg "
               onClick={handleChannelModal}

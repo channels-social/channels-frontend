@@ -22,6 +22,7 @@ import { Outlet } from "react-router-dom";
 import EmptyProfileCard from "./Widgets/EmptyProfileCard";
 import { domainUrl } from "./../../utils/globals";
 import { setProfileEngagement } from "./../../redux/slices/profileEngagementSlice";
+import { isEmbeddedOrExternal } from "./../../services/rest";
 import Others from "../../assets/icons/Subtract.svg";
 import { postRequestUnAuthenticated } from "./../../services/rest";
 import Linkify from "react-linkify";
@@ -500,30 +501,30 @@ const Profile = () => {
                     </div>
                   </div>
                 </div>
-
-                {hasImages ? (
-                  <div
-                    className={`flex lg:ml-5 md:ml-2 md:mt-0 mt-4 md:mb-0 justify-center ${
-                      !profileData.description ||
-                      profileData.description.length <= 40
-                        ? "xl:w-1/2"
-                        : " xl:w-3/5"
-                    } h-full w-full md:justify-end mb-2 lg:w-3/5 md:w-1/2`}
-                  >
-                    <ProfileCarousel images={profileData.imageCards} />
-                  </div>
-                ) : isOwner ? (
-                  <div
-                    className={`flex md:ml-4 md:mt-0 mt-4 md:mb-0 justify-center ${
-                      !profileData.description ||
-                      profileData.description.length <= 40
-                        ? "md:w-3/5 xl:w-3/5"
-                        : "md:w-3/5 lg:w-1/2"
-                    } h-full w-full md:justify-end mb-2`}
-                  >
-                    <EmptyProfileCard handleClick={handleEditCards} />
-                  </div>
-                ) : null}
+                {!isEmbeddedOrExternal() &&
+                  (hasImages ? (
+                    <div
+                      className={`flex lg:ml-5 md:ml-2 md:mt-0 mt-4 md:mb-0 justify-center ${
+                        !profileData.description ||
+                        profileData.description.length <= 40
+                          ? "xl:w-1/2"
+                          : " xl:w-3/5"
+                      } h-full w-full md:justify-end mb-2 lg:w-3/5 md:w-1/2`}
+                    >
+                      <ProfileCarousel images={profileData.imageCards} />
+                    </div>
+                  ) : isOwner ? (
+                    <div
+                      className={`flex md:ml-4 md:mt-0 mt-4 md:mb-0 justify-center ${
+                        !profileData.description ||
+                        profileData.description.length <= 40
+                          ? "md:w-3/5 xl:w-3/5"
+                          : "md:w-3/5 lg:w-1/2"
+                      } h-full w-full md:justify-end mb-2`}
+                    >
+                      <EmptyProfileCard handleClick={handleEditCards} />
+                    </div>
+                  ) : null)}
               </div>
             </div>
             <div className="items-center text-center mt-3">

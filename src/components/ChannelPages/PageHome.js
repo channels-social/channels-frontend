@@ -13,6 +13,7 @@ import { fetchChannel } from "../../redux/slices/channelSlice";
 import EmptyTopicPage from "./widgets/EmptyTopicPage";
 import TopicHomeSkeleton from "./../skeleton/Topic/TopicHomeSkeleton";
 import InviteTopicPage from "./../Channel/InviteTopicPage";
+import socket, { connectSocketWithUser } from "../../utils/socket";
 
 const PageHome = () => {
   const { channelName, channelId, topicId } = useParams();
@@ -44,6 +45,12 @@ const PageHome = () => {
       setLoading(false);
     }, 500);
   }, [topicId, channelId, dispatch]);
+
+  useEffect(() => {
+    if (myData?._id) {
+      connectSocketWithUser(myData._id);
+    }
+  }, [myData]);
 
   const isLoading =
     topicStatus === "loading" || channel.loading === true || loading;

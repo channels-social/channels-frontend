@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { getCsrfToken } from "../services/csrfToken";
 import StorageManager from "./../components/EmbedChannels/utility/storage_manager";
 
-const isEmbeddedOrExternal = () => {
+export const isEmbeddedOrExternal = () => {
   if (typeof window === "undefined") return false;
   const domain = window.location.hostname;
   return !(

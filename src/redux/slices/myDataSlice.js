@@ -120,10 +120,8 @@ export const fetchMyData = () => async (dispatch, getState) => {
   if (!auth.token) {
     return;
   }
-  // console.log(auth);
   try {
     const response = await postRequestAuthenticated("/fetch/userData");
-    console.log(response);
     if (response.success) {
       dispatch(setMyData(response.user));
     }

@@ -96,6 +96,7 @@ const EmbedAuthPage = ({ initialEmail = "" }) => {
                 email: user.email,
                 contact: user.contact,
                 whatsapp_number: user.whatsapp_number,
+                _id: user._id,
               };
               console.log(user);
               StorageManager.setItem("user", JSON.stringify(partialUser));
@@ -156,6 +157,7 @@ const EmbedAuthPage = ({ initialEmail = "" }) => {
       if (success) {
         const partialUser = {
           name: user.name,
+          _id: user._id,
           email: user.email,
           username: user.username,
           contact: user.contact,
