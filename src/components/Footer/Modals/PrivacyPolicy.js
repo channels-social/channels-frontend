@@ -47,14 +47,14 @@ const PrivacyPolicy = () => {
         />
         <div className="fixed inset-0 flex items-center justify-center z-[999]">
           <Dialog.Content
-            className=" dark:bg-primaryBackground-dark rounded-xl overflow-hidden shadow-xl transform transition-all min-h-[20%] max-h-[75%] overflow-y-auto custom-scrollbar w-3/4 md:w-1/2 lg:w-1/3 py-5 pl-5"
+            className=" bg-theme-primaryBackground rounded-xl overflow-hidden shadow-xl transform transition-all min-h-[20%] max-h-[75%] overflow-y-auto custom-scrollbar w-3/4 md:w-1/2 lg:w-1/3 py-5 pl-5"
             onClick={(e) => e.stopPropagation()}
           >
             <Dialog.Title />
 
             <div className="flex flex-col h-full">
               <div className="flex justify-between items-center mb-4 pr-3">
-                <h2 className="text-white text-lg font-normal font-inter ">
+                <h2 className="text-theme-secondaryText text-lg font-normal font-inter ">
                   Privacy Policy
                 </h2>
                 <img
@@ -65,7 +65,7 @@ const PrivacyPolicy = () => {
                 />
               </div>
               <div
-                className="flex-grow overflow-y-auto dark:text-secondaryText-dark text-sm font-inter"
+                className="flex-grow overflow-y-auto text-theme-secondaryText text-sm font-inter"
                 style={{ lineHeight: "1.5" }}
               >
                 <ReactMarkdown remarkPlugins={[remarkGfm]}>

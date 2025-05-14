@@ -331,18 +331,18 @@ const OnboardingModal = () => {
               <div className="sm:hidden h-2 bg-primaryBackground"></div>
               {boardindex === 0 ? (
                 <div className="flex flex-col bg-chipBackground h-full  sm:w-3/5 w-full  py-6 px-6 sm:px-8">
-                  <p className="text-white text-3xl font-medium tracking-wide font-familjen-grotesk">
+                  <p className="text-theme-secondaryText text-3xl font-medium tracking-wide font-familjen-grotesk">
                     First things first,
                     <br />
                     claim your domain
                   </p>
-                  <p className="text-white text-sm font-extralight ml-0.5 mt-1 font-inter">
+                  <p className="text-theme-secondaryText text-sm font-extralight ml-0.5 mt-1 font-inter">
                     before anyone else takes it.
                   </p>
                   <div className="relative flex items-center mt-5 border border-profileBorder rounded-md p-2 bg-chipBackground ">
                     <input
                       type="text"
-                      className="flex px-3 py-2 text-white font-normal font-inter bg-chipBackground focus:outline-none rounded-l-md placeholder:text-white placeholder:text-sm placeholder:font-light placeholder:font-inter"
+                      className="flex px-3 py-2 text-theme-secondaryText font-normal font-inter bg-chipBackground focus:outline-none rounded-l-md placeholder:text-theme-secondaryText placeholder:text-sm placeholder:font-light placeholder:font-inter"
                       placeholder="Your domain name"
                       value={domainName}
                       maxLength={40}
@@ -364,7 +364,9 @@ const OnboardingModal = () => {
                       )}
                       <p
                         className={`${
-                          isUsername ? "text-white" : "text-errorLight"
+                          isUsername
+                            ? "text-theme-secondaryText"
+                            : "text-errorLight"
                         } font-light ml-1 font-inter text-xs`}
                       >
                         {isUsername
@@ -379,7 +381,7 @@ const OnboardingModal = () => {
                     className={`w-full py-2.5 mt-6 rounded-full ${
                       domainName !== ""
                         ? "text-buttonText  bg-primary"
-                        : "text-primaryGrey bg-dark"
+                        : "text-primaryGrey bg"
                     }  font-normal`}
                     onClick={handleClaimDomain}
                   >
@@ -394,7 +396,7 @@ const OnboardingModal = () => {
                 </div>
               ) : boardindex === 1 ? (
                 <div className="flex flex-col bg-chipBackground h-88px sm:h-full sm:w-1/2 w-full  overflow-y-auto custom-scrollbar">
-                  <p className="text-white text-3xl font-medium mb-3 pt-6 px-8 tracking-wide font-familjen-grotesk">
+                  <p className="text-theme-secondaryText text-3xl font-medium mb-3 pt-6 px-8 tracking-wide font-familjen-grotesk">
                     Put together all your socials handles
                   </p>
                   {links.map((link, index) => (
@@ -442,10 +444,10 @@ const OnboardingModal = () => {
                 </div>
               ) : (
                 <div className="flex flex-col bg-chipBackground sm:h-full h-88px  sm:w-1/2 w-full  overflow-y-auto custom-scrollbar">
-                  <p className="text-white text-3xl font-medium  pt-5 px-8 tracking-wide font-familjen-grotesk">
+                  <p className="text-theme-secondaryText text-3xl font-medium  pt-5 px-8 tracking-wide font-familjen-grotesk">
                     Last one!
                   </p>
-                  <p className="text-white text-sm font-extralight ml-0.5 px-8 mt-1 font-inter">
+                  <p className="text-theme-secondaryText text-sm font-extralight ml-0.5 px-8 mt-1 font-inter">
                     Add details to your profile.
                   </p>
                   <div className="px-8">
@@ -459,7 +461,9 @@ const OnboardingModal = () => {
                             style={{ borderWidth: "2px" }}
                           />
                           <div className="absolute  cursor-pointer bottom-0 left-0 w-full h-1/2 bg-gray-800 bg-opacity-50 flex justify-center items-center rounded-b-full">
-                            <span className="text-white text-sm">Add</span>
+                            <span className="text-theme-secondaryText text-sm">
+                              Add
+                            </span>
                             <input
                               type="file"
                               accept="image/*"

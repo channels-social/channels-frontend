@@ -32,6 +32,23 @@ export const updateWhatsAppNumber = createAsyncThunk(
         { number }
       );
       if (response.success) {
+        return response;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+export const saveWhatsAppNumber = createAsyncThunk(
+  "myData/saveWhatsAppNumber",
+  async (number, { rejectWithValue }) => {
+    try {
+      const response = await postRequestAuthenticated("/save/whatsapp/number", {
+        number,
+      });
+      if (response.success) {
         return number;
       } else {
         return rejectWithValue(response.message);
@@ -49,6 +66,7 @@ const initialState = {
   logo: "",
   username: "",
   description: "",
+  color_logo: "",
   links: [],
   location: "",
   contact: "",
@@ -58,6 +76,8 @@ const initialState = {
   imageCards: [],
   subscriptions: [],
   channel_subscriptions: [],
+  payment_subscription: false,
+  payment_plan: "",
   subscribers: [],
   updatestatus: "idle",
   updateerror: null,

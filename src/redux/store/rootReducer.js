@@ -37,6 +37,10 @@ import FaqsReducer from "./../slices/faqsSlice";
 import chatReducer from "./../slices/chatSlice";
 import reorderTopicReducer from "./../slices/reorderTopicSlice";
 import eventReducer from "./../slices/eventSlice";
+import dmReducer from "./../slices/dmSlice";
+import adminReducer from "./../slices/adminSlice";
+import businessReducer from "./../slices/businessSlice";
+import pollReducer from "./../slices/pollSlice";
 
 export const appReducer = {
   auth: authReducer,
@@ -77,6 +81,10 @@ export const appReducer = {
   chat: chatReducer,
   reorderTopic: reorderTopicReducer,
   event: eventReducer,
+  dmChat: dmReducer,
+  admin: adminReducer,
+  business: businessReducer,
+  poll: pollReducer,
 };
 
 const combinedReducer = combineReducers(appReducer);

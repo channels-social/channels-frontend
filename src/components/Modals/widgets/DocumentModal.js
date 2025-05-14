@@ -52,14 +52,14 @@ const DocumentModal = () => {
         return (
           <div className="document-viewer">
             {isLoading && !loadError && (
-              <p className="text-white mt-4 ml-2">Loading....</p>
+              <p className="text-theme-secondaryText mt-4 ml-2">Loading....</p>
             )}
             {loadError ? (
-              <div className="text-white text-center mt-4">
-                <p className="text-white">Failed to load PDF.</p>
+              <div className="text-theme-secondaryText text-center mt-4">
+                <p className="text-theme-secondaryText">Failed to load PDF.</p>
                 <button
                   onClick={retryLoad}
-                  className="p-2 mt-3 bg-primary text-buttonText rounded-md"
+                  className="p-2 mt-3 bg-theme-secondaryText text-theme-primaryBackground rounded-md"
                 >
                   Retry
                 </button>
@@ -82,7 +82,7 @@ const DocumentModal = () => {
                 >
                   Previous
                 </button>
-                <p className="text-white font-normal font-inter">
+                <p className="text-theme-secondaryText font-normal font-inter">
                   Page {pageNumber} of {numPages}
                 </p>
                 <button
@@ -136,25 +136,25 @@ const DocumentModal = () => {
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-70 z-40" />
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <Dialog.Content className="bg-chipBackground rounded-xl overflow-hidden overflow-x-auto overflow-y-auto custom-scrollbar shadow-xl transform h-3/4 transition-all w-[90%] md:w-max">
+          <Dialog.Content className="bg-theme-secondaryBackground rounded-xl overflow-hidden overflow-x-auto overflow-y-auto custom-scrollbar shadow-xl transform h-3/4 transition-all w-[90%] md:w-max">
             <Dialog.Title></Dialog.Title>
             <div className="flex flex-col p-5">
               <div className="flex justify-between items-center mb-4">
                 <div className="flex flex-row justify-start items-center w-3/4">
-                  <h2 className="text-white text-sm font-normal truncate overflow-hidden text-ellipsis font-inter ">
+                  <h2 className="text-theme-secondaryText text-sm font-normal truncate overflow-hidden text-ellipsis font-inter ">
                     {fileName}
                   </h2>
                   <FontAwesomeIcon
                     icon={faDownload}
                     onClick={downloadFile}
-                    className="cursor-pointer text-white ml-3"
+                    className="cursor-pointer text-theme-secondaryText ml-3"
                   />
                 </div>
 
                 <img
                   src={Close}
                   alt="Close"
-                  className="w-6 h-6 cursor-pointer"
+                  className="w-5 h-5 cursor-pointer"
                   onClick={handleClose}
                 />
               </div>

@@ -34,6 +34,9 @@ import EventUnsplashModal from "./../components/Modals/Unsplash/EventUnsplashMod
 import EventCardModal from "./../components/Modals/Event/EventCardModal";
 import DeleteEventModal from "./../components/Modals/deletions/eventDeletionModal";
 import EmbedLogoutModal from "./../components/Modals/EmbedLogoutModal";
+import DeleteDMModal from "./../components/Modals/deletions/dmDeleteModal";
+import EventShareModal from "./../components/Modals/share/eventShareModal";
+import PollModal from "./../components/Modals/Poll/PollModal";
 
 const Modals = () => (
   <>
@@ -72,6 +75,9 @@ const Modals = () => (
     <EventCardModal />
     <DeleteEventModal />
     <EmbedLogoutModal />
+    <DeleteDMModal />
+    <EventShareModal />
+    <PollModal />
   </>
 );
 

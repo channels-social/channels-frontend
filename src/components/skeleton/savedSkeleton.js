@@ -5,6 +5,9 @@ import { ResponsiveMasonry } from "react-responsive-masonry";
 import Masonry from "react-responsive-masonry";
 
 const SavedSkeleton = () => {
+  const isDarkTheme = document.documentElement.classList.contains("dark");
+  const baseColor = isDarkTheme ? "#545357" : "#e0e0e0";
+  const highlightColor = isDarkTheme ? "#c4c4c4" : "#f5f5f5";
   const items = ["", "", "", "", "", "", "", "", ""];
   const items2 = [120, 320, 120, 350, 350, 120];
 
@@ -12,8 +15,8 @@ const SavedSkeleton = () => {
     <div className="w-full h-full flex flex-col sm:flex-row mt-8">
       <div className="flex  sm:flex-col ml-4 w-[90%] sm:w-3/5 md:2/5  lg:w-[30%] p-4 rounded-lg bg-profileBackground">
         <SkeletonTheme
-          baseColor="#545357"
-          highlightColor="#c4c4c4"
+          baseColor={baseColor}
+          highlightColor={highlightColor}
           enableAnimation={false}
         >
           {items.map((item, index) => (

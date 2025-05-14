@@ -2,6 +2,8 @@ import { React, useState, useEffect } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import Close from "../../../assets/icons/Close.svg";
 import AddIcon from "../../../assets/icons/addIcon.svg";
+import AddIconLight from "../../../assets/lightIcons/add_light.svg";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faSearch } from "@fortawesome/free-solid-svg-icons";
 import { useSelector, useDispatch } from "react-redux";
@@ -74,11 +76,11 @@ const PushtoCurationModal = () => {
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-70 z-50" />
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <Dialog.Content className="dark:bg-tertiaryBackground-dark rounded-xl overflow-hidden shadow-xl transform transition-all min-h-[20%] max-h-[80%]  w-[90%] xs:w-3/4 sm:w-1/2 md:w-2/5 lg:w-[35%] xl:w-[30%]">
+          <Dialog.Content className="bg-theme-tertiaryBackground rounded-xl overflow-hidden shadow-xl transform transition-all min-h-[20%] max-h-[80%]  w-[90%] xs:w-3/4 sm:w-1/2 md:w-2/5 lg:w-[35%] xl:w-[30%]">
             <Dialog.Title />
             <div className="flex flex-col p-5 h-full">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="dark:text-secondaryText-dark text-lg font-normal font-inter">
+                <h2 className="text-theme-secondaryText text-lg font-normal font-inter">
                   Push Chip
                 </h2>
                 <img
@@ -92,20 +94,29 @@ const PushtoCurationModal = () => {
                 className="flex flex-row mt-2 cursor-pointer w-max"
                 onClick={handleCurationOpenModal}
               >
-                <div className="dark:bg-primaryBackground-dark rounded-full p-1">
-                  <img src={AddIcon} alt="add" className="w-4 h-4" />
+                <div className="bg-theme-primaryBackground rounded-full p-1">
+                  <img
+                    src={AddIcon}
+                    alt="add"
+                    className="dark:block hidden w-4 h-4"
+                  />
+                  <img
+                    src={AddIconLight}
+                    alt="add"
+                    className="dark:hidden w-4 h-4"
+                  />
                 </div>
-                <p className="dark:text-secondaryText-dark ml-2 tracking-wide text-sm  font-light font-inter">
+                <p className="text-theme-secondaryText ml-2 tracking-wide text-sm  font-light font-inter">
                   Create a new curation
                 </p>
               </div>
-              <h2 className="mt-5 dark:text-primaryText-dark text-sm font-light font-inter mb-1">
+              <h2 className="mt-5 text-theme-primaryText text-sm font-light font-inter mb-1">
                 Choose Curation
               </h2>
               <div className="mt-1.5 relative w-full">
                 <FontAwesomeIcon
                   icon={faSearch}
-                  className="absolute left-3 top-[45%] transform -translate-y-1/2 dark:text-primaryText-dark w-4 h-4"
+                  className="absolute left-3 top-[42%] transform -translate-y-1/2 text-theme-primaryText w-3.5 h-3.5"
                 />
                 {searchQuery && (
                   <img
@@ -118,8 +129,8 @@ const PushtoCurationModal = () => {
                 <input
                   type="text"
                   placeholder="Search"
-                  className={` pl-10 pr-3 py-3 mb-2 border dark:border-chatDivider-dark dark:bg-transparent dark:text-secondaryText-dark 
-                    placeholder:dark:text-primaryText-dark ${"rounded-lg"}
+                  className={` pl-10 pr-3 py-3 mb-2 border border-theme-chatDivider bg-transparent text-theme-secondaryText 
+                    placeholder:text-theme-primaryText ${"rounded-lg"}
                                 placeholder:text-left focus:outline-none w-full font-inter font-normal flex `}
                   style={{ fontSize: "15px" }}
                   value={searchQuery}
@@ -144,12 +155,12 @@ const PushtoCurationModal = () => {
                             alt=""
                             className="w-14 h-10 rounded-lg"
                           />
-                          <p className="ml-3 dark:text-secondaryText-dark text-sm font-normal tracking-wide">
+                          <p className="ml-3 text-theme-secondaryText text-sm font-normal ">
                             {curation.name}
                           </p>
                         </div>
                         {selectedCurationId !== curation._id && (
-                          <div className="border-t dark:border-chatDivider-dark w-full mt-2"></div>
+                          <div className="border-t border-theme-chatDivider w-full mt-2"></div>
                         )}
                       </div>
                     )
@@ -158,7 +169,7 @@ const PushtoCurationModal = () => {
 
               {selectedCurationId !== "" && (
                 <button
-                  className={`w-full mt-3 py-2.5 font-normal text-sm rounded-full dark:bg-secondaryText-dark dark:text-primaryBackground-dark`}
+                  className={`w-full mt-3 py-2.5 font-normal text-sm rounded-lg bg-theme-secondaryText text-theme-primaryBackground`}
                   onClick={handlePushtoCuration}
                 >
                   Save to Curation

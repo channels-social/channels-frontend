@@ -35,13 +35,13 @@
   height: 8px;
   width: 8px;
   background-color: transparent;
-  border: 1px solid #e4e4e4;
+  border: 1px solid var(--theme-secondaryText);
   opacity: 1;
   border-radius: 50%;
 }
 
 .slick-dots li.slick-active button:before {
-  background-color: #e4e4e4;
+  background-color: var(--theme-secondaryText);
   height: 8px;
   margin-top: 0px;
   width: 8px;

@@ -1,45 +1,44 @@
 // src/components/MapCard.js
-import { React, useState, useEffect } from 'react';
-import { GoogleMap, useLoadScript, Marker } from '@react-google-maps/api';
+import { React, useState, useEffect } from "react";
+import { GoogleMap, useLoadScript, Marker } from "@react-google-maps/api";
 
 const containerStyle = {
-  width: '100%',
-  height: '120px',
+  width: "100%",
+  height: "120px",
 };
 
 const mapOptions = {
   disableDefaultUI: true,
-  mapTypeId: 'roadmap',
+  mapTypeId: "roadmap",
 };
 
 const parseCoordinatesFromUrl = (url) => {
   try {
     const urlObj = new URL(url);
     const params = new URLSearchParams(urlObj.search);
-    const query = params.get('query');
+    const query = params.get("query");
     if (query) {
-      const [lat, lng] = query.split(',').map(Number);
+      const [lat, lng] = query.split(",").map(Number);
       if (!isNaN(lat) && !isNaN(lng)) {
         return { lat, lng };
       }
     }
   } catch (error) {
-    console.error('Invalid URL:', error);
+    console.error("Invalid URL:", error);
   }
   return { lat: 14.5995, lng: 120.9842 };
 };
 
-
-
 const GoogleMapsCard = ({ item }) => {
+  console.log(item);
   const [center, setCenter] = useState({ lat: 14.5995, lng: 120.9842 });
   const { isLoaded, loadError } = useLoadScript({
-    googleMapsApiKey: 'AIzaSyA4giJjY94Cl2MJegYyp0NZYIUEOUTq9I0',
+    googleMapsApiKey: "AIzaSyA4giJjY94Cl2MJegYyp0NZYIUEOUTq9I0",
   });
 
   const handleMarkerClick = () => {
     if (item.url) {
-      window.open(item.url, '_blank');
+      window.open(item.url, "_blank");
     }
   };
 
@@ -59,7 +58,7 @@ const GoogleMapsCard = ({ item }) => {
   }
 
   return (
-    <div className="max-w-md rounded-xl overflow-hidden mr-4">
+    <div className="max-w-md rounded-xl overflow-hidden mr-4 border-2 border-theme-chatDivider">
       <div className="relative">
         <GoogleMap
           mapContainerStyle={containerStyle}
@@ -74,8 +73,10 @@ const GoogleMapsCard = ({ item }) => {
             onClick={handleMarkerClick}
           />
         </GoogleMap>
-        <div className="absolute bottom-0 w-full left-0 right-0 bg-chipBackground bg-opacity-70 text-white p-1">
-          <p className="text-xs px-2 font-inter text-textColor font-normal p-0">{item.text}</p>
+        <div className="absolute bottom-0 w-full left-0 right-0 bg-theme-tertiaryBackground bg-opacity-70 text-theme-secondaryText p-1">
+          <p className="text-xs px-2 font-inter text-theme-secondaryText font-light p-0">
+            {item.text}
+          </p>
         </div>
       </div>
     </div>

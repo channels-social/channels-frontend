@@ -1,12 +1,11 @@
-import React, { useState, useRef, useEffect } from "react";
 import ChannelCover from "../../assets/channel_images/channel_cover.svg";
+import ArrowBack from "../../assets/icons/arrow_back.svg";
 import Settings from "../../assets/icons/setting.svg";
-import AddIcon from "../../assets/icons/addIcon.svg";
 import Edit from "../../assets/icons/Edit.svg";
+import EditLight from "../../assets/lightIcons/edit_light.svg";
 import Stack from "../../assets/icons/stack.svg";
+import StackLight from "../../assets/lightIcons/curation_light.svg";
 import ChannelLogo from "../../assets/icons/default_channel_logo.svg";
-import useModal from "./../hooks/ModalHook";
-import { useDispatch, useSelector } from "react-redux";
 import { createGeneralTopic } from "./../../redux/slices/channelItemsSlice";
 import {
   clearCreateTopic,
@@ -25,12 +24,7 @@ import {
   setCreateChannelItems,
 } from "../../redux/slices/createChannelSlice.js";
 import { setModalModal } from "../../redux/slices/modalSlice.js";
-import {
-  useParams,
-  useSearchParams,
-  useNavigate,
-  useLocation,
-} from "react-router-dom";
+
 import ChannelSkeleton from "./../skeleton/channelSkeleton";
 import InviteChannelPage from "./InviteChannelPage";
 import { domainUrl } from "./../../utils/globals";
@@ -38,8 +32,21 @@ import { fetchTopics } from "../../redux/slices/reorderTopicSlice.js";
 import TopicsTab from "./Tabs/TopicsTab";
 import MembersTab from "./Tabs/MembersTab";
 import Compressor from "compressorjs";
-import { useStore } from "react-redux";
 import { getAppPrefix } from "./../EmbedChannels/utility/embedHelper";
+
+import {
+  React,
+  useState,
+  useEffect,
+  useRef,
+  useNavigate,
+  useDispatch,
+  useSearchParams,
+  useSelector,
+  useParams,
+  useModal,
+  useLocation,
+} from "../../globals/imports";
 
 const ChannelPage = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -287,18 +294,26 @@ const ChannelPage = () => {
   }
 
   return (
-    <div className="dark:bg-secondaryBackground-dark w-full h-screen flex flex-col overflow-y-auto">
-      <div className="relative w-full h-44">
+    <div className="bg-theme-secondaryBackground w-full h-full flex flex-col overflow-y-auto">
+      <div className="relative w-full h-44 shrink-0">
         <img
           src={channel.cover_image ? channel.cover_image : ChannelCover}
           alt="channel-cover"
           onClick={closeDropdown}
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover shrink-0"
         />
+        <div className="absolute left-3 top-3 text-theme-secondaryText">
+          <img
+            src={ArrowBack}
+            alt="arrow-back"
+            className="text-theme-secondaryText w-5 h-5 cursor-pointer"
+            onClick={() => navigate(-1)}
+          />
+        </div>
         {isEditCover && (
           <div
-            className="absolute left-3 top-3 cursor-pointer dark:bg-buttonEnable-dark px-3 text-sm font-light py-1.5
-         dark:text-secondaryText-dark rounded-lg"
+            className="absolute left-3 top-3 cursor-pointer bg-theme-secondaryText px-3 text-sm font-light py-1.5
+         text-theme-primaryBackground rounded-lg"
             onClick={handleSaveCover}
           >
             {channelstatus === "loading" ? "Saving" : "Save"}
@@ -306,13 +321,19 @@ const ChannelPage = () => {
         )}
       </div>
       {isOwner && (
-        <div className="absolute right-3 sm:top-3 top-10">
+        <div className="absolute right-4 sm:top-2 top-14">
           <img
             src={Settings}
             alt="settings"
-            className="w-6 h-6 cursor-pointer"
+            className=" w-6 h-6 cursor-pointer"
             onClick={toggleDropdown}
           />
+          {/* <img
+            src={SettingsLight}
+            alt="settings"
+            className="dark:hidden w-6 h-6 cursor-pointer"
+            onClick={toggleDropdown}
+          /> */}
         </div>
       )}
 
@@ -320,7 +341,7 @@ const ChannelPage = () => {
         <div
           ref={dropdownRef}
           className="absolute top-8 right-4 mt-2 w-max rounded-md shadow-lg
-          dark:bg-dropdown-dark  z-50"
+          bg-theme-dropdown  z-50"
         >
           <div
             className="py-1"
@@ -332,9 +353,10 @@ const ChannelPage = () => {
               className="relative flex flex-row px-4 items-center"
               // onClick={handleOpenCover}
             >
-              <img src={Edit} alt="edit" className="" />
+              <img src={Edit} alt="edit" className="dark:block hidden " />
+              <img src={EditLight} alt="edit" className="dark:hidden" />
               <p
-                className="block ml-2 py-2 text-sm dark:text-primaryText-dark cursor-pointer"
+                className="block ml-2 py-2 text-sm text-theme-primaryText cursor-pointer"
                 role="menuitem"
               >
                 Edit cover
@@ -350,9 +372,18 @@ const ChannelPage = () => {
               className="flex flex-row px-4 items-center"
               onClick={handleRemoveCover}
             >
-              <img src={Stack} alt="edit" className="w-4 h-4" />
+              <img
+                src={Stack}
+                alt="edit"
+                className="dark:block hidden w-4 h-4"
+              />
+              <img
+                src={StackLight}
+                alt="edit"
+                className="dark:hidden w-4 h-4"
+              />
               <p
-                className="block ml-2 py-2 text-sm dark:text-primaryText-dark cursor-pointer"
+                className="block ml-2 py-2 text-sm text-theme-primaryText cursor-pointer"
                 role="menuitem"
               >
                 Remove cover
@@ -378,16 +409,16 @@ const ChannelPage = () => {
 
         <div className="flex flex-col ml-5 w-full">
           <div className="flex flex-row justify-between items-center">
-            <p className=" text-lg sm:text-xl dark:text-secondaryText-dark font-inter font-[500]">
+            <p className=" text-lg sm:text-xl text-theme-secondaryText font-inter font-[500]">
               {channel.name}
             </p>
             {/* <img src={SettingIcon} alt="setting-icon" className=" w-5 h-5" /> */}
           </div>
-          <p className="text-[10px] dark:text-emptyEvent-dark font-light">
+          <p className="text-xs text-theme-emptyEvent font-light">
             {channel.members.length} members
           </p>
           <p
-            className="mt-0.5 text-sm font-light dark:text-primaryText-dark mb-1"
+            className="mt-0.5 text-sm font-light text-theme-primaryText mb-1"
             style={{ whiteSpace: "pre-line" }}
           >
             {channel.description}
@@ -395,39 +426,39 @@ const ChannelPage = () => {
           <div className="flex flex-row space-x-4 mt-2">
             {isOwner ? (
               <div
-                className="py-2 px-3 cursor-pointer dark:text-secondaryText-dark dark:bg-buttonEnable-dark rounded-lg text-sm font-inter"
+                className="py-2 px-3 cursor-pointer text-theme-primaryBackground bg-theme-secondaryText rounded-lg text-sm font-inter"
                 onClick={() => handleOwnerShareChannel(channel._id)}
               >
                 Share join link
               </div>
             ) : (
               <div
-                className={`py-2 px-3 cursor-pointer dark:text-secondaryText-dark text-center
+                className={`py-2 px-3 cursor-pointer  text-center
                   ${
-                    channel.requests?.includes(myData._id)
-                      ? "dark:bg-chatBackground-dark"
-                      : "dark:bg-buttonEnable-dark"
+                    channel.requests?.includes(myData?._id)
+                      ? "bg-theme-buttonDisable text-theme-buttonDisableText"
+                      : "bg-theme-secondaryText text-theme-primaryBackground"
                   }
                    rounded-lg text-sm font-inter`}
                 onClick={() => handleJoinChannel(channel)}
               >
-                {channel.requests?.includes(myData._id)
+                {channel.requests?.includes(myData?._id)
                   ? "Requested"
-                  : channel.members?.includes(myData._id)
+                  : channel.members?.includes(myData?._id)
                   ? "Check updates"
                   : "Join channel"}
               </div>
             )}
             {isOwner ? (
               <div
-                className="border dark:border-primaryText-dark py-2 px-3 rounded-lg cursor-pointer dark:text-secondaryText-dark text-xs sm:text-sm font-inter"
+                className="border border-theme-primaryText py-2 px-3 rounded-lg cursor-pointer text-theme-secondaryText text-xs sm:text-sm font-inter"
                 onClick={handleEditChannel}
               >
                 Edit Channel
               </div>
             ) : (
               <div
-                className="border dark:border-primaryText-dark py-2 px-3 rounded-lg cursor-pointer dark:text-secondaryText-dark text-sm font-inter"
+                className="border border-theme-primaryText py-2 px-3 rounded-lg cursor-pointer text-theme-secondaryText text-sm font-inter"
                 onClick={() => handleShareChannel(channel._id)}
               >
                 Share Invite
@@ -437,20 +468,20 @@ const ChannelPage = () => {
         </div>
       </div>
       <div className="flex flex-col mx-3">
-        <div className="border-t my-4 dark:border-t-chatDivider-dark "></div>
+        <div className="border-t my-4 border-t-theme-chatDivider "></div>
         {isLoggedIn && channel.topics.length === 0 && (
-          <p className="mt-2 text-xl dark:text-white font-inter font-normal">
+          <p className="mt-2 text-xl text-theme-secondaryText font-inter font-normal">
             Topics
           </p>
         )}
         {channel.topics.length === 0 && channel.user === myData._id && (
           <div className="mt-2 flex flex-row space-x-3">
-            <div className="p-4 dark:bg-chatDivider-dark rounded-lg flex-col justify-start items-start w-max">
+            <div className="p-4 bg-theme-sidebarBackground rounded-lg flex-col justify-start items-start w-max border border-theme-sidebarDivider">
               <div className="flex-col justify-start items-start  flex">
-                <div className=" dark:text-sidebarColor-dark text-xs font-normal font-inter ">
+                <div className=" text-theme-sidebarColor text-xs font-normal font-inter ">
                   Suggested
                 </div>
-                <div className="dark:text-primaryText-dark text-xs font-normal font-inter mt-1">
+                <div className="text-theme-primaryText text-xs font-normal font-inter mt-1">
                   For open-ended conversations,
                   <br />
                   you can start with General
@@ -458,7 +489,7 @@ const ChannelPage = () => {
               </div>
 
               <div
-                className="p-2 rounded border cursor-pointer mt-2 w-max dark:border-primaryText-dark dark:text-secondaryText-dark text-xs justify-center items-center "
+                className="p-2 rounded border cursor-pointer mt-2 w-max border-theme-primaryText text-theme-secondaryText text-xs justify-center items-center "
                 onClick={handleCreateTopic}
               >
                 Create General
@@ -469,7 +500,7 @@ const ChannelPage = () => {
         {/* <div className="flex flex-row items-center">
           {isOwner && (
             <div
-              className="px-6 py-6 dark:bg-chatDivider-dark rounded-lg flex-col justify-start w-max items-center cursor-pointer"
+              className="px-6 py-6 bg-theme-chatDivider rounded-lg flex-col justify-start w-max items-center cursor-pointer"
               onClick={() => handleTopicModal(channel._id)}
             >
               <img src={AddIcon} alt="add" className="mx-auto" />
@@ -480,7 +511,7 @@ const ChannelPage = () => {
           )}
           {isOwner && (
             <div
-              className="px-4 py-6 ml-4 dark:bg-chatDivider-dark rounded-lg flex-col text-center justify-start w-max items-center cursor-pointer"
+              className="px-4 py-6 ml-4 bg-theme-chatDivider rounded-lg flex-col text-center justify-start w-max items-center cursor-pointer"
               onClick={() => handleReorderTopicModal(channel._id)}
             >
               <img src={AddIcon} alt="add" className="mx-auto" />
@@ -500,8 +531,8 @@ const ChannelPage = () => {
                   onClick={() => handleTabClick(tab.href)}
                   className={`mx-2 xs:px-12 px-8 py-3 text-sm transition-colors duration-300 ${
                     activeTab === tab.href
-                      ? "border-b-2 dark:text-secondaryText-dark dark:border-secondaryText-dark"
-                      : "dark:text-primaryText-dark "
+                      ? "border-b-2 text-theme-secondaryText border-theme-secondaryText"
+                      : "text-theme-emptyEvent "
                   }`}
                 >
                   {tab.name}
@@ -514,7 +545,7 @@ const ChannelPage = () => {
           <div
             className={`${
               isOwner ? "w-80" : "w-28"
-            } mx-auto border dark:border-chatDivider-dark`}
+            } mx-auto border border-theme-chatDivider`}
             style={{ height: "0.1px" }}
           ></div>
         )}

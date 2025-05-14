@@ -3,6 +3,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Time from "../../../assets/icons/Stopwatch.svg";
+import TimeLight from "../../../assets/lightIcons/stopwatch_light.svg";
 
 import { parse } from "date-fns";
 
@@ -47,8 +48,8 @@ const EventTimePicker = ({
       ref={ref}
       placeholder={placeholder}
       className="w-full py-1 text-sm pr-10 font-light rounded
-       dark:bg-transparent border-b border-b-chatDivider-dark placeholder-font-light placeholder-text-sm
-        dark:text-secondaryText-dark focus:outline-none placeholder:text-emptyEvent-dark"
+       bg-transparent border-b border-theme-chatDivider placeholder-font-light placeholder-text-sm
+        text-theme-secondaryText focus:outline-none placeholder:text-emptyEvent"
     />
   ));
   // const ReadOnlyInput2 = forwardRef(({ value, onClick }, ref) => (
@@ -79,7 +80,12 @@ const EventTimePicker = ({
         <img
           src={Time}
           alt="Time"
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 dark:text-primaryText-dark"
+          className="dark:block hidden absolute right-0 top-1/2 transform -translate-y-1/2 text-theme-primaryText"
+        />
+        <img
+          src={TimeLight}
+          alt="Time"
+          className="dark:hidden absolute right-0 top-1/2 transform -translate-y-1/2 text-theme-primaryText"
         />
       </div>
       <div className="relative  w-[45%]">
@@ -97,7 +103,12 @@ const EventTimePicker = ({
         <img
           src={Time}
           alt="Time"
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 dark:text-primaryText-dark"
+          className="dark:block hidden absolute right-0 top-1/2 transform -translate-y-1/2 text-theme-primaryText"
+        />
+        <img
+          src={TimeLight}
+          alt="Time"
+          className="dark:hidden absolute right-0 top-1/2 transform -translate-y-1/2 text-theme-primaryText"
         />
       </div>
     </div>

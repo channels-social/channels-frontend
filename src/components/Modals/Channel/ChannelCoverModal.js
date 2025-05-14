@@ -102,11 +102,11 @@ const ChannelCoverModal = () => {
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-70 z-40" />
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <Dialog.Content className="dark:bg-tertiaryBackground-dark rounded-xl overflow-hidden shadow-xl transform transition-all w-3/4 md:w-1/2 lg:w-1/3">
+          <Dialog.Content className="bg-theme-tertiaryBackground rounded-xl overflow-hidden shadow-xl transform transition-all w-3/4 md:w-1/2 lg:w-1/3">
             <Dialog.Title></Dialog.Title>
             <div className="flex flex-col p-5">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="dark:text-secondaryText-dark text-lg font-normal">
+                <h2 className="text-theme-secondaryText text-lg font-normal">
                   Edit Cover
                 </h2>
                 <img
@@ -118,7 +118,7 @@ const ChannelCoverModal = () => {
               </div>
               <div className="relative mx-auto">
                 <button
-                  className="mx-auto px-3 py-2 text-sm dark:bg-secondaryText-dark dark:text-primaryBackground-dark rounded cursor-pointer"
+                  className="mx-auto px-3 py-2 text-sm bg-theme-secondaryText text-theme-primaryBackground rounded cursor-pointer"
                   onClick={() => fileInputRef.current.click()}
                 >
                   Upload Image

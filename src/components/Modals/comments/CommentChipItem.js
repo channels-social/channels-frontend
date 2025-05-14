@@ -57,14 +57,16 @@ const CommentItem = ({ item, handleChange }) => {
       />
       <div className="flex flex-col  ">
         <div className="flex flex-row items-end">
-          <p className="dark:text-secondaryText-dark font-normal text-[11px] font-inter">
+          <p className="text-theme-secondaryText font-normal text-[11px] font-inter">
             {item.user?.username}
           </p>
-          <p className="dark:text-primaryText-dark font-light pl-2 text-[10px] font-inter">
+          <p className="text-theme-primaryText font-light pl-2 text-[10px] font-inter">
             {timeAgo}
           </p>
         </div>
-        <p className="text-white font-light text-xs mt-0.5">{item.comment}</p>
+        <p className="text-theme-secondaryText font-light text-xs mt-0.5">
+          {item.comment}
+        </p>
         <div className="flex flex-row items-center pt-2 pb-2">
           <div className="flex flex-row items-center cursor-pointer">
             <img
@@ -73,12 +75,12 @@ const CommentItem = ({ item, handleChange }) => {
               className="mr-1 h-4 w-4"
               onClick={() => toggleUpvoteComment(item._id)}
             />
-            <p className="dark:text-secondaryText-dark text-xs font-normal">
+            <p className="text-theme-secondaryText text-xs font-normal">
               {item.upvotes?.length ?? 0}
             </p>
           </div>
           <p
-            className="dark:text-primaryText-dark ml-4 text-xs font-normal font-inter cursor-pointer"
+            className="text-theme-primaryText ml-4 text-xs font-normal font-inter cursor-pointer"
             onClick={() => handleChange(item)}
           >
             Reply
@@ -90,7 +92,7 @@ const CommentItem = ({ item, handleChange }) => {
             onClick={handleShowReply}
           >
             <img src={ReplyLine} alt="reply" />
-            <p className="dark:text-primaryText-dark font-normal text-xs pl-2">
+            <p className="text-theme-primaryText font-normal text-xs pl-2">
               {showreply
                 ? "hide replies"
                 : `view ${item.replies?.length} more replies`}

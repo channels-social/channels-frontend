@@ -5,6 +5,10 @@ import Upvote from "../../assets/icons/upvote.svg";
 import Upvoted from "../../assets/icons/upvoted.svg";
 import Edit from "../../assets/icons/Edit.svg";
 import Delete from "../../assets/icons/Delete.svg";
+import EditLight from "../../assets/lightIcons/edit_light.svg";
+import DeleteLight from "../../assets/lightIcons/delete_light.svg";
+import UpvoteLight from "../../assets/lightIcons/upvote_light.svg";
+import UpvotedLight from "../../assets/lightIcons/upvote_filled_light.svg";
 import Send from "../../assets/icons/Send.svg";
 import Comment from "../../assets/icons/Comment.svg";
 import MetaCard from "./widgets/MetaCard";
@@ -159,7 +163,7 @@ const CurationChips = ({ item, owner }) => {
   );
 
   return (
-    <div className="container pl-4 pb-4 w-full pt-4 rounded-lg space-y-2.5 border dark:border-chatDivider-dark dark:bg-tertiaryBackground-dark">
+    <div className="container pl-4 pb-4 w-full pt-4 rounded-lg space-y-2.5 border border-theme-chatDivider bg-theme-tertiaryBackground">
       <div className="flex flex-row justify-between">
         <div
           className="cursor-pointer w-max"
@@ -181,15 +185,15 @@ const CurationChips = ({ item, owner }) => {
               className="flex space-x-1 cursor-pointer"
               onClick={toggleDropdown}
             >
-              <div className="w-1 h-1 dark:bg-primaryText-dark rounded-full"></div>
-              <div className="w-1 h-1 dark:bg-primaryText-dark rounded-full"></div>
-              <div className="w-1 h-1 dark:bg-primaryText-dark rounded-full"></div>
+              <div className="w-1 h-1 bg-theme-primaryText rounded-full"></div>
+              <div className="w-1 h-1 bg-theme-primaryText rounded-full"></div>
+              <div className="w-1 h-1 bg-theme-primaryText rounded-full"></div>
             </div>
             {isDropdownOpen && (
               <div
                 ref={dropdownRef}
                 className="absolute top-8 right-0 w-max rounded-md shadow-lg border
-                 dark:border-chatDivider-dark dark:bg-tertiaryBackground-dark  ring-1 ring-black ring-opacity-5 z-50"
+                 border-theme-chatDivider bg-theme-tertiaryBackground  ring-1 ring-black ring-opacity-5 z-50"
               >
                 <div
                   className="py-1"
@@ -201,9 +205,18 @@ const CurationChips = ({ item, owner }) => {
                     className="flex flex-row px-4 items-center"
                     onClick={handleEditModal}
                   >
-                    <img src={Edit} alt="edit" className="w-4 h-4" />
+                    <img
+                      src={Edit}
+                      alt="edit"
+                      className="dark:block hidden w-4 h-4"
+                    />
+                    <img
+                      src={EditLight}
+                      alt="edit"
+                      className="dark:hidden w-4 h-4"
+                    />
                     <p
-                      className="block ml-2 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
+                      className="block ml-2 py-2 text-sm text-theme-secondaryText cursor-pointer"
                       role="menuitem"
                     >
                       Edit
@@ -213,9 +226,18 @@ const CurationChips = ({ item, owner }) => {
                     className="flex flex-row px-4 items-center"
                     onClick={handleDeleteModal}
                   >
-                    <img src={Delete} alt="edit" className="w-4 h-4" />
+                    <img
+                      src={Delete}
+                      alt="delete"
+                      className="dark:block hidden w-4 h-4"
+                    />
+                    <img
+                      src={DeleteLight}
+                      alt="delete"
+                      className="dark:hidden w-4 h-4"
+                    />
                     <p
-                      className="block  ml-2 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
+                      className="block  ml-2 py-2 text-sm text-theme-secondaryText cursor-pointer"
                       role="menuitem"
                     >
                       Delete
@@ -227,7 +249,7 @@ const CurationChips = ({ item, owner }) => {
                   >
                     <img src={Send} alt="push-curation" className="w-4 h-4" />
                     <p
-                      className="block  ml-1 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
+                      className="block  ml-1 py-2 text-sm text-theme-secondaryText cursor-pointer"
                       role="menuitem"
                     >
                       Push to Curation
@@ -239,13 +261,13 @@ const CurationChips = ({ item, owner }) => {
           </div>
         ) : null}
       </div>
-      <p className="dark:text-profileColor-dark text-sm mt-1 font-light pr-4">
+      <p className="text-theme-profileColor text-sm mt-1 font-light pr-4">
         {item.user.name}
       </p>
       <div className="flex flex-col space-y-2.5">
         <Linkify componentDecorator={componentDecorator}>
           <div className="w-full pr-1 overflow-hidden">
-            <p className="dark:text-secondaryText-dark text-sm font-light font-inter whitespace-pre-wrap break-words">
+            <p className="text-theme-secondaryText text-sm font-light font-inter whitespace-pre-wrap break-words">
               {isExpanded
                 ? item.text
                 : `${item.text.slice(0, maxLength)}${
@@ -254,7 +276,7 @@ const CurationChips = ({ item, owner }) => {
               {item.text.length > maxLength && (
                 <span
                   onClick={toggleReadMore}
-                  className="dark:text-white cursor-pointer ml-1"
+                  className="text-theme-secondaryText cursor-pointer ml-1"
                 >
                   {isExpanded ? "<- Show Less" : "Read More ->"}
                 </span>
@@ -264,7 +286,7 @@ const CurationChips = ({ item, owner }) => {
         </Linkify>
         {item.date.date && item.date.event && <DateTimeCard item={item.date} />}
         {item.location.text && <GoogleMapsCard item={item.location} />}
-        <div className="mr-3">
+        <div className="mr-4">
           {item.document && item.document.url && (
             <DocumentPreview document={item.document} />
           )}
@@ -290,9 +312,14 @@ const CurationChips = ({ item, owner }) => {
           <img
             src={isUpvoted ? Upvoted : Upvote}
             alt="Upvote"
-            className="mr-0.5 h-5 w-5"
+            className="dark:block hidden mr-0.5 h-5 w-5"
           />
-          <p className="dark:text-secondaryText-dark text-sm font-normal">
+          <img
+            src={isUpvoted ? UpvotedLight : UpvoteLight}
+            alt="Upvote"
+            className="dark:hidden mr-0.5 h-5 w-5"
+          />
+          <p className="text-theme-secondaryText text-sm font-normal">
             {item.upvotes.length}
           </p>
         </div>
@@ -301,7 +328,7 @@ const CurationChips = ({ item, owner }) => {
           onClick={openCommentModal}
         >
           <img src={Comment} alt="Comment" className="mr-0.5" />
-          <p className="dark:text-secondaryText-dark text-sm font-normal">
+          <p className="text-theme-secondaryText text-sm font-normal">
             {item.comments ? item?.comments : 0}
           </p>
         </div>
@@ -310,7 +337,7 @@ const CurationChips = ({ item, owner }) => {
           onClick={openShareModal}
         >
           <img src={Send} alt="Send" className="mr-0.5 h-7 w-7" />
-          <p className="dark:text-secondaryText-dark text-sm font-normal">
+          <p className="text-theme-secondaryText text-sm font-normal">
             {item.shared_by}
           </p>
         </div>
@@ -318,13 +345,13 @@ const CurationChips = ({ item, owner }) => {
           {" "}
           {/* New relative container for positioning */}
           {isSavedMessageVisible && (
-            <div className="absolute -top-7 left-1/2 transform -translate-x-1/2 bg-dark text-white text-xs rounded-lg px-2 py-1">
+            <div className="absolute -top-7 left-1/2 transform -translate-x-1/2 bg text-theme-secondaryText text-xs rounded-lg px-2 py-1">
               {savedMessage}
             </div>
           )}
           <div
             className={`${
-              isSaved ? "" : "dark:bg-chatDivider-dark"
+              isSaved ? "" : "bg-theme-chatDivider"
             } px-2 py-0.5 rounded-xl cursor-pointer`}
             onClick={handleSaved}
           >

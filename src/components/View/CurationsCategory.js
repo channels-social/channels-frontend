@@ -17,6 +17,7 @@ import ListSelected from "../../assets/icons/List_s.svg";
 import CategoryUnselected from "../../assets/icons/category_s.svg";
 import CurationItemsSkeleton from "./../skeleton/curationItemsSkeleton";
 import Share from "../../assets/icons/share_icon.svg";
+import ShareLight from "../../assets/lightIcons/share_icon_light.svg";
 import ProfileItemsSkeleton from "./../skeleton/profileItemsSkeleton";
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import SaveIcon from "../../assets/icons/save_icon.svg";
@@ -24,6 +25,7 @@ import SavedIcon from "../../assets/icons/favorite.svg";
 import Chips from "./../chips/Chips";
 import ProfileChips from "./../chips/ProfileChips";
 import AddIcon from "../../assets/icons/addIcon.svg";
+import AddIconLight from "../../assets/lightIcons/add_light.svg";
 import { setChipField } from "../../redux/slices/chipSlice";
 import { domainUrl } from "./../../utils/globals";
 
@@ -129,7 +131,7 @@ const CurationsCategory = () => {
   return (
     <div className="flex flex-col w-full">
       <div className="flex flex-row justify-between items-center mb-3">
-        <p className="text-white text-xl sm:text-2xl font-familjen-grotesk font-normal tracking-wide sm:pl-3">
+        <p className="text-theme-secondaryText text-xl sm:text-2xl font-familjen-grotesk font-normal tracking-wide sm:pl-3">
           {decodedCategory}
         </p>
         <div className="flex items-center justify-end mr-4 sm:mr-12">
@@ -186,7 +188,7 @@ const CurationsCategory = () => {
               style={{ height: "1px" }}
             ></div>
             <div className="flex flex-col w-[95%] mt-2 ">
-              <p className="text-lg text-white font-normal  font-inter">
+              <p className="text-lg text-theme-secondaryText font-normal  font-inter">
                 {selectedCuration?.name}
               </p>
               <div className="flex flex-row items-center justify-between mt-1">
@@ -201,7 +203,7 @@ const CurationsCategory = () => {
                   {!isOwner && (
                     <div className="relative">
                       {isSavedMessageVisible && (
-                        <div className="absolute -top-7 left-1/2 transform -translate-x-1/2 bg-dark text-white text-xs rounded-lg px-2 py-1">
+                        <div className="absolute -top-7 left-1/2 transform -translate-x-1/2 bg text-theme-secondaryText text-xs rounded-lg px-2 py-1">
                           {savedMessage}
                         </div>
                       )}
@@ -223,14 +225,28 @@ const CurationsCategory = () => {
                     <img
                       src={AddIcon}
                       alt="add-icon"
-                      className="cursor-pointer ml-3"
+                      className="dark:block hidden cursor-pointer ml-3"
+                      onClick={() => handleChipOpen(selectedCuration?._id)}
+                    />
+                  )}
+                  {isEditable && (
+                    <img
+                      src={AddIconLight}
+                      alt="add-icon"
+                      className="dark:hidden cursor-pointer ml-3"
                       onClick={() => handleChipOpen(selectedCuration?._id)}
                     />
                   )}
                   <img
                     src={Share}
                     alt="share"
-                    className="w-6 h-6 text-primary ml-3 cursor-pointer"
+                    className="dark:block hidden w-6 h-6 text-primary ml-3 cursor-pointer"
+                    onClick={handleShareOpen}
+                  />
+                  <img
+                    src={ShareLight}
+                    alt="share"
+                    className="dark:hidden w-6 h-6 text-primary ml-3 cursor-pointer"
                     onClick={handleShareOpen}
                   />
                 </div>
@@ -241,7 +257,7 @@ const CurationsCategory = () => {
               ) : chips.length === 0 ? (
                 <div className="flex items-center mt-20">
                   <div
-                    className="container rounded-md bg-dark pl-4 pr-4 pt-3 pb-3 flex flex-col min-w-fit max-w-72 ml-auto mb-36"
+                    className="container rounded-md bg pl-4 pr-4 pt-3 pb-3 flex flex-col min-w-fit max-w-72 ml-auto mb-36"
                     style={{ marginRight: "auto" }}
                   >
                     <h3 className=" text-textColor text-sm">
@@ -283,7 +299,7 @@ const CurationsCategory = () => {
                   <input
                     type="text"
                     placeholder="Search"
-                    className="pl-5 pr-3 py-3 rounded-lg text-white bg-primaryBackground focus:outline-none w-full font-inter font-normal text-sm flex items-center placeholder:text-textFieldColor placeholder:text-xs"
+                    className="pl-5 pr-3 py-3 rounded-lg text-theme-secondaryText bg-primaryBackground focus:outline-none w-full font-inter font-normal text-sm flex items-center placeholder:text-textFieldColor placeholder:text-xs"
                   />
                 </div>
               </div> */}
@@ -336,13 +352,13 @@ const CurationsCategory = () => {
             <div className="flex-1  mr-5 mt-4">
               <div className="flex flex-col mb-1">
                 <div className="flex flex-row items-center">
-                  <p className="text-lg text-white font-normal  font-inter">
+                  <p className="text-lg text-theme-secondaryText font-normal  font-inter">
                     {selectedCuration?.name}
                   </p>
                   {!isOwner && (
                     <div className="relative">
                       {isSavedMessageVisible && (
-                        <div className="absolute -top-7 left-1/2 transform -translate-x-1/2 bg-dark text-white text-xs rounded-lg px-2 py-1">
+                        <div className="absolute -top-7 left-1/2 transform -translate-x-1/2 bg text-theme-secondaryText text-xs rounded-lg px-2 py-1">
                           {savedMessage}
                         </div>
                       )}
@@ -364,7 +380,15 @@ const CurationsCategory = () => {
                     <img
                       src={AddIcon}
                       alt="add-icon"
-                      className="cursor-pointer ml-3"
+                      className="dark:block hidden cursor-pointer ml-3"
+                      onClick={() => handleChipOpen(selectedCuration?._id)}
+                    />
+                  )}
+                  {isEditable && (
+                    <img
+                      src={AddIconLight}
+                      alt="add-icon"
+                      className="dark:hidden cursor-pointer ml-3"
                       onClick={() => handleChipOpen(selectedCuration?._id)}
                     />
                   )}
@@ -399,7 +423,7 @@ const CurationsCategory = () => {
               ) : chips.length === 0 ? (
                 <div className="flex items-center mt-20">
                   <div
-                    className="container rounded-md bg-dark pl-4 pr-4 pt-3 pb-3 flex flex-col min-w-fit max-w-72 ml-auto mb-36"
+                    className="container rounded-md bg pl-4 pr-4 pt-3 pb-3 flex flex-col min-w-fit max-w-72 ml-auto mb-36"
                     style={{ marginRight: "auto" }}
                   >
                     <h3 className=" text-textColor text-sm">
@@ -450,7 +474,7 @@ const CurationsCategory = () => {
                 alt={curation.name}
               />
               <p
-                className="text-white text-sm mt-1  font-inter font-normal text-left overflow-hidden"
+                className="text-theme-secondaryText text-sm mt-1  font-inter font-normal text-left overflow-hidden"
                 style={{
                   display: "-webkit-box",
                   WebkitLineClamp: 1,
@@ -474,7 +498,7 @@ const CurationsCategory = () => {
       ) : (
         <div className="flex items-center mt-20">
           <div
-            className="container rounded-md bg-dark pl-4 pr-4 pt-3 pb-3 flex flex-col min-w-fit max-w-72 ml-auto mb-36"
+            className="container rounded-md bg pl-4 pr-4 pt-3 pb-3 flex flex-col min-w-fit max-w-72 ml-auto mb-36"
             style={{ marginRight: "auto" }}
           >
             <h3 className=" text-textColor text-sm">

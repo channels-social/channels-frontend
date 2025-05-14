@@ -831,7 +831,7 @@
 //                           type="checkbox"
 //                           checked={agreed}
 //                           onChange={(e) => setAgreed(e.target.checked)}
-//                           className="w-4 h-4 text-black bg-dark rounded-sm checked:bg-primary focus:ring-primary checked:ring-primary"
+//                           className="w-4 h-4 text-black bg rounded-sm checked:bg-primary focus:ring-primary checked:ring-primary"
 //                         />
 //                         <label className="ml-2 text-xs text-primaryGrey">
 //                           I agree to the{" "}
@@ -868,7 +868,7 @@
 //                     <button
 //                       type="button"
 //                       onClick={() => googleLogin()}
-//                       className="w-4/5 px-1.5 py-2 mb-4 text-xs ml-auto mr-auto font-normal text-white bg-dark rounded-3xl"
+//                       className="w-4/5 px-1.5 py-2 mb-4 text-xs ml-auto mr-auto font-normal text-white bg rounded-3xl"
 //                     >
 //                       <img
 //                         src={googleLogo}

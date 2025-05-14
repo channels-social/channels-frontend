@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import Test from "../../../assets/images/test.png";
-import MapPin from "../../../assets/icons/map-pin.svg";
+
 import { format, parseISO, parse, isValid } from "date-fns";
 import Edit from "../../../assets/icons/Edit.svg";
+import EditLight from "../../../assets/lightIcons/edit_light.svg";
+import { ReactComponent as LocationIcon } from "../../../assets/icons/location.svg";
+
 import Delete from "../../../assets/icons/Delete.svg";
+import DeleteLight from "../../../assets/lightIcons/delete_light.svg";
 import useModal from "./../../hooks/ModalHook";
 import { useDispatch, useSelector } from "react-redux";
 import { setModalModal } from "../../../redux/slices/modalSlice";
@@ -24,6 +28,7 @@ const EventCard = ({
   openDropdownId,
   handleToggleDropdown,
   btnPadding,
+  btnFlex,
   spacing,
   topSpacing = "mt-4",
 }) => {
@@ -36,7 +41,6 @@ const EventCard = ({
   const { handleOpenModal } = useModal();
   const myData = useSelector((state) => state.myData);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const eventt = useSelector((state) => state.event);
   const navigate = useNavigate();
   const location = useLocation();
   const dropdownRef = useRef(null);
@@ -45,8 +49,9 @@ const EventCard = ({
   const dispatch = useDispatch();
 
   const handleEventModal = () => {
-    dispatch(setModalModal({ field: "event", value: event }));
-    handleOpenModal("modalEventCardOpen");
+    // dispatch(setModalModal({ field: "event", value: event }));
+    // handleOpenModal("modalEventCardOpen");
+    navigate(`/event/${event._id}`);
   };
   const handleDeleteEventModal = () => {
     toggleDropdown();
@@ -273,30 +278,33 @@ const EventCard = ({
 
   return (
     <div
-      className={`${color} border  dark:border-chatDivider-dark rounded-lg p-3 md:${width} w-full flex xs:flex-row flex-col mb-2`}
+      className={`${color} border  border-theme-chatDivider rounded-lg p-3 md:${width} w-full flex xs:flex-row flex-col mb-2`}
       onClick={closeDropdown}
     >
       <div className="flex flex-row items-start justify-between">
-        <img
-          src={event.cover_image ? event.cover_image : Test}
-          alt="event-image"
-          className={`rounded-lg ${imageHeight} w-28 object-cover flex-shrink-0`}
-        />
+        <div className={` xs:w-28 w-full relative`}>
+          <img
+            src={event.cover_image ? event.cover_image : Test}
+            alt="event-image"
+            className={`rounded-lg object-cover flex-shrink-0 ${imageHeight}`}
+          />
+        </div>
+
         <div className="items-center justify-end ml-2 relative xs:hidden flex">
           {event.user === myData._id && (
             <div
               className="flex space-x-1 cursor-pointer"
               onClick={toggleDropdown}
             >
-              <div className="w-1 h-1 dark:bg-primaryText-dark rounded-full"></div>
-              <div className="w-1 h-1 dark:bg-primaryText-dark rounded-full"></div>
-              <div className="w-1 h-1 dark:bg-primaryText-dark rounded-full"></div>
+              <div className="w-1 h-1 bg-theme-primaryText rounded-full"></div>
+              <div className="w-1 h-1 bg-theme-primaryText rounded-full"></div>
+              <div className="w-1 h-1 bg-theme-primaryText rounded-full"></div>
             </div>
           )}
           {isDropdownOpen && (
             <div
               ref={dropdownRef}
-              className="absolute top-4 right-0 w-max rounded-md shadow-lg border dark:border-chatDivider-dark dark:bg-tertiaryBackground-dark  ring-1 ring-black ring-opacity-5 z-50"
+              className="absolute top-4 right-0 w-max rounded-md shadow-lg border border-theme-chatDivider bg-theme-tertiaryBackground  ring-1 ring-black ring-opacity-5 z-50"
             >
               <div
                 className="py-1"
@@ -308,9 +316,18 @@ const EventCard = ({
                   className="flex flex-row px-4 items-center"
                   onClick={handleEditEventModal}
                 >
-                  <img src={Edit} alt="edit" className="w-4 h-4" />
+                  <img
+                    src={Edit}
+                    alt="edit"
+                    className="dark:block hidden w-4 h-4"
+                  />
+                  <img
+                    src={EditLight}
+                    alt="edit"
+                    className="dark:hidden w-4 h-4"
+                  />
                   <p
-                    className="block ml-2 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
+                    className="block ml-2 py-2 text-sm text-theme-secondaryText cursor-pointer"
                     role="menuitem"
                   >
                     Edit
@@ -320,9 +337,18 @@ const EventCard = ({
                   className="flex flex-row px-4 items-center"
                   onClick={handleDeleteEventModal}
                 >
-                  <img src={Delete} alt="edit" className="w-4 h-4" />
+                  <img
+                    src={Delete}
+                    alt="edit"
+                    className="dark:block hidden w-4 h-4"
+                  />
+                  <img
+                    src={DeleteLight}
+                    alt="edit"
+                    className="dark:hidden w-4 h-4"
+                  />
                   <p
-                    className="block  ml-2 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
+                    className="block  ml-2 py-2 text-sm text-theme-secondaryText cursor-pointer"
                     role="menuitem"
                   >
                     Delete
@@ -334,110 +360,74 @@ const EventCard = ({
         </div>
       </div>
       <div className="xs:ml-3 flex flex-col justify-between items-start ">
-        <div>
-          <div className="flex flex-row items-center justify-between w-full">
-            <p className="dark:text-sidebarColor-dark font-normal xs:mt-0 mt-2 text-xs w-full">
-              {date} {time ? "• " + time : ""}
-            </p>
-            <div className="items-center justify-end ml-2 relative xs:flex hidden">
-              {event.user === myData._id && (
-                <div
-                  className="flex space-x-1 cursor-pointer"
-                  onClick={toggleDropdown}
-                >
-                  <div className="w-1 h-1 dark:bg-primaryText-dark rounded-full"></div>
-                  <div className="w-1 h-1 dark:bg-primaryText-dark rounded-full"></div>
-                  <div className="w-1 h-1 dark:bg-primaryText-dark rounded-full"></div>
-                </div>
-              )}
-              {isDropdownOpen && (
-                <div
-                  ref={dropdownRef}
-                  className="absolute top-4 right-0 w-max rounded-md shadow-lg border dark:border-chatDivider-dark dark:bg-tertiaryBackground-dark  ring-1 ring-black ring-opacity-5 z-50"
-                >
-                  <div
-                    className="py-1"
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby="options-menu"
-                  >
-                    <div
-                      className="flex flex-row px-4 items-center"
-                      onClick={handleEditEventModal}
-                    >
-                      <img src={Edit} alt="edit" className="w-4 h-4" />
-                      <p
-                        className="block ml-2 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
-                        role="menuitem"
-                      >
-                        Edit
-                      </p>
-                    </div>
-                    <div
-                      className="flex flex-row px-4 items-center"
-                      onClick={handleDeleteEventModal}
-                    >
-                      <img src={Delete} alt="edit" className="w-4 h-4" />
-                      <p
-                        className="block  ml-2 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
-                        role="menuitem"
-                      >
-                        Delete
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-          <p className="dark:text-secondaryText-dark text-sm font-medium font-inter mt-1 max-w-72">
+        <div className="text-left">
+          <p className="text-theme-sidebarColor font-normal xs:mt-0 mt-2 text-xs w-full">
+            {date} {time ? "• " + time : ""}
+          </p>
+          <p className="text-theme-secondaryText text-sm font-normal font-inter mt-1 max-w-72">
             {event.name}
           </p>
-          <div
-            className="flex flex-row items-start mt-1 w-full cursor-pointer max-w-64"
-            onClick={() => handleLocation(event.location)}
-          >
-            <img src={MapPin} alt="map-pin" className="w-3 h-3 mt-[1px]" />
-            <div className="ml-0.5  dark:text-emptyEvent-dark text-xs font-normal font-inter">
-              {event.locationText || "Online"}
+          {event.locationText && (
+            <div
+              className="flex flex-row items-start mt-1 w-full cursor-pointer max-w-64"
+              onClick={() => handleLocation(event.location)}
+            >
+              <LocationIcon
+                className={`w-7 h-7 mt-[1px] fill-current text-theme-emptyEvent
+                        `}
+              />
+              <div className="ml-0.5  text-theme-emptyEvent text-xs font-light font-inter">
+                {event.locationText}
+              </div>
             </div>
-          </div>
+          )}
+          {event.meet_url && (
+            <div className="flex flex-row items-start mt-1 w-full cursor-pointer max-w-64">
+              <div className="ml-0.5  text-theme-emptyEvent text-xs font-light font-inter">
+                {event.meet_url}
+              </div>
+            </div>
+          )}
         </div>
 
         <div
-          className={`flex flex-row ${spacing} xs:${topSpacing} mt-3 items-center`}
+          className={`flex ${
+            btnFlex
+              ? `${btnFlex} space-y-2 justify-start items-start`
+              : `flex flex-row ${spacing} items-center`
+          }  xs:${topSpacing} mt-3  `}
         >
           {event.joined_users.includes(myData?._id) ||
           event.user === myData?._id ? (
             <div className="relative">
               <button
-                className={`cursor-pointer text-xs dark:bg-secondaryText-dark dark:text-primaryBackground-dark rounded-md font-normal text-center py-2.5 ${btnPadding}`}
+                className={`cursor-pointer text-xs bg-theme-secondaryText text-theme-primaryBackground rounded-md font-normal text-center py-2.5 xs:px-3 px-1.5`}
                 onClick={() => handleToggleDropdown(event._id)}
               >
                 Add to Calendar
               </button>
               {openDropdownId === event._id && (
                 <div
-                  className="absolute z-10 border  rounded-lg dark:border-chatDivider-dark dark:bg-tertiaryBackground-dark mt-1 w-max"
+                  className="absolute z-10 border  rounded-lg border-theme-chatDivider bg-theme-tertiaryBackground mt-1 w-max"
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div
-                    className="flex flex-col cursor-pointer text-sm font-light dark:text-secondaryText-dark
-                     hover:dark:bg-primaryBackground-dark hover:rounded-t-lg px-6 py-3"
+                    className="flex flex-col cursor-pointer text-sm font-light text-theme-secondaryText
+                     hover:bg-theme-primaryBackground hover:rounded-t-lg px-6 py-3"
                     onClick={handleGoogleCalendar}
                   >
                     <p>Google</p>
                   </div>
-                  <div className="border-t dark:border-t-chatDivider-dark"></div>
+                  <div className="border-t border-t-theme-chatDivider"></div>
                   <div
-                    className="flex flex-col cursor-pointer text-sm font-light dark:text-secondaryText-dark  hover:dark:bg-primaryBackground-dark px-6 py-3"
+                    className="flex flex-col cursor-pointer text-sm font-light text-theme-secondaryText  hover:bg-theme-primaryBackground px-6 py-3"
                     onClick={handleDownloadICS}
                   >
                     <p>ICS/Apple</p>
                   </div>
-                  <div className="border-t dark:border-t-chatDivider-dark"></div>
+                  <div className="border-t border-t-theme-chatDivider"></div>
                   <div
-                    className="flex flex-col cursor-pointer text-sm font-light dark:text-secondaryText-dark hover:rounded-b-lg hover:dark:bg-primaryBackground-dark px-6 py-3"
+                    className="flex flex-col cursor-pointer text-sm font-light text-theme-secondaryText hover:rounded-b-lg hover:bg-theme-primaryBackground px-6 py-3"
                     onClick={handleOutlookCalendar}
                   >
                     <p>Outlook</p>
@@ -447,24 +437,28 @@ const EventCard = ({
             </div>
           ) : event.requested_users.includes(myData._id) ? (
             <div
-              className={`cursor-pointer text-sm dark:bg-emptyEvent-dark dark:text-primaryBackground-dark rounded-md font-normal text-center ${btnPadding} py-2`}
+              className={`cursor-pointer text-sm bg-theme-emptyEvent text-theme-primaryBackground rounded-md font-normal text-center ${
+                btnFlex ? "px-4" : btnPadding
+              } py-2`}
             >
               Requested
             </div>
           ) : (
             <div
-              className="cursor-pointer text-sm dark:bg-secondaryText-dark dark:text-primaryBackground-dark rounded-md font-normal text-center px-3 py-2"
+              className="cursor-pointer text-sm bg-theme-secondaryText text-theme-primaryBackground rounded-md font-normal text-center xs:px-3 px-1.5 py-2"
               onClick={handleJoinEvent}
             >
               {event.joining === "public" ? "Join event" : "Request access"}
             </div>
           )}
           <div
-            className={`cursor-pointer text-xs border  dark:border-secondaryText-dark dark:text-secondaryText-dark 
-            rounded-md font-normal text-center ${btnPadding} py-2.5`}
+            className={`cursor-pointer text-xs border  border-theme-secondaryText text-theme-secondaryText 
+            rounded-md font-normal text-center ${
+              btnFlex ? "px-4" : "xs:px-3 px-1.5"
+            }  py-2.5`}
             onClick={handleEventModal}
           >
-            Know more
+            View details
           </div>
         </div>
       </div>

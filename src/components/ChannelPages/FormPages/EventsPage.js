@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from "react-redux";
 import EventCard from "./../widgets/EventCard";
 import { setEventField } from "../../../redux/slices/eventSlice";
 import AddIcon from "../../../assets/icons/addIcon.svg";
+import AddIconLight from "../../../assets/lightIcons/add_light.svg";
 import useModal from "./../../hooks/ModalHook";
 
 const EventsPage = ({ topicId }) => {
@@ -144,34 +145,52 @@ const EventsPage = ({ topicId }) => {
     dispatch(setEventField({ field: "topic", value: topicId }));
     handleOpenModal("modalEventOpen");
   };
+  const handleMonthDropdown = () => {
+    setYearDropdownOpen(false);
+    setMonthDropdownOpen(!monthDropdownOpen);
+  };
+  const handleYearDropdown = () => {
+    setMonthDropdownOpen(false);
+
+    setYearDropdownOpen(!yearDropdownOpen);
+  };
 
   return (
     <div className="flex flex-col">
       <div className="flex flex-row justify-start space-x-4">
         <div
-          className={`text-xs border font-light dark:border-secondaryText-dark px-1.5 py-1 rounded-full cursor-pointer 
-            dark:text-secondaryText-dark flex flex-row items-center
+          className={`text-xs border font-light border-theme-sidebarDivider px-1.5 py-1 rounded-full cursor-pointer 
+            text-theme-secondaryText flex flex-row items-center
           `}
           onClick={handleCreateEvent}
         >
-          <img src={AddIcon} alt="add-icon" className="w-4 h-4 mr-0.5" />
+          <img
+            src={AddIcon}
+            alt="add-icon"
+            className="dark:block hidden w-4 h-4 mr-0.5"
+          />
+          <img
+            src={AddIconLight}
+            alt="add-icon"
+            className="dark:hidden w-4 h-4 mr-0.5"
+          />
           Create
         </div>
         <div
-          className={`rounded-full text-xs border font-light dark:border-secondaryText-dark px-3.5 py-1.5 cursor-pointer ${
+          className={`rounded-full text-xs border font-light border-theme-sidebarDivider px-3.5 py-1.5 cursor-pointer ${
             selectedTab === "Calendar"
-              ? "dark:bg-secondaryText-dark dark:text-primaryBackground-dark"
-              : "dark:text-secondaryText-dark"
+              ? "bg-theme-secondaryText text-theme-primaryBackground"
+              : "text-theme-secondaryText"
           }`}
           onClick={() => setSelectedTab("Calendar")}
         >
           Calendar
         </div>
         <div
-          className={`rounded-full text-xs border font-light dark:border-secondaryText-dark px-3.5 py-1.5 cursor-pointer ${
+          className={`rounded-full text-xs border font-light border-theme-sidebarDivider px-3.5 py-1.5 cursor-pointer ${
             selectedTab === "All upcoming events"
-              ? "dark:bg-secondaryText-dark dark:text-primaryBackground-dark"
-              : "dark:text-secondaryText-dark"
+              ? "bg-theme-secondaryText text-theme-primaryBackground"
+              : "text-theme-secondaryText"
           }`}
           onClick={() => setSelectedTab("All upcoming events")}
         >
@@ -191,8 +210,8 @@ const EventsPage = ({ topicId }) => {
                   onClick={handlePrevMonth}
                 />
                 <div
-                  className="bg-transparent dark:text-calendarMarkings-dark cursor-pointer"
-                  onClick={() => setMonthDropdownOpen(!monthDropdownOpen)}
+                  className="bg-transparent text-theme-calendarMarkings cursor-pointer text-sm font-light"
+                  onClick={handleMonthDropdown}
                 >
                   {months[currentDate.getMonth()]}{" "}
                   <img src={ArrowDown} className="inline w-4" alt="dropdown" />
@@ -206,11 +225,11 @@ const EventsPage = ({ topicId }) => {
               </div>
 
               {monthDropdownOpen && (
-                <div className="absolute z-10 max-h-90 overflow-y-auto custom-scrollbar dark:bg-tertiaryBackground-dark border dark:border-chatBackground-dark rounded-lg shadow-lg">
+                <div className="absolute z-10 max-h-90 overflow-y-auto custom-scrollbar bg-theme-tertiaryBackground border border-theme-chatBackground rounded-lg shadow-lg">
                   {months.map((month) => (
                     <div
                       key={month}
-                      className="p-2 text-left text-sm dark:text-secondaryText-dark hover:bg-chatBackground-dark"
+                      className="p-2 text-left text-sm text-theme-secondaryText hover:bg-chatBackground"
                       onClick={() => handleMonthChange(month)}
                     >
                       {month}
@@ -228,8 +247,8 @@ const EventsPage = ({ topicId }) => {
                   onClick={handlePrevYear}
                 />
                 <div
-                  className="bg-transparent  dark:text-calendarMarkings-dark cursor-pointer"
-                  onClick={() => setYearDropdownOpen(!yearDropdownOpen)}
+                  className="bg-transparent  text-theme-calendarMarkings text-sm font-light cursor-pointer"
+                  onClick={handleYearDropdown}
                 >
                   {currentDate.getFullYear()}{" "}
                   <img src={ArrowDown} className="inline w-4" alt="dropdown" />
@@ -243,11 +262,11 @@ const EventsPage = ({ topicId }) => {
               </div>
 
               {yearDropdownOpen && (
-                <div className="absolute z-10 max-h-90 overflow-y-auto custom-scrollbar dark:bg-tertiaryBackground-dark border dark:border-chatBackground-dark rounded-lg shadow-lg">
+                <div className="absolute z-10 max-h-90 overflow-y-auto custom-scrollbar bg-theme-tertiaryBackground border border-theme-chatBackground rounded-lg shadow-lg">
                   {years.map((year) => (
                     <div
                       key={year}
-                      className="p-2 text-left text-sm dark:text-secondaryText-dark hover:bg-chatBackground-dark"
+                      className="p-2 text-left text-sm text-theme-secondaryText hover:bg-chatBackground"
                       onClick={() => handleYearChange(year.toString())}
                     >
                       {year}
@@ -261,7 +280,7 @@ const EventsPage = ({ topicId }) => {
             {["M", "T", "W", "T", "F", "S", "S"].map((day) => (
               <div
                 key={day}
-                className="dark:text-primaryText-dark  font-light text-[10px]"
+                className="text-theme-primaryText  font-light text-[10px]"
               >
                 {day}
               </div>
@@ -285,8 +304,8 @@ const EventsPage = ({ topicId }) => {
                     key={index}
                     className={`text-center rounded-full h-6 w-6 text-sm font-light cursor-pointer ${
                       selectedDate.toDateString() === day.toDateString()
-                        ? "dark:bg-secondaryText-dark dark:text-primaryBackground-dark p-0.5"
-                        : "dark:text-primaryText-dark"
+                        ? "bg-theme-secondaryText text-theme-primaryBackground p-0.5"
+                        : "text-theme-primaryText"
                     }`}
                     onClick={() => setSelectedDate(day)}
                   >
@@ -304,9 +323,10 @@ const EventsPage = ({ topicId }) => {
                   imageHeight="h-32"
                   chatId={chat._id}
                   event={chat.event}
-                  color="dark:bg-[#353535]"
+                  color="bg-theme-[#353535]"
                   openDropdownId={openDropdownId}
                   handleToggleDropdown={handleToggleDropdown}
+                  btnFlex="flex-col"
                   btnPadding="px-1"
                   spacing="space-x-2"
                   topSpacing="mt-3"
@@ -316,7 +336,7 @@ const EventsPage = ({ topicId }) => {
           ) : (
             <div className="flex flex-col w-full items-center mt-8">
               <img src={Emotion} alt="empty-event" className="w-16" />
-              <p className="dark:text-emptyEvent-dark text-xs mt-2">
+              <p className="text-theme-emptyEvent text-xs mt-2">
                 No events yet..
               </p>
             </div>
@@ -334,7 +354,7 @@ const EventsPage = ({ topicId }) => {
                   imageHeight="h-32"
                   chatId={chat._id}
                   event={chat.event}
-                  color="dark:bg-[#353535]"
+                  color="bg-theme-[#353535]"
                   openDropdownId={openDropdownId}
                   handleToggleDropdown={handleToggleDropdown}
                   btnPadding="px-1"
@@ -346,7 +366,7 @@ const EventsPage = ({ topicId }) => {
           ) : (
             <div className="flex flex-col w-full items-center mt-8">
               <img src={Emotion} alt="empty-event" className="w-16" />
-              <p className="dark:text-emptyEvent-dark text-xs mt-2">
+              <p className="text-theme-emptyEvent text-xs mt-2">
                 No upcoming events..
               </p>
             </div>

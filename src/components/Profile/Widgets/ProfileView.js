@@ -15,6 +15,7 @@ import {
 } from "../../../redux/slices/deleteCategorySlice";
 import { updateReorderItems } from "../../../redux/slices/pushItemsSlice";
 import AddIcon from "../../../assets/icons/addIcon.svg";
+import AddIconLight from "../../../assets/lightIcons/add_light.svg";
 import { useDispatch, useSelector } from "react-redux";
 import ProfileItemsSkeleton from "./../../skeleton/profileItemsSkeleton";
 import EmptyItemsCard from "./EmptyItemsCard";
@@ -24,8 +25,12 @@ import { setCurationField } from "../../../redux/slices/curationSlice";
 import { setChipField } from "../../../redux/slices/chipSlice";
 import ChipIcon from "../../../assets/icons/chip_icon.svg";
 import CurationIcon from "../../../assets/icons/curation_icon.svg";
+import CurationIconLight from "../../../assets/lightIcons/curation_light.svg";
+import ChipIconLight from "../../../assets/lightIcons/chip_icon_light.png";
 import Edit from "../../../assets/icons/Edit.svg";
 import Delete from "../../../assets/icons/Delete.svg";
+import EditLight from "../../../assets/lightIcons/edit_light.svg";
+import DeleteLight from "../../../assets/lightIcons/delete_light.svg";
 import useWindowSize from "../../../utils/sizeHook";
 
 const MasonryItem = ({ item, owner, gallery, enableReorder }) => {
@@ -161,7 +166,7 @@ const CategorySection = ({
     <div
       className={`mb-12 flex flex-col ${
         items.length > 1 && category.name
-          ? "border dark:border-chatDivider-dark "
+          ? "border border-theme-chatDivider "
           : ""
       }  rounded-lg px-3 pb-3`}
     >
@@ -171,7 +176,7 @@ const CategorySection = ({
             category.name ? " py-3 " : ""
           }relative mb-2`}
         >
-          <div className="text-white text-2xl font-normal font-familjen-grotesk -mt-1">
+          <div className="text-theme-secondaryText text-2xl font-normal font-familjen-grotesk -mt-1">
             {category.name}
           </div>
           <div className="relative">
@@ -179,14 +184,22 @@ const CategorySection = ({
               <img
                 src={AddIcon}
                 alt="add-icon"
-                className="cursor-pointer"
+                className="dark:block hidden cursor-pointer"
+                onClick={toggleDropdown}
+              />
+            )}
+            {owner && category.name && (
+              <img
+                src={AddIconLight}
+                alt="add-icon"
+                className="dark:hidden cursor-pointer"
                 onClick={toggleDropdown}
               />
             )}
             {isDropdownOpen && category.name && (
               <div
                 ref={dropdownRef}
-                className="absolute  top-8 left-0  w-28 rounded-md shadow-lg dark:bg-tertiaryBackground-dark dark:border-chatDivider-dark  ring-1 ring-black ring-opacity-5 z-50"
+                className="absolute  top-8 left-0  w-28 rounded-md shadow-lg bg-theme-tertiaryBackground border-theme-chatDivider  ring-1 ring-black ring-opacity-5 z-50"
               >
                 <div
                   className="py-1"
@@ -198,9 +211,18 @@ const CategorySection = ({
                     className="flex flex-row px-3 items-center cursor-pointer"
                     onClick={() => handleChipOpen(category._id)}
                   >
-                    <img src={ChipIcon} alt="edit" className="w-4 h-4" />
+                    <img
+                      src={ChipIcon}
+                      alt="edit"
+                      className="dark:block hidden w-4 h-4"
+                    />
+                    <img
+                      src={ChipIconLight}
+                      alt="edit"
+                      className="dark:hidden w-4 h-4"
+                    />
                     <p
-                      className="block px-2 py-2 text-sm dark:text-secondaryText-dark "
+                      className="block px-2 py-2 text-sm text-theme-secondaryText "
                       role="menuitem"
                     >
                       Chip
@@ -210,9 +232,18 @@ const CategorySection = ({
                     className="flex flex-row px-3 items-center cursor-pointer"
                     onClick={() => handleCurationOpen(category._id)}
                   >
-                    <img src={CurationIcon} alt="edit" className="w-4 h-4" />
+                    <img
+                      src={CurationIcon}
+                      alt="edit"
+                      className="dark:block hidden w-4 h-4"
+                    />
+                    <img
+                      src={CurationIconLight}
+                      alt="edit"
+                      className="dark:hidden w-4 h-4"
+                    />
                     <p
-                      className="block px-2 py-2 text-sm dark:text-secondaryText-dark "
+                      className="block px-2 py-2 text-sm text-theme-secondaryText "
                       role="menuitem"
                     >
                       Curation
@@ -229,15 +260,15 @@ const CategorySection = ({
                 className="flex flex-col space-y-1 cursor-pointer"
                 onClick={toggleDropdownDot}
               >
-                <div className="w-1 h-1 dark:bg-emptyEvent-dark rounded-full"></div>
-                <div className="w-1 h-1 dark:bg-emptyEvent-dark rounded-full"></div>
-                <div className="w-1 h-1 dark:bg-emptyEvent-dark rounded-full"></div>
+                <div className="w-1 h-1 bg-theme-emptyEvent rounded-full"></div>
+                <div className="w-1 h-1 bg-theme-emptyEvent rounded-full"></div>
+                <div className="w-1 h-1 bg-theme-emptyEvent rounded-full"></div>
               </div>
             )}
             {isDropdownDotOpen && (
               <div
                 ref={dropdownRefDot}
-                className="absolute left-0 top-6  w-28 rounded-md shadow-lg dark:bg-tertiaryBackground-dark dark:border-chatDivider-dark ring-1
+                className="absolute left-0 top-6  w-28 rounded-md shadow-lg bg-theme-tertiaryBackground border-theme-chatDivider ring-1
                     ring-black ring-opacity-5 z-50"
               >
                 <div
@@ -250,9 +281,18 @@ const CategorySection = ({
                     className="flex flex-row px-3 items-center"
                     onClick={() => handleEditModal(category)}
                   >
-                    <img src={Edit} alt="edit" className="w-3 h-3 mr-2" />
+                    <img
+                      src={Edit}
+                      alt="edit"
+                      className="dark:block hidden w-3 h-3 mr-2"
+                    />
+                    <img
+                      src={EditLight}
+                      alt="edit"
+                      className="dark:hidden w-3 h-3 mr-2"
+                    />
                     <p
-                      className="block ml-1 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
+                      className="block ml-1 py-2 text-sm text-theme-secondaryText cursor-pointer"
                       role="menuitem"
                     >
                       Edit
@@ -262,9 +302,18 @@ const CategorySection = ({
                     className="flex flex-row px-3 items-center"
                     onClick={() => handleDeleteModal(category)}
                   >
-                    <img src={Delete} alt="edit" className="w-4 h-4 mr-2" />
+                    <img
+                      src={Delete}
+                      alt="edit"
+                      className="dark:block hidden w-3 h-3 mr-2"
+                    />
+                    <img
+                      src={DeleteLight}
+                      alt="edit"
+                      className="dark:hidden w-3 h-3 mr-2"
+                    />
                     <p
-                      className="block  ml-1 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
+                      className="block  ml-1 py-2 text-sm text-theme-secondaryText cursor-pointer"
                       role="menuitem"
                     >
                       Delete

@@ -295,20 +295,6 @@ const ChipsModal = () => {
     dispatch(setChipField({ field: name, value }));
   };
 
-  const handleTextareaChange = () => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      const scrollTop = textarea.scrollTop;
-      const currentHeight = textarea.offsetHeight;
-      const newHeight = textarea.scrollHeight;
-      if (currentHeight !== newHeight) {
-        textarea.style.height = "auto"; // Reset height to auto
-        textarea.style.height = `${newHeight}px`; // Set height to match scroll height
-      }
-      textarea.scrollTop = scrollTop;
-    }
-  };
-
   const handleDateChange = (date) => {
     const isoDate = date ? date.toISOString() : "";
     dispatch(setDateField({ field: "date", value: isoDate }));
@@ -331,6 +317,19 @@ const ChipsModal = () => {
     dispatch(setDateField({ field: "end_time", value: isoString }));
   };
 
+  const handleTextareaChange = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      const scrollTop = textarea.scrollTop;
+      const currentHeight = textarea.offsetHeight;
+      const newHeight = textarea.scrollHeight;
+      if (currentHeight !== newHeight) {
+        textarea.style.height = "auto"; // Reset height to auto
+        textarea.style.height = `${newHeight}px`; // Set height to match scroll height
+      }
+      textarea.scrollTop = scrollTop;
+    }
+  };
   useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
@@ -386,8 +385,8 @@ const ChipsModal = () => {
   };
 
   const postButtonClass = isEmptyData
-    ? "dark:text-buttonDisable-dark dark:text-opacity-40 dark:bg-buttonDisable-dark dark:bg-opacity-10"
-    : "dark:bg-secondaryText-dark dark:text-primaryBackground-dark";
+    ? "text-theme-buttonDisableText text-theme-opacity-40 bg-theme-buttonDisable bg-theme-opacity-10"
+    : "bg-theme-secondaryText text-theme-primaryBackground";
   const reservedButtonClass = isEmptyData
     ? "border border-chipLinkBackground text-primaryGrey"
     : "border border-borderbtn text-primary";
@@ -399,9 +398,9 @@ const ChipsModal = () => {
       onClick={onClick}
       ref={ref}
       placeholder="Date"
-      className="w-[210%] py-1 text-sm pr-10 font-light rounded dark:bg-transparent
-       border-b border-b-chatDivider-dark placeholder-font-light placeholder-text-sm 
-       dark:text-secondaryText-dark focus:outline-none placeholder:text-emptyEvent-dark"
+      className="w-[210%] py-1 text-sm pr-10 font-light rounded bg-transparent
+       border-b border-b-chatDivider placeholder-font-light placeholder-text-sm 
+       text-theme-secondaryText focus:outline-none placeholder:text-emptyEvent"
     />
   ));
 
@@ -419,7 +418,7 @@ const ChipsModal = () => {
         <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-70 z-50" />
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <Dialog.Content
-            className="dark:bg-secondaryBackground-dark rounded-xl overflow-hidden shadow-xl transform transition-all min-h-[20%] max-h-[80%] overflow-y-auto custom-scrollbar w-[90%] sm:w-max py-5 pl-5"
+            className="bg-theme-secondaryBackground rounded-xl overflow-hidden shadow-xl transform transition-all min-h-[20%] max-h-[80%] overflow-y-auto custom-scrollbar w-[90%] sm:w-max py-5 pl-5"
             onClick={(e) => e.stopPropagation()}
           >
             <Dialog.Title />
@@ -429,7 +428,7 @@ const ChipsModal = () => {
               // />:
               <div className="flex flex-col h-full">
                 <div className="flex flex-row justify-between items-center mb-4 pr-4">
-                  <h2 className="dark:text-secondaryText-dark text-lg font-normal font-inter">
+                  <h2 className="text-theme-secondaryText text-lg font-normal font-inter">
                     New Chip
                   </h2>
                   <img
@@ -439,13 +438,13 @@ const ChipsModal = () => {
                     onClick={handleClose}
                   />
                 </div>
-                <div className="flex justify-between space-x-3 items-center mb-5 pr-4 overflow-x-auto xs:overflow-x-hidden custom-scrollbar">
+                <div className="flex justify-between space-x-4 items-center mb-5 pr-4 overflow-x-auto xs:overflow-x-hidden custom-scrollbar">
                   <div
                     className={`${
                       visibleFields.link
-                        ? "dark:bg-secondaryText-dark dark:text-primaryBackground-dark"
-                        : "border dark:border-chatBackground-dark dark:text-chatBackground-dark"
-                    } rounded-full px-2.5 py-1.5 cursor-pointer flex items-center`}
+                        ? "bg-theme-secondaryText text-theme-primaryBackground"
+                        : "border border-theme-chatDivider text-theme-emptyEvent"
+                    } rounded-full w-full py-1.5 cursor-pointer flex items-center text-center justify-center`}
                     onClick={() => toggleFieldVisibility("link")}
                   >
                     <LinkIcon
@@ -462,9 +461,9 @@ const ChipsModal = () => {
                   <div
                     className={`${
                       visibleFields.media || fileObjects.length > 0
-                        ? "dark:bg-secondaryText-dark dark:text-primaryBackground-dark"
-                        : "border dark:border-chatBackground-dark dark:text-chatBackground-dark"
-                    } relative rounded-full px-2.5 py-1.5 cursor-pointer flex items-center`}
+                        ? "bg-theme-secondaryText text-theme-primaryBackground"
+                        : "border border-theme-chatDivider text-theme-emptyEvent"
+                    } relative rounded-full w-full py-1.5 cursor-pointer flex  items-center text-center justify-center`}
                   >
                     <PhotoIcon
                       className={`w-5 h-5 fill-current ${
@@ -487,9 +486,9 @@ const ChipsModal = () => {
                   <div
                     className={`${
                       visibleFields.docs || fileData !== null
-                        ? "dark:bg-secondaryText-dark dark:text-primaryBackground-dark"
-                        : "border dark:border-chatBackground-dark dark:text-chatBackground-dark"
-                    } relative rounded-full px-2.5 py-1.5 cursor-pointer flex items-center`}
+                        ? "bg-theme-secondaryText text-theme-primaryBackground"
+                        : "border border-theme-chatDivider text-theme-emptyEvent"
+                    } relative rounded-full w-full py-1.5 cursor-pointer flex  items-center text-center justify-center`}
                   >
                     <DocumentIcon
                       className={`w-5 h-5 fill-current ${
@@ -511,16 +510,16 @@ const ChipsModal = () => {
                   <div
                     className={`${
                       visibleFields.location
-                        ? "dark:bg-secondaryText-dark dark:text-primaryBackground-dark"
-                        : "border dark:border-chatBackground-dark dark:text-chatBackground-dark"
-                    } rounded-full px-2.5 py-1.5 cursor-pointer flex items-center`}
+                        ? "bg-theme-secondaryText text-theme-primaryBackground"
+                        : "border border-theme-chatDivider text-theme-emptyEvent"
+                    } rounded-full w-full py-1.5 cursor-pointer flex  items-center text-center justify-center`}
                     onClick={() => toggleFieldVisibility("location")}
                   >
                     <LocationIcon
                       className={`w-5 h-5 fill-current ${
                         visibleFields.location
-                          ? "dark:text-primaryBackground-dark"
-                          : "dark:text-emptyEvent-dark-dark"
+                          ? "text-theme-primaryBackground"
+                          : "text-theme-emptyEvent"
                       }`}
                     />
                     <span className="ml-1 text-xs sm:text-sm font-inter font-normal">
@@ -530,15 +529,15 @@ const ChipsModal = () => {
                   {/* <div
                     className={`${
                       visibleFields.calendar
-                        ? "dark:bg-secondaryText-dark dark:text-primaryBackground-dark"
-                        : "border dark:border-chatBackground-dark dark:text-chatBackground-dark"
+                        ? "bg-theme-secondaryText text-theme-primaryBackground"
+                        : "border border-theme-chatBackground text-theme-chatBackground"
                     } rounded-full px-2.5 py-1.5 cursor-pointer flex items-center`}
                     onClick={() => toggleFieldVisibility("calendar")}
                   >
                     <img
                       src={Event}
                       alt="event"
-                      className-="w-5 h-5 mr-1 dark:bg-primaryText-dark"
+                      className-="w-5 h-5 mr-1 bg-theme-primaryText"
                     />
                     <span className="ml-1 text-xs sm:text-sm font-inter font-normal">
                       Event
@@ -546,18 +545,17 @@ const ChipsModal = () => {
                   </div> */}
                 </div>
                 <div className="flex flex-col mr-4 ">
-                  <p className="dark:text-secondaryText-dark text-sm font-light font-inter mb-1">
+                  <p className="text-theme-secondaryText text-sm font-light font-inter mb-1">
                     Description
                   </p>
                   <textarea
                     ref={textareaRef}
                     className="w-full py-1 mt-1 text-sm font-light rounded no-scrollbar 
-                    dark:bg-transparent border-b dark:border-b-chatDivider-dark  dark:text-secondaryText-dark  placeholder:dark:text-emptyEvent-dark
-                    placeholder-font-light placeholder-text-sm focus:outline-none
+                    bg-transparent border-b border-theme-chatDivider  text-theme-secondaryText  placeholder:text-theme-emptyEvent
+                    placeholder-font-light placeholder-text-sm focus:outline-none overflow-hidden
                     resize-none"
                     placeholder="What is this chip about"
                     rows={1}
-                    onInput={handleTextareaChange}
                     value={chipData.text}
                     onChange={handleChange}
                     name="text"
@@ -566,11 +564,11 @@ const ChipsModal = () => {
                   {visibleFields.location && (
                     <>
                       <div className="flex flex-row justify-between mt-4 pr-3">
-                        <p className="dark:text-secondaryText-dark text-sm font-light font-inter">
+                        <p className="text-theme-secondaryText text-sm font-light font-inter">
                           Location
                         </p>
                         <p
-                          className="dark:text-secondaryText-dark text-xs font-light underline p-1 font-inter cursor-pointer"
+                          className="text-theme-secondaryText text-xs font-light underline p-1 font-inter cursor-pointer"
                           onClick={getCurrentLocation}
                         >
                           use current location
@@ -578,9 +576,9 @@ const ChipsModal = () => {
                       </div>
                       <div className="relative">
                         <input
-                          className="w-full py-1 mr-3 text-sm mt-1 pr-3 font-light rounded no-scrollbar dark:bg-transparent
-                        border-b dark:border-b-chatDivider-dark placeholder-font-light placeholder-text-sm dark:text-secondaryText-dark
-                        focus:outline-none placeholder:dark:text-emptyEvent-dark resize-none"
+                          className="w-full py-1 mr-3 text-sm mt-1 pr-3 font-light rounded no-scrollbar bg-transparent
+                        border-b border-theme-chatDivider placeholder-font-light placeholder-text-sm text-theme-secondaryText
+                        focus:outline-none placeholder:text-theme-emptyEvent resize-none"
                           placeholder="Enter location"
                           name="location"
                           onChange={handleInputChange}
@@ -596,17 +594,17 @@ const ChipsModal = () => {
                           />
                         )}
                         {suggestions.length > 0 && (
-                          <div className="absolute top-10 z-[999] dark:bg-tertiaryBackground-dark text-white text-xs pr-1 mr-2 rounded-lg  w-[90%]">
+                          <div className="absolute top-10 z-[999] bg-theme-tertiaryBackground text-theme-secondaryText text-xs pr-1 mr-2 rounded-lg  w-[90%]">
                             <ul>
                               {suggestions.map((suggestion, index) => (
                                 <li
                                   key={index}
-                                  className="px-4 py-2  cursor-pointer"
+                                  className="px-4 py-2  cursor-pointer hover:bg-theme-primaryBackground"
                                   onClick={() =>
                                     handleSuggestionClick(suggestion)
                                   }
                                 >
-                                  <i className="text-white mr-2 fas fa-map-marker-alt"></i>
+                                  <i className="text-theme-secondaryText mr-2 fas fa-map-marker-alt"></i>
                                   {suggestion.description}
                                 </li>
                               ))}
@@ -618,7 +616,7 @@ const ChipsModal = () => {
                   )}
                   {chipData.document?.url && (
                     <>
-                      <div className="relative mt-4 w-full rounded-lg dark:bg-chatDivider-dark cursor-pointer">
+                      <div className="relative mt-4 w-full rounded-lg bg-theme-chatDivider cursor-pointer">
                         <div
                           className="flex flex-row items-center justify-start"
                           onClick={handleFileClick}
@@ -629,19 +627,20 @@ const ChipsModal = () => {
                             className="h-14 "
                           />
                           <div className="flex flex-col ml-3">
-                            <p className="dark:text-secondaryText-dark text-xs font-normal">
+                            <p className="text-theme-secondaryText text-xs font-normal">
                               {chipData.document.name}
                             </p>
-                            <p className="dark:text-emptyEvent-dark mt-1  text-xs font-light font-inter">
+                            <p className="text-theme-emptyEvent mt-1  text-xs font-light font-inter">
                               {chipData.document.pages}
                             </p>
                           </div>
                         </div>
-                        <div className="absolute right-0 top-0 bg-dark rounded-full w-5 h-5 flex justify-center items-center border">
+
+                        <div className="absolute right-1 top-1 bg-[#edecea] bg-opacity-70 rounded-full w-5 h-5 flex justify-center items-center p-1 ">
                           <img
                             src={Close}
                             alt="close"
-                            className="w-4 h-4 cursor-pointer"
+                            className="w-3 h-3 cursor-pointer"
                             onClick={handleDocClear}
                           />
                         </div>
@@ -650,13 +649,13 @@ const ChipsModal = () => {
                   )}
                   {visibleFields.link && (
                     <>
-                      <p className="dark:text-secondaryText-dark text-sm font-light font-inter mt-4">
+                      <p className="text-theme-secondaryText text-sm font-light font-inter mt-4">
                         Link
                       </p>
                       <input
-                        className="w-full py-1 mr-3 text-sm mt-1 pr-3 font-light rounded no-scrollbar dark:bg-transparent
-                        border-b dark:border-b-chatDivider-dark placeholder-font-light placeholder-text-sm dark:text-secondaryText-dark
-                        focus:outline-none placeholder:dark:text-emptyEvent-dark resize-none"
+                        className="w-full py-1 mr-3 text-sm mt-1 pr-3 font-light rounded no-scrollbar bg-transparent
+                        border-b border-theme-chatDivider placeholder-font-light placeholder-text-sm text-theme-secondaryText
+                        focus:outline-none placeholder:text-theme-emptyEvent resize-none"
                         placeholder="https://"
                         name="link"
                         onChange={handleChange}
@@ -667,13 +666,13 @@ const ChipsModal = () => {
                   )}
                   {visibleFields.calendar && (
                     <>
-                      <p className="dark:text-secondaryText-dark text-sm font-light font-inter mt-4">
+                      <p className="text-theme-secondaryText text-sm font-light font-inter mt-4">
                         Calendar
                       </p>
                       <input
-                        className="w-full py-1 mr-3 text-sm mt-1 pr-3 font-light rounded no-scrollbar dark:bg-transparent
-                        border-b dark:border-b-chatDivider-dark placeholder-font-light placeholder-text-sm dark:text-secondaryText-dark
-                        focus:outline-none placeholder:dark:text-emptyEvent-dark resize-none"
+                        className="w-full py-1 mr-3 text-sm mt-1 pr-3 font-light rounded no-scrollbar bg-transparent
+                        border-b border-theme-chatDivider placeholder-font-light placeholder-text-sm text-theme-secondaryText
+                        focus:outline-none placeholder:text-theme-emptyEvent resize-none no-scrollbar "
                         placeholder="Event Name"
                         name="event"
                         maxLength={30}
@@ -690,7 +689,7 @@ const ChipsModal = () => {
                         />
                         <FontAwesomeIcon
                           icon={faCalendarAlt}
-                          className="absolute right-2 top-1/2 transform -translate-y-1/2 dark:text-primaryText-dark"
+                          className="absolute right-2 top-1/2 transform -translate-y-1/2 text-theme-primaryText"
                         />
                       </div>
 

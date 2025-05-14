@@ -15,11 +15,13 @@ const GoogleAuthCallback = () => {
     const stateRaw = hashParams.get("state");
     let redirectDomain = null;
     let hostDomain = null;
+    let channel = null;
 
     try {
       const decoded = JSON.parse(decodeURIComponent(stateRaw));
       redirectDomain = decoded.redirectDomain;
       hostDomain = decoded.hostDomain;
+      channel = decoded.channel;
     } catch (err) {
       console.error("❌ Failed to decode state:", err);
     }
@@ -27,16 +29,22 @@ const GoogleAuthCallback = () => {
     console.log("🔑 accessToken:", accessToken);
     console.log("🌍 redirectDomain:", redirectDomain);
     console.log("🌐 hostDomain:", hostDomain);
+    console.log("🌐 channel:", channel);
 
     if (accessToken && redirectDomain) {
-      fetchUserDetails(accessToken, redirectDomain, hostDomain);
+      fetchUserDetails(accessToken, redirectDomain, hostDomain, channel);
     } else {
       console.log("No access token or redirect domain received");
       window.close(); // Close popup if invalid
     }
   }, [searchParams]);
 
-  const fetchUserDetails = async (accessToken, redirectDomain, hostDomain) => {
+  const fetchUserDetails = async (
+    accessToken,
+    redirectDomain,
+    hostDomain,
+    channel
+  ) => {
     try {
       // Get user info
       const response = await axios.get(
@@ -57,6 +65,7 @@ const GoogleAuthCallback = () => {
           name: userData.name,
           email: userData.email,
           domain: hostDomain,
+          channel: channel,
         }
       );
       console.log(registerResponse);
@@ -77,7 +86,7 @@ const GoogleAuthCallback = () => {
   };
 
   return (
-    <div className="dark:text-secondaryText-dark text-md font-normal pl-4 pt-4">
+    <div className="text-theme-secondaryText text-md font-normal pl-4 pt-4">
       Processing Google authentication...
     </div>
   );

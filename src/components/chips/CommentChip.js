@@ -93,7 +93,7 @@ const CommentChip = ({ item }) => {
     return <p>Loading....</p>;
   }
   return (
-    <div className="w-full space-y-2  dark:border-chatDivider-dark dark:bg-tertiaryBackground-dark">
+    <div className="w-full space-y-2  border-theme-chatDivider bg-theme-tertiaryBackground">
       <div
         className="cursor-pointer w-max"
         onClick={() => navigate(`/profile/${item.user.username}`)}
@@ -108,13 +108,13 @@ const CommentChip = ({ item }) => {
           <Initicon text={item?.user?.name} size={40} />
         )}
       </div>
-      <p className="dark:text-profileColor-dark text-xs font-normal pr-4">
+      <p className="text-theme-profileColor text-xs font-normal pr-4">
         {item?.user?.name}
       </p>
       <div className="flex flex-col space-y-1">
         <Linkify componentDecorator={componentDecorator}>
           <div className="w-full pr-1 overflow-hidden">
-            <p className="dark:text-secondaryText-dark text-sm font-light font-inter whitespace-pre-wrap break-words">
+            <p className="text-theme-secondaryText text-sm font-light font-inter whitespace-pre-wrap break-words">
               {isExpanded
                 ? item.text
                 : `${item.text.slice(0, maxLength)}${
@@ -123,7 +123,7 @@ const CommentChip = ({ item }) => {
               {item.text.length > maxLength && (
                 <span
                   onClick={toggleReadMore}
-                  className="dark:text-white cursor-pointer ml-1"
+                  className="text-theme-secondaryText cursor-pointer ml-1"
                 >
                   {isExpanded ? "<- Show Less" : "Read More ->"}
                 </span>
@@ -161,7 +161,7 @@ const CommentChip = ({ item }) => {
             alt="Upvote"
             className="mr-0.5 h-5 w-5"
           />
-          <p className="dark:text-secondaryText-dark text-sm font-normal">
+          <p className="text-theme-secondaryText text-sm font-normal">
             {item.upvotes.length}
           </p>
         </div>
@@ -171,7 +171,7 @@ const CommentChip = ({ item }) => {
           onClick={openShareModal}
         >
           <img src={Send} alt="Send" className="mr-0.5 h-7 w-7" />
-          <p className="dark:text-secondaryText-dark text-sm font-normal">
+          <p className="text-theme-secondaryText text-sm font-normal">
             {item.shared_by}
           </p>
         </div>
@@ -179,13 +179,13 @@ const CommentChip = ({ item }) => {
           {" "}
           {/* New relative container for positioning */}
           {isSavedMessageVisible && (
-            <div className="absolute -top-7 left-1/2 transform -translate-x-1/2 bg-dark text-white text-xs rounded-lg px-2 py-1">
+            <div className="absolute -top-7 left-1/2 transform -translate-x-1/2 bg text-theme-secondaryText text-xs rounded-lg px-2 py-1">
               {savedMessage}
             </div>
           )}
           <div
             className={`${
-              isSaved ? "" : "dark:bg-chatDivider-dark"
+              isSaved ? "" : "bg-theme-chatDivider"
             } px-2 py-0.5 rounded-xl cursor-pointer`}
             onClick={handleSaved}
           >

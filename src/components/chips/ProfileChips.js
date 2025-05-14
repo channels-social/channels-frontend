@@ -2,9 +2,13 @@ import React, { useState, useRef, useEffect } from "react";
 import Upvote from "../../assets/icons/upvote.svg";
 import Edit from "../../assets/icons/Edit.svg";
 import Delete from "../../assets/icons/Delete.svg";
+import EditLight from "../../assets/lightIcons/edit_light.svg";
+import DeleteLight from "../../assets/lightIcons/delete_light.svg";
 import Send from "../../assets/icons/Send.svg";
 import MetaCard from "../chips/widgets/MetaCard";
 import Comment from "../../assets/icons/Comment.svg";
+import UpvoteLight from "../../assets/lightIcons/upvote_light.svg";
+import UpvotedLight from "../../assets/lightIcons/upvote_filled_light.svg";
 import GoogleMapsCard from "../chips/widgets/googleMapsCard";
 import DateTimeCard from "../chips/widgets/DateTime";
 import Upvoted from "../../assets/icons/upvoted.svg";
@@ -143,17 +147,17 @@ const ProfileChips = ({ item }) => {
   );
 
   return (
-    <div className="container  pl-4 pb-4 w-full pt-4 rounded-lg space-y-2.5 border border-borderColor dark:border-chatDivider-dark dark:bg-tertiaryBackground-dark">
+    <div className="container  pl-4 pb-4 w-full pt-4 rounded-lg space-y-2.5 border border-borderColor border-theme-chatDivider bg-theme-tertiaryBackground">
       <div className="flex items-center justify-end mr-4 relative">
         <div className="flex space-x-1 cursor-pointer" onClick={toggleDropdown}>
-          <div className="w-1 h-1 dark:bg-primaryText-dark rounded-full"></div>
-          <div className="w-1 h-1 dark:bg-primaryText-dark rounded-full"></div>
-          <div className="w-1 h-1 dark:bg-primaryText-dark rounded-full"></div>
+          <div className="w-1 h-1 bg-theme-primaryText rounded-full"></div>
+          <div className="w-1 h-1 bg-theme-primaryText rounded-full"></div>
+          <div className="w-1 h-1 bg-theme-primaryText rounded-full"></div>
         </div>
         {isDropdownOpen && (
           <div
             ref={dropdownRef}
-            className="absolute top-4 right-0 w-max rounded-md shadow-lg border dark:border-chatDivider-dark dark:bg-tertiaryBackground-dark  ring-1 ring-black ring-opacity-5 z-50"
+            className="absolute top-4 right-0 w-max rounded-md shadow-lg border border-theme-chatDivider bg-theme-tertiaryBackground  ring-1 ring-black ring-opacity-5 z-50"
           >
             <div
               className="py-1"
@@ -165,9 +169,18 @@ const ProfileChips = ({ item }) => {
                 className="flex flex-row px-4 items-center"
                 onClick={handleEditModal}
               >
-                <img src={Edit} alt="edit" className="w-4 h-4" />
+                <img
+                  src={Edit}
+                  alt="edit"
+                  className="dark:block hidden w-4 h-4"
+                />
+                <img
+                  src={EditLight}
+                  alt="edit"
+                  className="dark:hidden w-4 h-4"
+                />
                 <p
-                  className="block ml-2 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
+                  className="block ml-2 py-2 text-sm text-theme-secondaryText cursor-pointer"
                   role="menuitem"
                 >
                   Edit
@@ -177,9 +190,18 @@ const ProfileChips = ({ item }) => {
                 className="flex flex-row px-4 items-center"
                 onClick={handleDeleteModal}
               >
-                <img src={Delete} alt="edit" className="w-4 h-4" />
+                <img
+                  src={Delete}
+                  alt="delete"
+                  className="dark:block hidden w-4 h-4"
+                />
+                <img
+                  src={DeleteLight}
+                  alt="delete"
+                  className="dark:hidden w-4 h-4"
+                />
                 <p
-                  className="block  ml-2 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
+                  className="block  ml-2 py-2 text-sm text-theme-secondaryText cursor-pointer"
                   role="menuitem"
                 >
                   Delete
@@ -191,7 +213,7 @@ const ProfileChips = ({ item }) => {
               >
                 <img src={Send} alt="push-curation" className="w-4 h-4" />
                 <p
-                  className="block  ml-2 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
+                  className="block  ml-2 py-2 text-sm text-theme-secondaryText cursor-pointer"
                   role="menuitem"
                 >
                   Push to Curation
@@ -203,7 +225,7 @@ const ProfileChips = ({ item }) => {
               >
                 <img src={Send} alt="push-category" className="w-4 h-4" />
                 <p
-                  className="block  ml-2 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
+                  className="block  ml-2 py-2 text-sm text-theme-secondaryText cursor-pointer"
                   role="menuitem"
                 >
                   Push to Category
@@ -217,7 +239,7 @@ const ProfileChips = ({ item }) => {
         {
           <Linkify componentDecorator={componentDecorator}>
             <div className="w-full pr-1 overflow-hidden">
-              <p className="dark:text-secondaryText-dark text-sm font-light font-inter whitespace-pre-wrap break-words">
+              <p className="text-theme-secondaryText text-sm font-light font-inter whitespace-pre-wrap break-words">
                 {isExpanded
                   ? item.text
                   : `${item.text.slice(0, maxLength)}${
@@ -226,7 +248,7 @@ const ProfileChips = ({ item }) => {
                 {item.text.length > maxLength && (
                   <span
                     onClick={toggleReadMore}
-                    className="dark:text-white cursor-pointer ml-1"
+                    className="text-theme-secondaryText cursor-pointer ml-1"
                   >
                     {isExpanded ? "<- Show Less" : "Read More ->"}
                   </span>
@@ -238,7 +260,7 @@ const ProfileChips = ({ item }) => {
         {item.date.date && item.date.event && <DateTimeCard item={item.date} />}
         {item.location.text && <GoogleMapsCard item={item.location} />}
         {item.document && item.document.url !== "" && (
-          <div className="mr-3">
+          <div className="mr-4">
             <DocumentPreview document={item.document} />
           </div>
         )}
@@ -263,9 +285,14 @@ const ProfileChips = ({ item }) => {
           <img
             src={isUpvoted ? Upvoted : Upvote}
             alt="Upvote"
-            className="mr-0.5 h-5 w-5"
+            className="dark:block hidden mr-0.5 h-5 w-5"
           />
-          <p className="dark:text-secondaryText-dark text-sm font-normal">
+          <img
+            src={isUpvoted ? UpvotedLight : UpvoteLight}
+            alt="Upvote"
+            className="dark:hidden mr-0.5 h-5 w-5"
+          />
+          <p className="text-theme-secondaryText text-sm font-normal">
             {item.upvotes.length}
           </p>
         </div>
@@ -274,7 +301,7 @@ const ProfileChips = ({ item }) => {
           onClick={openCommentModal}
         >
           <img src={Comment} alt="Comment-item" className="mr-0.5" />
-          <p className="dark:text-secondaryText-dark text-sm font-normal">
+          <p className="text-theme-secondaryText text-sm font-normal">
             {item.comments ? item?.comments : 0}
           </p>
         </div>
@@ -283,7 +310,7 @@ const ProfileChips = ({ item }) => {
           onClick={openShareModal}
         >
           <img src={Send} alt="Send" className="mr-0.5" />
-          <p className="dark:text-secondaryText-dark text-sm font-normal">
+          <p className="text-theme-secondaryText text-sm font-normal">
             {item.shared_by}
           </p>
         </div>

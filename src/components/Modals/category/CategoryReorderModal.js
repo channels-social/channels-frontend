@@ -62,13 +62,13 @@ const CategoryReorderModal = () => {
         <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-70 z-50" />
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <Dialog.Content
-            className="dark:bg-tertiaryBackground-dark rounded-xl overflow-hidden shadow-xl transform transition-all 
+            className="bg-theme-tertiaryBackground rounded-xl overflow-hidden shadow-xl transform transition-all 
           overflow-y-auto custom-scrollbar min-h-[20%] max-h-[80%]  w-[90%] xs:w-3/4 sm:w-1/2 md:w-2/5 lg:w-[35%] xl:w-[30%]"
           >
             <Dialog.Title />
             <div className="flex flex-col p-5 h-full">
               <div className="flex justify-between items-center mb-2">
-                <h2 className="dark:text-secondaryText-dark text-lg font-normal font-inter">
+                <h2 className="text-theme-secondaryText text-lg font-normal font-inter">
                   Reorder categories
                 </h2>
                 <img
@@ -78,7 +78,7 @@ const CategoryReorderModal = () => {
                   onClick={handleClose}
                 />
               </div>
-              <div className="dark:text-primaryText-dark text-sm font-light font-inter mb-3">
+              <div className="text-theme-primaryText text-sm font-light font-inter mb-3">
                 Drag categories to change order
               </div>
 
@@ -114,8 +114,8 @@ const CategoryReorderModal = () => {
                                 {...provided.dragHandleProps}
                               />
                               <div
-                                className="border ml-1 border-profileBorder py-1.5 px-4 rounded-full
-                               text-white w-full font-light tracking-wide text-base focus:outline-none focus:border-none focus:ring-0"
+                                className="border ml-1 border-profileBorder py-2 px-4 rounded-full text-sm  
+                               text-theme-secondaryText w-full font-normal tracking-wide focus:outline-none focus:border-none focus:ring-0"
                               >
                                 {category.name}
                               </div>
@@ -130,7 +130,7 @@ const CategoryReorderModal = () => {
               </DragDropContext>
 
               <button
-                className={`w-full mt-3 py-2.5 font-normal text-sm rounded-full dark:bg-secondaryText-dark dark:text-primaryBackground-dark`}
+                className={`w-full mt-3 py-2.5 font-normal text-sm rounded-lg bg-theme-secondaryText text-theme-primaryBackground`}
                 onClick={handleUpdateCategories}
               >
                 Save order

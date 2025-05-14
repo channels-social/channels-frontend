@@ -32,7 +32,7 @@ const Footer = forwardRef((props, ref) => {
   return (
     <footer
       ref={ref}
-      className="dark:bg-footerBackground-dark w-full text-white h-28 text-center flex border-t dark:border-t-chatDivider-dark z-10"
+      className="bg-theme-footerBackground w-full text-theme-secondaryText h-28 text-center flex  z-10"
     >
       <div className="flex flex-col px-2 xs:px-4 sm:px-6 lg:px-12 md:px-12  w-full justify-center">
         <div className="flex flex-row justify-between items-start">
@@ -51,7 +51,7 @@ const Footer = forwardRef((props, ref) => {
               <img
                 src={Linkedin}
                 alt="linkedin"
-                className="cursor-pointer dark:text-primaryText-dark text-xs font-normal font-inter leading-tight"
+                className="cursor-pointer  text-xs font-normal font-inter leading-tight"
               />
             </a>
             <a
@@ -62,7 +62,7 @@ const Footer = forwardRef((props, ref) => {
               <img
                 src={Instagram}
                 alt="instagram"
-                className="cursor-pointer dark:text-primaryText-dark text-xs font-normal font-inter leading-tight"
+                className="cursor-pointer text-xs font-normal font-inter leading-tight"
               />
             </a>
           </div>
@@ -70,19 +70,19 @@ const Footer = forwardRef((props, ref) => {
         <div className="flex flex-row justify-between mt-8 items-center">
           <div className="flex flex-row">
             <p
-              className="dark:text-emptyEvent-dark  text-[10px]  md:text-xs font-normal font-inter leading-tight cursor-pointer"
+              className="text-theme-emptyEvent  text-[10px]  md:text-xs font-normal font-inter leading-tight cursor-pointer"
               onClick={handleTermsOpen}
             >
               Terms of Service
             </p>
             <p
-              className="dark:text-emptyEvent-dark text-[10px]  md:text-xs font-normal ml-4 font-inter leading-tight cursor-pointer"
+              className="text-theme-emptyEvent text-[10px]  md:text-xs font-normal ml-4 font-inter leading-tight cursor-pointer"
               onClick={handlePrivacyOpen}
             >
               Privacy Policy
             </p>
           </div>
-          <p className="dark:text-emptyEvent-dark text-[10px]  md:text-xs font-light md:font-normal font-inter leading-tight">
+          <p className="text-theme-emptyEvent text-[10px]  md:text-xs font-light md:font-normal font-inter leading-tight">
             &copy; 2023 Chips2Connect Private Limited. All rights reserved.
           </p>
         </div>

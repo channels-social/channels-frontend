@@ -3,11 +3,14 @@ import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 const TopicChatSkeleton = () => {
+  const isDarkTheme = document.documentElement.classList.contains("dark");
+  const baseColor = isDarkTheme ? "#545357" : "#e0e0e0";
+  const highlightColor = isDarkTheme ? "#c4c4c4" : "#f5f5f5";
   return (
-    <div className="dark:bg-secondaryBackground-dark w-full h-full flex flex-col justify-start px-2 overflow-y-auto custom-scrollbar">
+    <div className="bg-theme-secondaryBackground w-full h-full flex flex-col justify-start px-2 overflow-y-auto custom-scrollbar">
       <SkeletonTheme
-        baseColor="#545357"
-        highlightColor="#c4c4c4"
+        baseColor={baseColor}
+        highlightColor={highlightColor}
         enableAnimation={false}
       >
         <div className="flex flex-row justify-start w-full">

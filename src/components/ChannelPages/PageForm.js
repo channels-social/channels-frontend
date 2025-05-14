@@ -1,12 +1,20 @@
-import React, { useState, useRef, useEffect } from "react";
 import SummaryPage from "./FormPages/SummaryPage";
 import ResourcePage from "./FormPages/ResourcePage";
+import Close from "../../assets/icons/Close.svg";
 import EventsPage from "./FormPages/EventsPage";
+import {
+  React,
+  useState,
+  useEffect,
+  useRef,
+  useSelector,
+} from "../../globals/imports";
 
-const PageForm = ({ isOpen, onClose, channelName, topic }) => {
+const PageForm = ({ isOpen, onClose, topic }) => {
   const modalRef = useRef(null);
   const [activeTab, setActiveTab] = useState("resources");
   const [forceOpen, setForceOpen] = useState(window.innerWidth >= 1170);
+  const myData = useSelector((state) => state.myData);
 
   useEffect(() => {
     const handleResize = () => {
@@ -35,8 +43,8 @@ const PageForm = ({ isOpen, onClose, channelName, topic }) => {
 
   const renderTabContent = () => {
     switch (activeTab) {
-      // case "summary":
-      //   return <SummaryPage />;
+      case "summary":
+        return <SummaryPage topic={topic} />;
       case "resources":
         return <ResourcePage />;
       case "events":
@@ -59,38 +67,53 @@ const PageForm = ({ isOpen, onClose, channelName, topic }) => {
           : "fixed inset-0 z-50 flex items-end justify-end"
       }`}
     >
-      {/* Dark background for modal mode */}
       {shouldShowModal && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-20 z-40"
-          onClick={onClose} // Close when clicking outside modal
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
+          onClick={onClose}
         ></div>
       )}
       <div
         ref={modalRef}
-        className={`dark:bg-tertiaryBackground-dark xl:dark:bg-primaryBackground-dark 
-          border dark:border-modalBorder-dark rounded-t-lg 
-          w-full  xl:w-[380px] xs:w-[375px] xl:h-full h-[88%] pt-1 pointer-events-auto z-50`}
+        className={`relative  
+    border border-theme-modalBorder bg-theme-sidebarBackground
+    w-full  xl:w-[380px] xs:w-[380px] xl:h-full h-[88%] pt-1 pointer-events-auto z-50`}
       >
-        {/* <div className="dark:text-white text-center mb-3">
+        <button
+          onClick={onClose}
+          className="xl:hidden flex absolute -top-8 right-3 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 z-50"
+          aria-label="Close"
+        >
+          <img
+            src={Close}
+            alt="close"
+            className="w-4 h-4 text-theme-chatDivider"
+          />
+        </button>
+
+        {/* <div className="text-theme-secondaryText text-center mb-3">
           {topic.name.charAt(0).toUpperCase() + topic.name.slice(1)}
         </div> */}
-        <div className="flex justify-center mb-3 pr-1 border-b  dark:border-chatDivider-dark">
-          {/* <button
-            className={` font-normal font-inter text-sm pt-2 pb-3 px-5 ${
-              activeTab === "summary"
-                ? "border-b-2 dark:border-primaryText-dark dark:text-primaryText-dark"
-                : "dark:text-secondaryText-dark"
-            } transition-colors duration-200`}
-            onClick={() => setActiveTab("summary")}
-          >
-            Chat Summary
-          </button> */}
+        <div className="flex justify-center mb-3 pr-1 border-b  border-theme-chatDivider">
+          {topic.payment_subscription &&
+            (topic.user === myData._id ||
+              topic.channel?.members?.includes(myData._id)) && (
+              <button
+                className={` font-normal font-inter text-sm pt-2 pb-3 px-5 ${
+                  activeTab === "summary"
+                    ? "border-b-2 border-theme-primaryText text-theme-primaryText"
+                    : "text-theme-emptyEvent"
+                } transition-colors duration-200 whitespace-nowrap`}
+                onClick={() => setActiveTab("summary")}
+              >
+                Chat Summary
+              </button>
+            )}
           <button
             className={`  font-inter text-sm py-3 px-5 w-1/2 ${
               activeTab === "resources"
-                ? "border-b-2 dark:border-primaryText-dark dark:text-primaryText-dark"
-                : "dark:text-secondaryText-dark"
+                ? "border-b-2 border-theme-primaryText text-theme-primaryText"
+                : "text-theme-emptyEvent"
             }`}
             onClick={() => setActiveTab("resources")}
           >
@@ -99,8 +122,8 @@ const PageForm = ({ isOpen, onClose, channelName, topic }) => {
           <button
             className={`  font-inter text-sm py-3 px-5 w-1/2 ${
               activeTab === "events"
-                ? "border-b-2 dark:border-primaryText-dark dark:text-primaryText-dark"
-                : "dark:text-secondaryText-dark"
+                ? "border-b-2 border-theme-primaryText text-theme-primaryText"
+                : "text-theme-emptyEvent"
             }`}
             onClick={() => setActiveTab("events")}
           >

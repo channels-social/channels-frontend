@@ -49,16 +49,16 @@ const CommentChipReplyItem = ({ item, handleChange, chipId, comment }) => {
       />
       <div className="flex flex-col  ">
         <div className="flex flex-row items-end">
-          <p className="dark:text-secondaryText-dark font-normal text-[11px] font-inter">
+          <p className="text-theme-secondaryText font-normal text-[11px] font-inter">
             {item.user?.name}
           </p>
-          <p className="dark:text-primaryText-dark font-light pl-2 text-[10px] font-inter">
+          <p className="text-theme-primaryText font-light pl-2 text-[10px] font-inter">
             {timeAgo}
           </p>
         </div>
-        <p className="dark:text-secondaryText-dark font-light text-xs mt-0.5">
+        <p className="text-theme-secondaryText font-light text-xs mt-0.5">
           <span
-            className="dark:text-buttonEnable-dark mr-1 text-xs font-light cursor-pointer"
+            className="text-theme-buttonEnable mr-1 text-xs font-light cursor-pointer"
             onClick={() =>
               window.open(`/profile/${item.repliedToUserId.username}`, "_blank")
             }
@@ -82,7 +82,7 @@ const CommentChipReplyItem = ({ item, handleChange, chipId, comment }) => {
             </p>
           </div>
           <p
-            className="dark:text-primaryText-dark ml-4 text-xs font-normal font-inter cursor-pointer"
+            className="text-theme-primaryText ml-4 text-xs font-normal font-inter cursor-pointer"
             onClick={() => handleChange(comment)}
           >
             Reply

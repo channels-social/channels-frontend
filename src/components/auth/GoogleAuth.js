@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useEffect, useSelector } from "../../globals/imports";
 
 const GoogleOneTapLogin = ({ handleTapGoogleSuccess }) => {
   const isLoggedIn = useSelector((state) => !!state.auth.user);

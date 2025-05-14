@@ -50,7 +50,9 @@ const DetailsForm = ({ formData, onFieldChange, handleImageUpload }) => {
             style={{ borderWidth: "2px" }}
           />
           <div className="absolute bottom-0 left-0 w-full h-1/2 bg-gray-800 bg-opacity-50 flex justify-center items-center rounded-b-full cursor-pointer">
-            <span className="text-white text-sm  cursor-pointer">Add</span>
+            <span className="text-theme-secondaryText text-xs  cursor-pointer font-light">
+              {formData.logo ? "Edit" : "Add"}
+            </span>
             <input
               type="file"
               accept="image/*"
@@ -60,16 +62,29 @@ const DetailsForm = ({ formData, onFieldChange, handleImageUpload }) => {
           </div>
         </div>
       </div>
-      <form className="space-y-6 mt-5">
-        <ProfileTextField
+      <form className="space-y-8 mt-5">
+        {/* <ProfileTextField
           label="Full Name"
           value={formData.name}
           onChange={handleChange}
           name="name"
-        />
+        /> */}
+        <div className="relative">
+          <label className="absolute left-4 -top-2 text-xs z-20 font-light font-inter bg-theme-tertiaryBackground text-theme-emptyEvent px-1">
+            Full Name
+          </label>
+          <input
+            type="text"
+            value={formData.name}
+            onChange={handleChange}
+            name="name"
+            className="w-full pt-3 pb-4 pl-4 pr-3  rounded-md border font-light font-inter border-theme-emptyEvent bg-transparent text-theme-secondaryText focus:border-theme-emptyEvent focus:ring-0 focus:outline-none"
+            placeholder=""
+          />
+        </div>
         <div className="flex flex-col">
           <div className="relative">
-            <label className="absolute left-4 -top-2 text-xs font-light font-inter dark:bg-tertiaryBackground-dark dark:text-secondaryText-dark">
+            <label className="absolute left-4 -top-2 text-xs font-light font-inter bg-theme-tertiaryBackground text-theme-emptyEvent px-1">
               User name
             </label>
             <input
@@ -78,13 +93,13 @@ const DetailsForm = ({ formData, onFieldChange, handleImageUpload }) => {
               maxLength={40}
               onChange={handleChange}
               name="username"
-              className="w-full pt-3 pb-4 pl-4 pr-3  rounded-md border font-light font-inter border-profileBorder dark:bg-transparent dark:text-secondaryText-dark focus:border-primary focus:ring-0 focus:outline-none"
+              className="w-full pt-3 pb-4 pl-4 pr-3  rounded-md border font-light font-inter border-theme-emptyEvent bg-transparent text-theme-secondaryText focus:border-theme-emptyEvent focus:ring-0 focus:outline-none"
               placeholder=""
             />
           </div>
           {isUsernameError && (
             <p
-              className={`dark:text-error-dark  font-light ml-1 font-inter text-xs`}
+              className={`text-theme-error  font-light ml-1 font-inter text-xs`}
             >
               {formData.username === ""
                 ? "Username can't be empty"
@@ -93,7 +108,7 @@ const DetailsForm = ({ formData, onFieldChange, handleImageUpload }) => {
           )}
         </div>
         <div className="relative">
-          <label className="absolute left-4 -top-2 text-xs font-light font-inter z-20 dark:bg-tertiaryBackground-dark dark:text-secondaryText-dark">
+          <label className="absolute left-4 -top-2 text-xs font-light font-inter  bg-theme-tertiaryBackground text-theme-emptyEvent px-1 z-50">
             Contact
           </label>
           <div className="flex items-center  rounded-md ">
@@ -109,17 +124,31 @@ const DetailsForm = ({ formData, onFieldChange, handleImageUpload }) => {
           </div>
         </div>
 
-        <ProfileTextField
+        {/* <ProfileTextField
           label="Location"
           value={formData.location}
           onChange={handleChange}
           name="location"
-        />
+        /> */}
+
+        <div className="relative">
+          <label className="absolute left-4 -top-2 text-xs z-20 font-light font-inter bg-theme-tertiaryBackground text-theme-emptyEvent px-1">
+            Location
+          </label>
+          <input
+            type="text"
+            value={formData.location}
+            onChange={handleChange}
+            name="location"
+            className="w-full pt-3 pb-4 pl-4 pr-3  rounded-md border font-light font-inter border-theme-emptyEvent bg-transparent text-theme-secondaryText focus:border-theme-emptyEvent focus:ring-0 focus:outline-none"
+            placeholder=""
+          />
+        </div>
 
         <div className="relative">
           <label
             className="absolute left-4 -top-2 text-xs font-light font-inter
-           dark:bg-tertiaryBackground-dark dark:text-secondaryText-dark z-00"
+           bg-theme-tertiaryBackground text-theme-emptyEvent z-00 px-1"
           >
             Description
           </label>
@@ -129,15 +158,15 @@ const DetailsForm = ({ formData, onFieldChange, handleImageUpload }) => {
             name="description"
             maxLength={maxChars}
             className="w-full text-sm pt-4 font-inter pb-4 pl-4 pr-3 rounded-lg 
-            border font-light dark:border-primaryText-dark dark:bg-transparent dark:text-secondaryText-dark focus:border-primary focus:ring-0 focus:outline-none"
+            border font-light border-theme-emptyEvent bg-transparent text-theme-secondaryText focus:border-primary focus:ring-0 focus:outline-none"
             rows="4"
             placeholder=""
           />
-          <div className="text-right absolute right-2 bottom-3 text-xs dark:text-primaryText-dark">
+          <div className="text-right absolute right-2 bottom-3 text-xs text-theme-primaryText">
             {charCount}/{maxChars}
           </div>
         </div>
-        <ProfileTextField
+        {/* <ProfileTextField
           label="Custom button display text"
           value={formData.customText}
           onChange={handleChange}
@@ -148,7 +177,7 @@ const DetailsForm = ({ formData, onFieldChange, handleImageUpload }) => {
           value={formData.customUrl}
           onChange={handleChange}
           name="customUrl"
-        />
+        /> */}
         <div className="mt-1"></div>
       </form>
     </div>

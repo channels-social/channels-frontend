@@ -33,8 +33,8 @@ const CreateCategoryModal = () => {
   const isOpen = useSelector((state) => state.modals.modalCreateCategoryOpen);
   const isNameEmpty = profileItems.category.name.trim() === "";
   const buttonClass = isNameEmpty
-    ? "dark:text-buttonDisable-dark dark:text-opacity-40 dark:bg-buttonDisable-dark dark:bg-opacity-10"
-    : "dark:bg-secondaryText-dark dark:text-primaryBackground-dark";
+    ? "text-theme-buttonDisableText text-theme-opacity-40 bg-theme-buttonDisable bg-theme-opacity-10"
+    : "bg-theme-secondaryText text-theme-primaryBackground";
 
   const handleCreateCategory = () => {
     setError("");
@@ -66,11 +66,11 @@ const CreateCategoryModal = () => {
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-70 z-50" />
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <Dialog.Content className="dark:bg-secondaryBackground-dark rounded-xl overflow-hidden shadow-xl transform transition-all min-h-[20%] max-h-[80%] overflow-y-auto custom-scrollbar w-[90%] xs:w-3/4 sm:w-1/2 md:w-2/5 lg:w-[35%] xl:w-[30%]">
+          <Dialog.Content className="bg-theme-secondaryBackground rounded-xl overflow-hidden shadow-xl transform transition-all min-h-[20%] max-h-[80%] overflow-y-auto custom-scrollbar w-[90%] xs:w-3/4 sm:w-1/2 md:w-2/5 lg:w-[35%] xl:w-[30%]">
             <Dialog.Title />
             <div className="flex flex-col p-5">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="dark:text-secondaryText-dark text-lg font-normal fonr-inter">
+                <h2 className="text-theme-secondaryText text-lg font-normal fonr-inter">
                   {profileItems.type === "edit"
                     ? "Edit Category"
                     : "New category"}
@@ -83,13 +83,13 @@ const CreateCategoryModal = () => {
                 />
               </div>
               <div className="mb-4">
-                <p className="dark:text-secondaryText-dark text-sm font-light font-inter">
+                <p className="text-theme-secondaryText text-sm font-light font-inter">
                   Name of the category
                 </p>
                 <input
                   id="category-name"
-                  className="w-full mt-3 text-md font-normal p-1 rounded dark:bg-transparent border-b dark:border-b-chatDivider-dark placeholder:font-light 
-                  placeholder:text-sm dark:text-secondaryText-dark focus:outline-none placeholder:text-primaryText-dark"
+                  className="w-full mt-3 text-md font-light text-sm p-1 rounded bg-transparent border-b border-theme-chatDivider placeholder:font-light 
+                  placeholder:text-sm text-theme-secondaryText focus:outline-none placeholder:text-primaryText"
                   type="text"
                   value={profileItems.category.name}
                   onChange={handleChange}
@@ -98,12 +98,12 @@ const CreateCategoryModal = () => {
                 />
               </div>
               {error && (
-                <p className="text-center my-2 dark:text-error-dark text-xs font-normal">
+                <p className="text-center my-2 text-theme-error text-xs font-normal">
                   {error}
                 </p>
               )}
               <button
-                className={`w-full mt-3 py-2.5 font-normal text-sm rounded-full ${buttonClass}`}
+                className={`w-full mt-3 py-2.5 font-normal text-sm rounded-lg  ${buttonClass}`}
                 disabled={isNameEmpty}
                 onClick={
                   profileItems.type === "edit"

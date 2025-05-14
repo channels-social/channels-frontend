@@ -3,11 +3,15 @@ import DropDown from "../../../assets/icons/arrow_drop_down.svg";
 import DropUp from "../../../assets/icons/arrow_drop_up.svg";
 import FAQCover from "../../../assets/images/Faq_empty_state.svg";
 import AddIcon from "../../../assets/icons/addIcon.svg";
+import AddIconLight from "../../../assets/lightIcons/create_new_light.svg";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import DragDrop from "../../../assets/icons/dragdrop.png";
 import Dots from "../../../assets/icons/three_dots.svg";
+import DotsLight from "../../../assets/lightIcons/faqs_dots_light.svg";
 import Edit from "../../../assets/icons/Edit.svg";
 import Delete from "../../../assets/icons/Delete.svg";
+import EditLight from "../../../assets/lightIcons/edit_light.svg";
+import DeleteLight from "../../../assets/lightIcons/delete_light.svg";
 
 import {
   setFaqData,
@@ -79,21 +83,27 @@ const FaqItem = ({
         />
       )}
       <div
-        className="dark:bg-tertiaryBackground-dark p-4 mt-6 rounded-lg flex flex-col cursor-pointer w-full"
+        className="bg-theme-tertiaryBackground p-4 mt-6 rounded-lg flex flex-col cursor-pointer w-full"
         onClick={handleClickOutside}
       >
         <div className="flex flex-row relative  items-center justify-start">
           <img
             src={Dots}
             alt="dots"
-            className="w-6 h-6 mr-2"
+            className="dark:block hidden w-6 h-6 mr-2"
+            onClick={() => toggleDropdown(id)}
+          />
+          <img
+            src={DotsLight}
+            alt="dots"
+            className="dark:hidden w-6 h-6 mr-2"
             onClick={() => toggleDropdown(id)}
           />
           {isDropdownOpen === id && (
             <div
               ref={dropdownRef}
-              className="absolute top-6 left-0 mt-1 ml-3 w-28 rounded-md shadow-lg border  dark:border-chatDivider-dark
-             dark:bg-tertiaryBackground-dark ring-1 ring-black ring-opacity-5 z-50"
+              className="absolute top-6 left-0 mt-1 ml-3 w-28 rounded-md shadow-lg border  border-theme-chatDivider
+             bg-theme-tertiaryBackground ring-1 ring-black ring-opacity-5 z-50"
             >
               <div
                 className="py-1"
@@ -102,9 +112,18 @@ const FaqItem = ({
                 aria-labelledby="options-menu"
               >
                 <div className="flex flex-row px-3 items-center">
-                  <img src={Edit} alt="edit" className="w-4 h-4" />
+                  <img
+                    src={Edit}
+                    alt="edit"
+                    className="dark:block hidden w-4 h-4"
+                  />
+                  <img
+                    src={EditLight}
+                    alt="edit"
+                    className="dark:hidden w-4 h-4"
+                  />
                   <p
-                    className="block font-light px-2 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
+                    className="block font-light px-2 py-2 text-sm text-theme-secondaryText cursor-pointer"
                     role="menuitem"
                     onClick={() => handleEditFaq(id, question, answer)}
                   >
@@ -115,9 +134,18 @@ const FaqItem = ({
                   className="flex flex-row px-3 items-center"
                   onClick={() => handleDeleteFaq(id)}
                 >
-                  <img src={Delete} alt="edit" className="w-4 h-4" />
+                  <img
+                    src={Delete}
+                    alt="edit"
+                    className="dark:block hidden w-4 h-4"
+                  />
+                  <img
+                    src={DeleteLight}
+                    alt="edit"
+                    className="dark:hidden w-4 h-4"
+                  />
                   <p
-                    className="block px-2 py-2 font-light text-sm   dark:text-secondaryText-dark cursor-pointer"
+                    className="block px-2 py-2 font-light text-sm   text-theme-secondaryText cursor-pointer"
                     role="menuitem"
                   >
                     Delete
@@ -130,14 +158,14 @@ const FaqItem = ({
             onClick={() => setIsOpen(!isOpen)}
             className="flex flex-row justify-between w-full"
           >
-            <button className="w-full text-left dark:text-secondaryText-dark font-normal">
+            <button className="w-full text-left text-theme-secondaryText font-normal">
               {question}
             </button>
             <img src={isOpen ? DropUp : DropDown} alt="drop-down" />
           </div>
         </div>
         {isOpen && (
-          <div className="dark:text-emptyEvent-dark text-sm mt-2 font-light font-inter ml-8">
+          <div className="text-theme-emptyEvent text-sm mt-2 font-light font-inter ml-8">
             {answer}
           </div>
         )}
@@ -212,7 +240,7 @@ const FaqsTab = ({ username }) => {
     setIsCreateFaq(false);
     setIsEditFaq(false);
     dispatch(setFaqData({ field: "question", value: "" }));
-    dispatch(setFaqData({ field: "", value: "" }));
+    dispatch(setFaqData({ field: "answer", value: "" }));
   };
   const handleSaveReorder = () => {
     const items = Faq.reorderItems;
@@ -263,12 +291,12 @@ const FaqsTab = ({ username }) => {
 
   const postButtonClass =
     Faq.question === "" || Faq.answer === ""
-      ? "dark:text-buttonDisable-dark dark:text-opacity-40 dark:bg-buttonDisable-dark dark:bg-opacity-10"
-      : "dark:bg-buttonEnable-dark dark:text-secondaryText-dark";
+      ? "text-theme-buttonDisableText bg-theme-buttonDisable "
+      : " bg-theme-secondaryText text-theme-primaryBackground";
 
   if (status === "loading") {
     return (
-      <div className="dark:text-primaryText-dark text-md font-normal mt-12 items-center flex justify-center">
+      <div className="text-theme-primaryText text-md font-normal mt-12 items-center flex justify-center">
         Loading...
       </div>
     );
@@ -285,19 +313,24 @@ const FaqsTab = ({ username }) => {
               className="flex items-center cursor-pointer"
               onClick={toggleCreateFaq}
             >
-              <div className="rounded-lg mr-1 flex dark:bg-tertiaryBackground-dark p-1  justify-center items-center">
+              <div className="rounded-lg mr-1 flex bg-theme-tertiaryBackground p-1  justify-center items-center">
                 <img
                   src={AddIcon}
                   alt="Add"
-                  className="w-4 h-4 dark:text-secondaryText-dark"
+                  className="dark:block hidden w-4 h-4 text-theme-secondaryText"
+                />
+                <img
+                  src={AddIconLight}
+                  alt="Add"
+                  className="dark:hidden w-4 h-4 text-theme-secondaryText"
                 />
               </div>
-              <p className="dark:text-emptyEvent-dark font-light text-sm ">
+              <p className="text-theme-emptyEvent font-light text-sm ">
                 Create new
               </p>
             </div>
             <div
-              className="flex flex-col space-y-1 cursor-pointer text-sm font-light dark:text-emptyEvent-dark"
+              className="flex flex-col space-y-1 cursor-pointer text-sm font-light text-theme-emptyEvent"
               onClick={() => setIsReorder(true)}
             >
               Reorder
@@ -307,28 +340,28 @@ const FaqsTab = ({ username }) => {
       {isReorder && (
         <div className="flex flex-row justify-between items-center mt-2 mb-4">
           <div
-            className="rounded-md text-sm  dark:bg-buttonEnable-dark cursor-pointer dark:text-secondaryText-dark px-4 py-1"
+            className="rounded-md text-sm  text-theme-primaryBackground bg-theme-secondaryText cursor-pointer  px-4 py-1"
             onClick={handleSaveReorder}
           >
             Save
           </div>
           <div
-            className="space-y-1 cursor-pointer underline text-sm font-light dark:text-emptyEvent-dark"
+            className="space-y-1 cursor-pointer underline text-sm font-light text-theme-emptyEvent"
             onClick={() => setIsReorder(false)}
           >
             Cancel
           </div>
         </div>
       )}
-      <div className="w-full border dark:border-chatDivider-dark p-4 rounded-xl ">
-        <div className="dark:text-secondaryText-dark text-xl font-medium font-familjen-grotesk ">
+      <div className="w-full border border-theme-chatDivider p-4 rounded-xl ">
+        <div className="text-theme-secondaryText text-xl font-medium font-familjen-grotesk ">
           FAQs
         </div>
         {items.length === 0 && isLoggedIn ? (
-          <div className="rounded-lg dark:bg-chatDivider-dark p-4 flex flex-row mt-2">
+          <div className="rounded-lg bg-theme-tertiaryBackground p-4 flex flex-row mt-2">
             <img src={FAQCover} alt="faq_cover" className="h-28 w-auto" />
             <div className="flex flex-col ml-3 justify-between">
-              <p className="dark:text-secondaryText-dark text-xs font-light font-inter">
+              <p className="text-theme-secondaryText text-xs font-light font-inter">
                 Everyone could use a little more clarity!
                 <br />
                 Add a set of Frequently Asked Questions (FAQs) about your brand
@@ -338,7 +371,7 @@ const FaqsTab = ({ username }) => {
                 understand and connect with your vision effortlessly.
               </p>
               <div
-                className="mt-2 border dark:border-primaryText-dark dark:text-secondaryText-dark  w-max rounded-md
+                className="mt-2 border border-theme-primaryText text-theme-secondaryText  w-max rounded-md
            px-2 py-1.5 text-xs font-light cursor-pointer"
                 onClick={toggleCreateFaq}
               >
@@ -347,17 +380,17 @@ const FaqsTab = ({ username }) => {
             </div>
           </div>
         ) : items.length === 0 ? (
-          <div className="text-center dark:text-secondaryText-dark">
+          <div className="text-center text-theme-secondaryText">
             No Faqs Found.
           </div>
         ) : null}
         {(isCreateFaq || isEditFaq) && (
-          <div className="dark:bg-tertiaryBackground-dark rounded-lg px-5 py-3 flex flex-col mt-6">
+          <div className="bg-theme-tertiaryBackground rounded-lg px-5 py-3 flex flex-col mt-6">
             <input
               id="question"
               className="w-full mt-3 p-1 rounded bg-chipBackground 
                    placeholder:font-light placeholder:text-sm text-sm font-light
-                   focus:outline-none dark:bg-transparent border-b dark:border-b-chatDivider-dark  dark:text-secondaryText-dark  placeholder:dark:text-emptyEvent-dark"
+                   focus:outline-none bg-transparent border-b border-theme-chatDivider  text-theme-secondaryText  placeholder:text-theme-emptyEvent"
               type="text"
               name="question"
               value={Faq.question}
@@ -367,9 +400,9 @@ const FaqsTab = ({ username }) => {
             />
             <textarea
               id="answer"
-              className="w-full mt-4 p-1 rounded bg-chipBackground 
+              className="w-full mt-4 p-1 rounded bg-chipBackground  resize-none
                    placeholder:font-light placeholder:text-sm text-sm font-light
-                   focus:outline-none dark:bg-transparent border-b dark:border-b-chatDivider-dark  dark:text-secondaryText-dark  placeholder:dark:text-emptyEvent-dark"
+                   focus:outline-none bg-transparent border-b border-theme-chatDivider  text-theme-secondaryText  placeholder:text-theme-emptyEvent"
               type="text"
               name="answer"
               value={Faq.answer}
@@ -381,13 +414,13 @@ const FaqsTab = ({ username }) => {
             <div className="justify-end flex flex-row mt-6 space-x-6">
               <div
                 className={`${postButtonClass} 
-          text-sm font-normal py-2 px-10 rounded-md cursor-pointer`}
+          text-sm font-normal py-2 px-10 rounded-md cursor-pointer `}
                 onClick={isEditFaq ? handleEditFaq : handleCreateFaq}
               >
                 Save
               </div>
               <div
-                className="border rounded-md dark:border-primaryText-dark dark:text-secondaryText-dark cursor-pointer
+                className="border rounded-md border-theme-primaryText text-theme-secondaryText cursor-pointer
               text-sm font-normal py-2 px-6"
                 onClick={closeFaq}
               >

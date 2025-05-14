@@ -3,9 +3,11 @@ import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import { useSelector, useDispatch } from "react-redux";
 import Chips from "./../chips/Chips";
 import AddIcon from "../../assets/icons/addIcon.svg";
+import AddIconLight from "../../assets/lightIcons/add_light.svg";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import Favourite from "../../assets/icons/favorite.svg";
 import Share from "../../assets/icons/share_icon.svg";
+import ShareLight from "../../assets/lightIcons/share_icon_light.svg";
 import List from "../../assets/icons/List.svg";
 import Category from "../../assets/icons/category.svg";
 import ListSelected from "../../assets/icons/List_s.svg";
@@ -150,7 +152,7 @@ const Saved = () => {
   return (
     <div className="flex flex-col w-full">
       <div className="flex flex-row justify-between items-center">
-        <p className="text-white text-xl sm:text-2xl font-familjen-grotesk font-normal tracking-wide sm:pl-3">
+        <p className="text-theme-secondaryText text-xl sm:text-2xl font-familjen-grotesk font-normal tracking-wide sm:pl-3">
           Saved
         </p>
         {activeTab === "Curations" && (
@@ -233,7 +235,7 @@ const Saved = () => {
               style={{ height: "1px" }}
             ></div>
             <div className="flex flex-col w-[95%]">
-              <p className="text-lg text-white font-normal  font-inter">
+              <p className="text-lg text-theme-secondaryText font-normal  font-inter">
                 {selectedCuration?.name}
               </p>
               <div className="flex flex-row items-center justify-between mt-1">
@@ -257,7 +259,15 @@ const Saved = () => {
                     <img
                       src={AddIcon}
                       alt="add-icon"
-                      className="cursor-pointer ml-3"
+                      className="dark:block hidden cursor-pointer ml-3"
+                      onClick={() => handleChipOpen(selectedCuration?._id)}
+                    />
+                  )}
+                  {selectedCuration.visibility === "anyone" && (
+                    <img
+                      src={AddIconLight}
+                      alt="add-icon"
+                      className="dark:hidden cursor-pointer ml-3"
                       onClick={() => handleChipOpen(selectedCuration?._id)}
                     />
                   )}
@@ -265,7 +275,13 @@ const Saved = () => {
                   <img
                     src={Share}
                     alt="share"
-                    className="w-6 h-6 text-primary ml-3 cursor-pointer"
+                    className="dark:block hidden w-6 h-6 text-primary ml-3 cursor-pointer"
+                    onClick={handleShareOpen}
+                  />
+                  <img
+                    src={ShareLight}
+                    alt="share"
+                    className="dark:hidden w-6 h-6 text-primary ml-3 cursor-pointer"
                     onClick={handleShareOpen}
                   />
                 </div>
@@ -276,7 +292,7 @@ const Saved = () => {
               ) : chips.length === 0 ? (
                 <div className="flex items-center mt-20">
                   <div
-                    className="container rounded-md bg-dark pl-4 pr-4 pt-3 pb-3 flex flex-col min-w-fit max-w-72 ml-auto mb-36"
+                    className="container rounded-md bg pl-4 pr-4 pt-3 pb-3 flex flex-col min-w-fit max-w-72 ml-auto mb-36"
                     style={{ marginRight: "auto" }}
                   >
                     <h3 className=" text-textColor text-sm">
@@ -318,7 +334,7 @@ const Saved = () => {
                 <input
                   type="text"
                   placeholder="Search"
-                  className="pl-5 pr-3 py-3 rounded-lg text-white bg-primaryBackground focus:outline-none w-full font-inter font-normal text-sm flex items-center placeholder:text-textFieldColor placeholder:text-xs"
+                  className="pl-5 pr-3 py-3 rounded-lg text-theme-secondaryText bg-primaryBackground focus:outline-none w-full font-inter font-normal text-sm flex items-center placeholder:text-textFieldColor placeholder:text-xs"
                 />
               </div>
             </div> */}
@@ -372,7 +388,7 @@ const Saved = () => {
             <div className="flex-1  mr-5 -mt-10">
               <div className="flex flex-col mb-1">
                 <div className="flex flex-row items-center">
-                  <p className="text-lg text-white font-normal  font-inter">
+                  <p className="text-lg text-theme-secondaryText font-normal  font-inter">
                     {selectedCuration?.name}
                   </p>
                   <div
@@ -422,7 +438,7 @@ const Saved = () => {
               ) : chips.length === 0 ? (
                 <div className="flex items-center mt-20">
                   <div
-                    className="container rounded-md bg-dark pl-4 pr-4 pt-3 pb-3 flex flex-col min-w-fit max-w-72 ml-auto mb-36"
+                    className="container rounded-md bg pl-4 pr-4 pt-3 pb-3 flex flex-col min-w-fit max-w-72 ml-auto mb-36"
                     style={{ marginRight: "auto" }}
                   >
                     <h3 className=" text-textColor text-sm">
@@ -473,7 +489,7 @@ const Saved = () => {
                 alt={curation.name}
               />
               <p
-                className="text-white text-sm mt-1  font-inter font-normal text-left overflow-hidden"
+                className="text-theme-secondaryText text-sm mt-1  font-inter font-normal text-left overflow-hidden"
                 style={{
                   display: "-webkit-box",
                   WebkitLineClamp: 1,
@@ -509,7 +525,7 @@ const Saved = () => {
       ) : (
         <div className="flex items-center mt-20">
           <div
-            className="container rounded-md bg-dark pl-4 pr-4 pt-3 pb-3 flex flex-col min-w-fit max-w-72 ml-auto mb-36"
+            className="container rounded-md bg pl-4 pr-4 pt-3 pb-3 flex flex-col min-w-fit max-w-72 ml-auto mb-36"
             style={{ marginRight: "auto" }}
           >
             <h3 className=" text-textColor text-sm">

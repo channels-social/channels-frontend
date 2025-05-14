@@ -46,8 +46,8 @@ const MyTimePicker = ({
       ref={ref}
       placeholder="Start Time"
       className="w-full py-1 text-sm pr-10 font-light rounded
-       dark:bg-transparent border-b border-b-chatDivider-dark placeholder-font-light placeholder-text-sm
-        dark:text-secondaryText-dark focus:outline-none placeholder:text-emptyEvent-dark"
+       bg-transparent border-b border-b-chatDivider placeholder-font-light placeholder-text-sm
+        text-theme-secondaryText focus:outline-none placeholder:text-emptyEvent"
     />
   ));
   // const ReadOnlyInput2 = forwardRef(({ value, onClick }, ref) => (
@@ -64,7 +64,7 @@ const MyTimePicker = ({
   return (
     <div className="flex flex-row justify-between mt-3 space-x-8 w-full">
       <div className="relative w-full flex flex-col">
-        <label className="dark:text-secondaryText-dark font-light text-sm mb-1">
+        <label className="text-theme-secondaryText font-light text-sm mb-1">
           Start Time
         </label>
         <DatePicker
@@ -79,11 +79,11 @@ const MyTimePicker = ({
         />
         <FontAwesomeIcon
           icon={faClock}
-          className="absolute right-2 mt-2 top-1/2 transform -translate-y-1/2 dark:text-primaryText-dark"
+          className="absolute right-2 mt-2 top-1/2 transform -translate-y-1/2 text-theme-primaryText"
         />
       </div>
       <div className="relative w-full flex flex-col">
-        <label className="dark:text-secondaryText-dark font-light text-sm mb-1">
+        <label className="text-theme-secondaryText font-light text-sm mb-1">
           End Time
         </label>
         <DatePicker
@@ -98,7 +98,7 @@ const MyTimePicker = ({
         />
         <FontAwesomeIcon
           icon={faClock}
-          className="absolute right-2 mt-2 top-1/2 transform -translate-y-1/2 dark:text-primaryText-dark"
+          className="absolute right-2 mt-2 top-1/2 transform -translate-y-1/2 text-theme-primaryText"
         />
       </div>
     </div>

@@ -80,6 +80,8 @@ const initialState = {
   topic: "",
   description: "",
   startDate: "",
+  type: "offline",
+  meet_url: "",
   endDate: "",
   startTime: "",
   endTime: "",
@@ -89,7 +91,6 @@ const initialState = {
   joining: "public",
   cover_image: "",
   cover_image_source: "",
-  type: "",
   status: "idle",
 };
 

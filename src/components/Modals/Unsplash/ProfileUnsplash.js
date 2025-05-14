@@ -101,7 +101,7 @@ const ProfileUnsplashModal = ({ isOpen, onClose }) => {
             <Dialog.Title />
 
             <div className="flex justify-between items-center mb-4 pr-3">
-              <h2 className="text-white text-lg font-normal fonr-inter">
+              <h2 className="text-theme-secondaryText text-lg font-normal fonr-inter">
                 Unsplash
               </h2>
               <img
@@ -115,12 +115,12 @@ const ProfileUnsplashModal = ({ isOpen, onClose }) => {
               <div className="relative w-full">
                 <FontAwesomeIcon
                   icon={faSearch}
-                  className="absolute top-1/2 ml-3 transform -translate-y-1/2 text-white w-4 h-4"
+                  className="absolute top-1/2 ml-3 transform -translate-y-1/2 text-theme-secondaryText w-4 h-4"
                 />
                 <input
                   type="text"
                   placeholder="Search"
-                  className="pl-10 pr-3 py-3 rounded-xl bg-dark text-white placeholder-textFieldColor placeholder:font-light focus:outline-none w-full font-inter font-normal"
+                  className="pl-10 pr-3 py-3 rounded-xl bg text-theme-secondaryText placeholder-textFieldColor placeholder:font-light focus:outline-none w-full font-inter font-normal"
                   style={{ fontSize: "15px" }}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -135,7 +135,9 @@ const ProfileUnsplashModal = ({ isOpen, onClose }) => {
             </div>
             <div className="flex-grow overflow-y-auto custom-scrollbar">
               {loading ? (
-                <div className="text-center text-white mt-5">Loading...</div>
+                <div className="text-center text-theme-secondaryText mt-5">
+                  Loading...
+                </div>
               ) : (
                 <div className="grid grid-cols-2 gap-4 mt-4 mr-3">
                   {images.map((image, index) => (
@@ -149,7 +151,9 @@ const ProfileUnsplashModal = ({ isOpen, onClose }) => {
                         alt={image.name}
                         className="w-full h-44 object-cover rounded-lg"
                       />
-                      <p className="text-white text-xs mt-1">{image.name}</p>
+                      <p className="text-theme-secondaryText text-xs mt-1">
+                        {image.name}
+                      </p>
                       {selectedImages.includes(image.url) && (
                         <div className="absolute top-0 right-0 rounded-full border items-center border-white bg-selectedColor w-5 h-5">
                           <FontAwesomeIcon

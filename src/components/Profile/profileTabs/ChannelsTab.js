@@ -104,7 +104,7 @@ const ChannelsTab = ({ gallery = false }) => {
   }
   if (userChannels.length === 0) {
     return (
-      <div className="dark:text-secondaryText-dark text-center pt-6">
+      <div className="text-theme-secondaryText text-center pt-6">
         No Channels found.
       </div>
     );
@@ -112,64 +112,74 @@ const ChannelsTab = ({ gallery = false }) => {
   return userChannels.map((channel) => (
     <div
       key={channel._id}
-      className="p-3 rounded-lg mt-4 border dark:border-chatDivider-dark justify-start flex xs:flex-row flex-col items-start"
+      className="p-3 rounded-lg mt-4 border border-theme-chatDivider justify-start flex xs:flex-row flex-col items-start"
     >
       {channel.logo ? (
         <img
           src={channel.logo}
           alt="logo"
-          className="h-16 w-16 rounded-lg mt-2 cursor-pointer flex-shrink-0 object-cover "
+          className="h-16 w-16 rounded-lg  cursor-pointer flex-shrink-0 object-cover "
           onClick={() => handleChannelPage(channel)}
         />
       ) : (
         <img
           src={ChannelLogo}
           alt="logo"
-          className="h-16 w-16 rounded-lg mt-2 cursor-pointer flex-shrink-0 object-cover "
+          className="h-16 w-16 rounded-lg  cursor-pointer flex-shrink-0 object-cover "
           onClick={() => handleChannelPage(channel)}
         />
       )}
-      <div className="flex flex-col xs:ml-3">
+      <div className="flex flex-col xs:ml-3 ">
         <div
-          className="dark:text-secondaryText-dark text-lg font-medium font-inter cursor-pointer"
+          className="text-theme-secondaryText text-lg font-normal  cursor-pointer"
           onClick={() => handleChannelPage(channel)}
         >
           {channel.name}
         </div>
         <p
-          className="dark:text-primaryText-dark text-xs font-normal "
+          className="text-theme-emptyEvent text-sm font-light"
           style={{ whiteSpace: "pre-line" }}
         >
-          {channel.description}
+          {channel.description?.length > 150
+            ? channel.description.slice(0, 150) + "..."
+            : channel.description}
         </p>
-        <div className="flex flex-row space-x-4">
+
+        <div className="flex flex-row space-x-4 items-end">
           {isLoggedIn && myData?._id === channel?.user._id ? (
             <button
               onClick={() =>
                 handleOwnerShareChannel(channel._id, channel.user.username)
               }
-              className="cursor-pointer px-3 mt-4 font-normal  py-2.5 dark:bg-buttonEnable-dark
-                         dark:text-secondaryText-dark text-xs rounded-lg"
+              className="cursor-pointer px-3 mt-4 font-normal  py-2 bg-theme-secondaryText
+                         text-theme-primaryBackground text-xs rounded-lg "
             >
               Share join link
             </button>
-          ) : (
-            <button
+          ) : channel.requests?.includes(myData?._id) ? (
+            <div
+              className={`py-2.5 px-3 cursor-pointer text-center bg-theme-buttonDisable text-theme-buttonDisableText
+             rounded-lg text-sm `}
               onClick={() => handleJoinChannel(channel)}
-              className="cursor-pointer px-3 mt-4 font-normal  py-2.5 dark:bg-buttonEnable-dark
-                          dark:text-secondaryText-dark text-xs rounded-lg"
             >
-              {channel.requests?.includes(myData._id)
-                ? "Channel Request"
-                : channel.members?.includes(myData._id)
+              Requested
+            </div>
+          ) : (
+            <div
+              className={`flex items-center py-2 px-3 cursor-pointer 
+                bg-theme-secondaryText text-theme-primaryBackground
+               rounded-lg text-sm `}
+              onClick={() => handleJoinChannel(channel)}
+            >
+              {channel.members?.includes(myData?._id)
                 ? "Check updates"
                 : "Join channel"}
-            </button>
+            </div>
           )}
           {isLoggedIn && myData?._id === channel?.user._id ? (
             <button
-              className={`px-4 mt-4  py-2.5 border dark:border-secondaryText-dark 
-           dark:text-secondaryText-dark font-normal text-xs rounded-lg`}
+              className={`px-4 mt-4  py-2.5 border border-theme-secondaryText 
+           text-theme-secondaryText font-normal text-xs rounded-lg`}
               onClick={() => handleEditChannel(channel)}
             >
               Edit Channel
@@ -179,8 +189,8 @@ const ChannelsTab = ({ gallery = false }) => {
               onClick={() =>
                 handleShareChannel(channel._id, channel.user.username)
               }
-              className={`px-4 mt-4  py-2.5 border dark:border-secondaryText-dark 
-         dark:text-secondaryText-dark font-normal text-xs rounded-lg`}
+              className={`px-4 mt-4  py-2 border border-theme-secondaryText 
+         text-theme-secondaryText font-normal text-xs rounded-lg`}
             >
               Share
             </button>

@@ -2,7 +2,10 @@ import { React, useState } from "react";
 import SaveIcon from "../../assets/icons/save_icon.svg";
 import SavedIcon from "../../assets/icons/favorite.svg";
 import Upvote from "../../assets/icons/upvote.svg";
+import UpvoteLight from "../../assets/lightIcons/upvote_light.svg";
+import UpvotedLight from "../../assets/lightIcons/upvote_filled_light.svg";
 import Upvoted from "../../assets/icons/upvoted.svg";
+
 import Send from "../../assets/icons/Send.svg";
 import MetaCard from "./widgets/MetaCard";
 import Comment from "../../assets/icons/Comment.svg";
@@ -96,13 +99,13 @@ const Chips = ({ item }) => {
       key={key}
       target="_blank"
       rel="noopener noreferrer"
-      className="custom-link dark:text-buttonEnable-dark"
+      className="custom-link text-theme-buttonEnable"
     >
       {text}
     </a>
   );
   return (
-    <div className="container pl-4 pb-4 w-full pt-4 space-y-2.5 rounded-lg border dark:border-chatDivider-dark dark:bg-tertiaryBackground-dark">
+    <div className="container pl-4 pb-4 w-full pt-4 space-y-2.5 rounded-lg border border-theme-chatDivider bg-theme-tertiaryBackground">
       <div
         className="cursor-pointer w-max"
         onClick={() => navigate(`/profile/${item.user.username}`)}
@@ -113,18 +116,23 @@ const Chips = ({ item }) => {
             alt="Curation"
             className=" w-11 h-11 rounded-xl mr-1.5 object-cover"
           />
+        ) : item.user?.color_logo ? (
+          <div
+            className="rounded-full w-11 h-11 mr-1.5 shrink-0"
+            style={{ backgroundColor: item.user?.color_logo }}
+          ></div>
         ) : (
           <Initicon text={item.user.name} size={42} />
         )}
       </div>
-      <p className="dark:text-profileColor-dark text-sm mt-1 font-normal pr-4">
+      <p className="text-theme-profileColor text-sm mt-1 font-normal pr-4">
         {item.user?.name}
       </p>
       <div className="flex flex-col space-y-2.5">
         {
           <Linkify componentDecorator={componentDecorator}>
             <div className="w-full pr-1 overflow-hidden">
-              <p className="dark:text-secondaryText-dark text-sm font-light font-inter whitespace-pre-wrap break-words">
+              <p className="text-theme-secondaryText text-sm font-light font-inter whitespace-pre-wrap break-words">
                 {isExpanded
                   ? item.text
                   : `${item.text.slice(0, maxLength)}${
@@ -133,7 +141,7 @@ const Chips = ({ item }) => {
                 {item.text.length > maxLength && (
                   <span
                     onClick={toggleReadMore}
-                    className="dark:text-white cursor-pointer ml-1"
+                    className="text-theme-secondaryText cursor-pointer ml-1"
                   >
                     {isExpanded ? "<- Show Less" : "Read More ->"}
                   </span>
@@ -144,7 +152,7 @@ const Chips = ({ item }) => {
         }
         {item.date.date && item.date.event && <DateTimeCard item={item.date} />}
         {item.location.text && <GoogleMapsCard item={item.location} />}
-        <div className="mr-3">
+        <div className="mr-4">
           {item.document && item.document.url && (
             <DocumentPreview document={item.document} />
           )}
@@ -170,9 +178,14 @@ const Chips = ({ item }) => {
           <img
             src={isUpvoted ? Upvoted : Upvote}
             alt="Upvote"
-            className="mr-0.5 h-5 w-5"
+            className="dark:block hidden mr-0.5 h-5 w-5"
           />
-          <p className="dark:text-secondaryText-dark text-sm font-normal">
+          <img
+            src={isUpvoted ? UpvotedLight : UpvoteLight}
+            alt="Upvote"
+            className="dark:hidden mr-0.5 h-5 w-5"
+          />
+          <p className="text-theme-secondaryText text-sm font-normal">
             {item.upvotes.length}
           </p>
         </div>
@@ -181,7 +194,7 @@ const Chips = ({ item }) => {
           onClick={openCommentModal}
         >
           <img src={Comment} alt="Comment" className="mr-0.5" />
-          <p className="dark:text-secondaryText-dark text-sm font-normal">
+          <p className="text-theme-secondaryText text-sm font-normal">
             {item.comments ? item?.comments : 0}
           </p>
         </div>
@@ -190,19 +203,19 @@ const Chips = ({ item }) => {
           onClick={openShareModal}
         >
           <img src={Send} alt="Send" className="mr-0.5 h-7 w-7" />
-          <p className="dark:text-secondaryText-dark text-sm font-normal">
+          <p className="text-theme-secondaryText text-sm font-normal">
             {item.shared_by}
           </p>
         </div>
         <div className="relative">
           {isSavedMessageVisible && (
-            <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-dark text-white text-xs rounded-lg px-2 py-1">
+            <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg text-theme-secondaryText text-xs rounded-lg px-2 py-1">
               {savedMessage}
             </div>
           )}
           <div
             className={`${
-              isSaved ? "" : "dark:bg-chatDivider-dark"
+              isSaved ? "" : "bg-theme-chatDivider"
             } px-2 py-0.5 rounded-xl cursor-pointer`}
             onClick={handleSaved}
           >

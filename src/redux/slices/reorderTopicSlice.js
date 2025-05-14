@@ -23,6 +23,25 @@ export const fetchTopics = createAsyncThunk(
     }
   }
 );
+
+export const fetchOtherTopics = createAsyncThunk(
+  "topic/fetch-other-topics",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await postRequestAuthenticated(
+        "/fetch/other/topics",
+        data
+      );
+      if (response.success) {
+        return response.topics;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 export const fetchMembers = createAsyncThunk(
   "reorderTopics/fetchChannelMembers",
   async (channelId, { rejectWithValue }) => {
@@ -93,6 +112,7 @@ const initialState = {
   status: "idle",
   memberStatus: "idle",
   error: false,
+  otherTopics: [],
 };
 
 export const reorderTopicSlice = createSlice({
@@ -120,6 +140,13 @@ export const reorderTopicSlice = createSlice({
       .addCase(fetchTopics.fulfilled, (state, action) => {
         state.status = "idle";
         state.topics = action.payload;
+      })
+      .addCase(fetchOtherTopics.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchOtherTopics.fulfilled, (state, action) => {
+        state.status = "idle";
+        state.otherTopics = action.payload;
       })
       .addCase(fetchMembers.pending, (state) => {
         state.memberStatus = "loading";

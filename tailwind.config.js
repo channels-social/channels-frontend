@@ -1,78 +1,42 @@
 /** @type {import('tailwindcss').Config} */
+
 module.exports = {
   darkMode: "class",
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
       colors: {
-        primaryBackground: {
-          dark: "#202020",
-        },
-        secondaryBackground: {
-          dark: "#252525",
-        },
-        tertiaryBackground: {
-          dark: "#2c2c2c",
-        },
-        chatBackground: {
-          dark: "#5a5a5a",
-        },
-        primaryText: {
-          dark: "#c4c4c4",
-        },
-        secondaryText: {
-          dark: "#e4e4e4",
-        },
-        chatDivider: {
-          dark: "#3c3c3c",
-        },
-        modalBorder: {
-          dark: "#333333",
-        },
-        calendarMarkings: {
-          dark: "#cac4d0",
-        },
-        onboardBackground: {
-          dark: "#d9d9d9",
-        },
-        emptyEvent: {
-          dark: "#898989",
-        },
-        footerBackground: {
-          dark: "#101010",
-        },
-        buttonDisable: {
-          dark: "#e6e0e9",
-        },
-        buttonEnable: {
-          dark: "#1e69ea",
-        },
-        error: {
-          dark: "#F2B8B5",
-        },
-        welcomeColor: {
-          dark: "#363636",
-        },
-        sidebarColor: {
-          dark: "#ff8c4e",
-        },
-        placeholder: {
-          dark: "#969696",
-        },
-        subtitle: {
-          dark: "#a3a3a3",
-        },
-        dropdown: {
-          dark: "#28262b",
-        },
-        description: {
-          dark: "#bbbbbb",
-        },
-        profileColor: {
-          dark: "#7b7b7c",
-        },
-        homeToggle: {
-          dark: "#32302c",
+        theme: {
+          primaryBackground: "var(--theme-primaryBackground)",
+          secondaryBackground: "var(--theme-secondaryBackground)",
+          tertiaryBackground: "var(--theme-tertiaryBackground)",
+          chatBackground: "var(--theme-chatBackground)",
+          primaryText: "var(--theme-primaryText)",
+          secondaryText: "var(--theme-secondaryText)",
+          chatDivider: "var(--theme-chatDivider)",
+          modalBorder: "var(--theme-modalBorder)",
+          calendarMarkings: "var(--theme-calendarMarkings)",
+          onboardBackground: "var(--theme-onboardBackground)",
+          emptyEvent: "var(--theme-emptyEvent)",
+          footerBackground: "var(--theme-footerBackground)",
+          sidebarBackground: "var(--theme-sidebarBackground)",
+          sidebarDivider: "var(--theme-sidebarDivider)",
+          sidebarHighlight: "var(--theme-sidebarHighlight)",
+          buttonDisable: "var(--theme-buttonDisable)",
+          buttonDisableText: "var(--theme-buttonDisableText)",
+          buttonEnable: "var(--theme-buttonEnable)",
+          error: "var(--theme-error)",
+          welcomeColor: "var(--theme-welcomeColor)",
+          welcomeProfile: "var(--theme-welcomeProfile)",
+          sidebarColor: "var(--theme-sidebarColor)",
+          placeholder: "var(--theme-placeholder)",
+          subtitle: "var(--theme-subtitle)",
+          dropdown: "var(--theme-dropdown)",
+          description: "var(--theme-description)",
+          profileColor: "var(--theme-profileColor)",
+          homeToggle: "var(--theme-homeToggle)",
+          chips_home: "var(--theme-chips_home)",
+          pricingBackground: "var(--theme-pricingBackground)",
         },
       },
       fontFamily: {
@@ -81,8 +45,7 @@ module.exports = {
       },
       fontWeight: {
         extralight: 100,
-        light: 200,
-        thin: 300,
+        light: 300,
         normal: 400,
         medium: 500,
         semibold: 600,
@@ -101,14 +64,20 @@ module.exports = {
         "full-minus-120": "calc(100vw - 72px)",
         "full-minus-12": "calc(100% - 13px)",
         "full-minus-80": "calc(100vw - 80px)",
-        "full-height-30": "calc(100vh - 76px)",
-        "full-height-96": "calc(100vh - 115px)",
+        "full-height-36": "calc(100vh - 36px)",
+        "full-height-96": "calc(100vh - 110px)",
         "full-height-70": "calc(100vh - 70px)",
+        "full-height-64": "calc(100vh - 64px)",
+        "full-height-48": "calc(100vh - 48px)",
+        "full-height-56": "calc(100vh - 56px)",
+        "full-height-84": "calc(100vh - 84px)",
         "full-height-40": "calc(100vh - 40px)",
         "full-height-160": "calc(100vh - 170px)",
         "page-chat-screen": "calc(100vh - 130px)",
         "full-minus-64": "calc(100vw - 72px)",
+        "full-minus-44": "calc(100vw - 44px)",
         "full-minus-250": "calc(100vw - 250px)",
+        "full-minus-380": "calc(100vw - 630px)",
         "full-minus-68": "calc(100% - 68px)",
         76: "305px",
         "72px": "72px",
@@ -126,11 +95,20 @@ module.exports = {
     function ({ addComponents }) {
       addComponents({
         ".custom-checkbox": {
-          "@apply relative flex-shrink-0 h-4 w-4 appearance-none rounded-sm border-2 border-solid dark:border-primaryText-dark cursor-pointer":
-            {},
+          position: "relative",
+          flexShrink: "0",
+          height: "1rem",
+          width: "1rem",
+          appearance: "none",
+          borderRadius: "0.125rem",
+          borderWidth: "2px",
+          borderStyle: "solid",
+          borderColor: "var(--theme-primaryText)",
+          backgroundColor: "transparent",
+          cursor: "pointer",
           "&:checked": {
-            borderColor: "var(--tw-dark-border-primaryText-dark)",
-            backgroundColor: "var(--tw-dark-tertiaryBackground-dark)",
+            borderColor: "var(--theme-primaryText)",
+            backgroundColor: "var(--theme-tertiaryBackground)",
           },
           "&:checked::after": {
             content: '""',
@@ -142,7 +120,7 @@ module.exports = {
             transform: "rotate(45deg)",
             border: "2px solid",
             borderColor:
-              "transparent transparent var(--tw-dark-tertiaryBackground-dark) var(--tw-dark-tertiaryBackground-dark)",
+              "transparent transparent var(--theme-tertiaryBackground) var(--theme-tertiaryBackground)",
             borderLeft: "none",
             borderTop: "none",
           },

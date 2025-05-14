@@ -4,6 +4,7 @@ import Close from "../../assets/icons/Close.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../redux/slices/modalSlice";
 import AddImage from "../../assets/icons/add_image.svg";
+import AddImageLight from "../../assets/lightIcons/upload_light.svg";
 import { postRequestUnAuthenticatedWithFile } from "./../../services/rest";
 
 const FeedbackModal = () => {
@@ -103,19 +104,19 @@ const FeedbackModal = () => {
 
   const isEmptyData = description.trim() === "" && files.length === 0;
   const postButtonClass = isEmptyData
-    ? "dark:text-buttonDisable-dark dark:text-opacity-40 dark:bg-buttonDisable-dark dark:bg-opacity-10"
-    : "dark:bg-secondaryText-dark dark:text-primaryBackground-dark";
+    ? "text-theme-buttonDisableText text-theme-opacity-40 bg-theme-buttonDisable bg-theme-opacity-10"
+    : "bg-theme-secondaryText text-theme-primaryBackground";
 
   return (
     <Dialog.Root open={isOpen} onOpenChange={(open) => !open && handleClose()}>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-70 z-40" />
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <Dialog.Content className="dark:bg-tertiaryBackground-dark rounded-xl overflow-hidden shadow-xl transform transition-all w-3/4 md:w-1/2 lg:w-1/3">
+          <Dialog.Content className="bg-theme-tertiaryBackground rounded-xl overflow-hidden shadow-xl transform transition-all w-3/4 md:w-1/2 lg:w-1/3">
             <Dialog.Title className="sr-only">Feedback</Dialog.Title>
             <div className="flex flex-col p-5">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="dark:text-secondaryText-dark text-lg font-normal font-inter">
+                <h2 className="text-theme-secondaryText text-lg font-normal font-inter">
                   Feedback
                 </h2>
                 <img
@@ -125,10 +126,10 @@ const FeedbackModal = () => {
                   onClick={handleClose}
                 />
               </div>
-              <div className="mt-2 dark:text-secondaryText-dark font-normal text-sm font-inter">
+              <div className="mt-2 text-theme-secondaryText font-normal text-sm font-inter">
                 We’d love to hear from you!
               </div>
-              <div className="mt-1 dark:text-description-dark font-normal text-sm font-inter">
+              <div className="mt-1 text-theme-description font-normal text-sm font-inter">
                 Share your thoughts, ideas, or issues to help us improve
                 Channels.
               </div>
@@ -136,7 +137,7 @@ const FeedbackModal = () => {
                 <label
                   htmlFor="description"
                   className="absolute left-4 -top-2 text-xs font-light font-inter
-               dark:bg-tertiaryBackground-dark dark:text-primaryText-dark px-1"
+               bg-theme-tertiaryBackground text-theme-primaryText px-1"
                 >
                   Description
                 </label>
@@ -146,7 +147,7 @@ const FeedbackModal = () => {
                   onChange={(e) => setDescription(e.target.value)}
                   name="description"
                   className="w-full text-sm pt-4 font-inter pb-4 pl-4 pr-3 rounded-lg 
-                border font-light dark:border-chatBackground-dark dark:bg-transparent dark:text-secondaryText-dark focus:border-primary focus:ring-0 focus:outline-none"
+                border font-light border-theme-chatDivider bg-transparent text-theme-secondaryText focus:border-primary focus:ring-0 focus:outline-none"
                   rows="5"
                   placeholder=""
                 />
@@ -156,7 +157,7 @@ const FeedbackModal = () => {
                   {files.map((file, index) => (
                     <div
                       key={index}
-                      className="relative min-w-32 bg-gray-200 dark:bg-dark rounded-xl shadow-md overflow-hidden flex-shrink-0"
+                      className="relative min-w-32 bg-gray-200 bg-theme-dark rounded-xl shadow-md overflow-hidden flex-shrink-0"
                     >
                       <img
                         src={file}
@@ -176,8 +177,17 @@ const FeedbackModal = () => {
                 </div>
               )}
               <div className="flex flex-row mt-4 justify-start items-center ml-1 relative">
-                <img src={AddImage} alt="add-image" className="w-4 h-4 mr-2" />
-                <label className="flex items-center dark:text-secondaryText-dark text-sm font-light cursor-pointer">
+                <img
+                  src={AddImage}
+                  alt="add-image"
+                  className="dark:block hidden w-4 h-4 mr-2"
+                />
+                <img
+                  src={AddImageLight}
+                  alt="add-image"
+                  className="dark:hidden w-4 h-4 mr-2"
+                />
+                <label className="flex items-center text-theme-secondaryText text-sm font-light cursor-pointer">
                   Add Image
                   <input
                     type="file"

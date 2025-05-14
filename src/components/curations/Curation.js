@@ -20,7 +20,7 @@ const Curation = ({ curation }) => {
         onClick={handleChipsPage}
       />
       <p
-        className="text-white text-base mt-1 w-[215px] font-inter font-normal text-left overflow-hidden"
+        className="text-theme-secondaryText text-base mt-1 w-[215px] font-inter font-normal text-left overflow-hidden"
         style={{
           display: "-webkit-box",
           WebkitLineClamp: 2,

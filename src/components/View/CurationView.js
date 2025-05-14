@@ -4,12 +4,16 @@ import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import SaveIcon from "../../assets/icons/save_icon.svg";
 import SavedIcon from "../../assets/icons/favorite.svg";
 import AddIcon from "../../assets/icons/addIcon.svg";
+import AddIconLight from "../../assets/lightIcons/add_light.svg";
 import ShareIcon from "../../assets/icons/share_icon.svg";
+import ShareIconLight from "../../assets/lightIcons/share_icon_light.svg";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import useModal from "./../hooks/ModalHook";
 import Edit from "../../assets/icons/Edit.svg";
 import Delete from "../../assets/icons/Delete.svg";
+import EditLight from "../../assets/lightIcons/edit_light.svg";
+import DeleteLight from "../../assets/lightIcons/delete_light.svg";
 import { setCurationField } from "../../redux/slices/curationSlice";
 import { setChipField } from "../../redux/slices/chipSlice";
 import {
@@ -174,10 +178,10 @@ const CurationView = () => {
   const isEditable = curation?.visibility === "anyone" || isOwner;
 
   return (
-    <div className="flex flex-col px-4 pt-4 dark:bg-chatDivider-dark w-full h-full overflow-y-auto custom-scrollbar">
+    <div className="flex flex-col px-4 pt-4 bg-theme-chatDivider w-full h-full overflow-y-auto custom-scrollbar">
       {/* <div className="flex flex-row justify-between items-center mt-3 relative"> */}
       <div className="flex flex-row items-center space-x-3 w-full">
-        <p className="sm:text-3xl  text-xl text-white font-normal font-familjen-grotesk">
+        <p className="sm:text-3xl  text-xl text-theme-secondaryText font-normal font-familjen-grotesk">
           {curation.name}
         </p>
         {!owner && (
@@ -185,7 +189,7 @@ const CurationView = () => {
             {" "}
             {/* New relative container for positioning */}
             {isSavedMessageVisible && (
-              <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg-dark text-white text-xs rounded-lg px-2 py-1">
+              <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg text-white text-xs rounded-lg px-2 py-1">
                 {savedMessage}
               </div>
             )}
@@ -207,14 +211,28 @@ const CurationView = () => {
           <img
             src={AddIcon}
             alt="add-icon"
-            className="cursor-pointer"
+            className="dark:block hidden cursor-pointer"
+            onClick={handleChipOpen}
+          />
+        )}
+        {isEditable && (
+          <img
+            src={AddIconLight}
+            alt="add-icon"
+            className="dark:hidden cursor-pointer"
             onClick={handleChipOpen}
           />
         )}
         <img
           src={ShareIcon}
           alt="save"
-          className="cursor-pointer "
+          className="dark:block hidden cursor-pointer "
+          onClick={handleShareOpen}
+        />
+        <img
+          src={ShareIconLight}
+          alt="save"
+          className="dark:hidden cursor-pointer "
           onClick={handleShareOpen}
         />
         <div className="relative flex pl-2  ">
@@ -243,7 +261,16 @@ const CurationView = () => {
                   className="flex flex-row px-4 items-center"
                   onClick={handleEditModal}
                 >
-                  <img src={Edit} alt="edit" className="w-4 h-4" />
+                  <img
+                    src={Edit}
+                    alt="edit"
+                    className="dark:block hidden w-4 h-4"
+                  />
+                  <img
+                    src={EditLight}
+                    alt="edit"
+                    className="dark:hidden w-4 h-4"
+                  />
                   <p
                     className="block ml-1 py-2 text-sm text-textFieldColor cursor-pointer"
                     role="menuitem"
@@ -255,7 +282,16 @@ const CurationView = () => {
                   className="flex flex-row px-4 items-center"
                   onClick={handleDeleteModal}
                 >
-                  <img src={Delete} alt="edit" className="w-4 h-4" />
+                  <img
+                    src={Delete}
+                    alt="delete"
+                    className="dark:block hidden w-4 h-4"
+                  />
+                  <img
+                    src={DeleteLight}
+                    alt="delete"
+                    className="dark:hidden w-4 h-4"
+                  />
                   <p
                     className="block  ml-1 py-2 text-sm text-deleteIcon cursor-pointer"
                     role="menuitem"
@@ -275,14 +311,14 @@ const CurationView = () => {
                 </div>} */}
       </div>
       {curation.description && (
-        <p className="dark:text-primaryText-dark text-xs mt-2 mb-1 w-full lg:w-1/2 font-normal font-inter">
+        <p className="text-theme-primaryText text-sm mt-2 mb-1 w-full lg:w-3/4 font-normal font-inter">
           {curation.description}
         </p>
       )}
       {curation?.user?.username && (
         <a
           href={`https://${domainUrl}/profile/${curation.user.username}`}
-          className="dark:text-secondaryText-dark font-normal text-xs mt-2 underline mb-8 w-max"
+          className="text-theme-secondaryText font-normal text-sm  underline mb-8 w-max"
           style={{ textUnderlineOffset: "2px" }}
         >
           {curation.user.name}
@@ -307,7 +343,7 @@ const CurationView = () => {
       ) : (
         <div className="flex items-center justify-center mt-20">
           <div
-            className="container rounded-md bg-dark pl-4 pr-4 pt-3 pb-3 flex flex-col min-w-fit max-w-72 ml-auto mb-36"
+            className="container rounded-md bg pl-4 pr-4 pt-3 pb-3 flex flex-col min-w-fit max-w-72 ml-auto mb-36"
             style={{ marginRight: "auto" }}
           >
             <h3 className=" text-textColor text-sm">

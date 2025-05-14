@@ -11,7 +11,7 @@ const ProfileTextField = ({ label, value, onChange, type = "text", name }) => {
         value={value}
         onChange={onChange}
         name={name}
-        className="w-full pt-3 pb-4 pl-4 pr-3  rounded-md border font-light font-inter border-profileBorder bg-borderColor text-profileText focus:border-primary focus:ring-0 focus:outline-none"
+        className="w-full pt-3 pb-4 pl-4 pr-3  rounded-md border font-light font-inter border-theme-emptyEvent bg-transparent text-theme-secondaryText focus:border-theme-emptyEvent focus:ring-0 focus:outline-none"
         placeholder=""
       />
     </div>

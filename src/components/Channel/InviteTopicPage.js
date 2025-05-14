@@ -1,7 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import { joinTopicInvite } from "../../redux/slices/topicSlice.js";
+import {
+  React,
+  useState,
+  useEffect,
+  useNavigate,
+  useDispatch,
+  useSelector,
+} from "../../globals/imports";
 
 const InviteTopicPage = ({ code, topicId, username, channelId }) => {
   const dispatch = useDispatch();
@@ -45,22 +50,20 @@ const InviteTopicPage = ({ code, topicId, username, channelId }) => {
 
   return (
     <div
-      className="dark:bg-secondaryBackground-dark 
+      className="bg-theme-secondaryBackground 
     w-full h-full flex flex-col justify-center items-center"
     >
-      <div className="border dark:border-chatDivider-dark dark:bg-tertiaryBackground-dark rounded-md px-8 py-8 flex flex-col">
-        <p className="dark:text-secondaryText-dark font-normal text-md ">
-          {error}
-        </p>
+      <div className="border border-theme-chatDivider bg-theme-tertiaryBackground rounded-md px-8 py-8 flex flex-col">
+        <p className="text-theme-secondaryText font-normal text-md ">{error}</p>
 
         <div className="mt-10">
           <div className="flex justify-center">
             {loading && (
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 dark:border-primaryText-dark"></div>
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-theme-primaryText"></div>
             )}
           </div>
         </div>
-        <p className="dark:text-secondaryText-dark font-normal text-sm mt-4 text-center">
+        <p className="text-theme-secondaryText font-normal text-sm mt-4 text-center">
           Please wait...
         </p>
       </div>

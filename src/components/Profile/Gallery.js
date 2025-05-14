@@ -1,13 +1,8 @@
-import React, { useState, useRef, useEffect } from "react";
 import ProfileCarousel from "./Widgets/ProfileCarousel";
 import UnsplashModal from "./../Modals/UnsplashModal";
 import ArrowForward from "../../assets/icons/arrow_forward_dark.svg";
 import ArrowBack from "../../assets/icons/arrow_back.svg";
-import useModal from "./../hooks/ModalHook";
-import { useDispatch, useSelector } from "react-redux";
 import ProfileIcon from "../../assets/icons/profile.svg";
-import { useLocation } from "react-router-dom";
-import { postRequestUnAuthenticated } from "./../../services/rest";
 import {
   fetchGallery,
   selectGalleryStatus,
@@ -19,13 +14,28 @@ import ProfileForm from "./FormProfile/ProfileForm";
 import ProfileSkeleton from "./../skeleton/profileSkeleton";
 import { domainUrl } from "./../../utils/globals";
 import EmptyProfileCard from "./Widgets/EmptyProfileCard";
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet } from "react-router-dom";
 import Others from "../../assets/icons/Subtract.svg";
+import DarkOther from "../../assets/lightIcons/browser_light.svg";
+import ThreadsLight from "../../assets/lightIcons/threads_light.svg";
 import Linkify from "react-linkify";
 import ChannelsTab from "./profileTabs/ChannelsTab";
 import FaqsTab from "./profileTabs/FaqsTab";
 import CurationsTab from "./profileTabs/CurationsTab";
 import { setIsDomain } from "../../redux/slices/authSlice";
+
+import {
+  React,
+  useState,
+  useEffect,
+  useRef,
+  useNavigate,
+  useDispatch,
+  useSelector,
+  useModal,
+  useLocation,
+  postRequestUnAuthenticated,
+} from "../../globals/imports";
 
 const Gallery = () => {
   const tabs = [
@@ -244,7 +254,7 @@ const Gallery = () => {
 
   return (
     <div
-      className={`w-full pt-4 px-4 h-screen dark:bg-secondaryBackground-dark overflow-y-auto custom-scrollbar`}
+      className={`w-full pt-4 px-4 h-screen bg-theme-secondaryBackground overflow-y-auto custom-scrollbar`}
       onClick={handleClickOutside}
     >
       {galleryStatus === "loading" ? (
@@ -279,7 +289,7 @@ const Gallery = () => {
           {/* </div> */}
           {/* {isOwner && (
             <button
-              className={`xs:bg-dark p-2 flex flex-row absolute right-0 xs:right-16 ${
+              className={`xs:bg p-2 flex flex-row absolute right-0 xs:right-16 ${
                 isOwner && !hasImages
                   ? "xl:right-[14%] xxl:right-[13%]"
                   : "xl:right-[10%] xxl:right-[9%]"
@@ -295,7 +305,7 @@ const Gallery = () => {
           <div className="">
             <div
               className={`${
-                isOwner || hasImages ? "md:dark:bg-tertiaryBackground-dark" : ""
+                isOwner || hasImages ? "md:bg-theme-tertiaryBackground" : ""
               }  rounded-lg md:px-6 px-0 py-4 sm:py-6 w-full`}
             >
               <div
@@ -319,11 +329,16 @@ const Gallery = () => {
                       className="rounded-full w-24 h-24 border border-white object-cover"
                       style={{ borderWidth: "3px" }}
                     />
+                  ) : galleryData.color_logo ? (
+                    <div
+                      className="rounded-full w-24 h-24 border border-theme-white shrink-0"
+                      style={{ backgroundColor: galleryData.color_logo }}
+                    ></div>
                   ) : (
                     <img
                       src={ProfileIcon}
                       alt="Profile"
-                      className="rounded-full w-24 h-24 dark:bg-chatDivider-dark border dark:border-secondaryText-dark p-6 object-cover"
+                      className="rounded-full w-24 h-24 bg-theme-chatDivider border border-theme-secondaryText p-6 object-cover"
                       style={{ borderWidth: "2px" }}
                     />
                   )}
@@ -333,11 +348,11 @@ const Gallery = () => {
                     }`}
                   >
                     <p
-                      className={`sm:text-2xl text-xl  dark:text-secondaryText-dark font-normal font-inter`}
+                      className={`sm:text-2xl text-xl  text-theme-secondaryText font-normal font-inter`}
                     >
                       {galleryData.name}
                     </p>
-                    <p className="mt-1 text-xs  font-light dark:text-profileColor-dark font-inter">
+                    <p className="mt-1 text-xs font-light text-theme-emptyEvent font-inter">
                       {galleryData.username}.{domainUrl}
                     </p>
                     {/* <p
@@ -349,7 +364,7 @@ const Gallery = () => {
                     {
                       <Linkify componentDecorator={componentDecorator}>
                         <p
-                          className="mt-2 text-sm font-light dark:text-description-dark whitespace-pre-wrap 
+                          className="mt-2 text-sm font-light text-theme-emptyEvent whitespace-pre-wrap 
                         overflow-hidden overflow-wrap break-word"
                         >
                           {isExpanded
@@ -362,7 +377,7 @@ const Gallery = () => {
                           {galleryData.description.length > maxLength && (
                             <span
                               onClick={toggleReadMore}
-                              className="dark:text-secondaryText-dark cursor-pointer ml-1"
+                              className="text-theme-secondaryText cursor-pointer ml-1"
                             >
                               {isExpanded ? (
                                 <>
@@ -389,7 +404,7 @@ const Gallery = () => {
                       </Linkify>
                     }
                     {(galleryData.location || galleryData.contact) && (
-                      <p className="mt-2 font-light text-xs dark:text-profileColor-dark">
+                      <p className="mt-2 font-light text-sm text-theme-emptyEvent">
                         {galleryData.location}
                         {galleryData.contact && galleryData.location
                           ? " | "
@@ -415,18 +430,18 @@ const Gallery = () => {
                             )
                           }
                           rel="noopener noreferrer"
-                          className="cursor-pointer px-3 mt-4 font-normal  py-2.5 dark:bg-secondaryText-dark
-                           dark:text-primaryBackground-dark text-xs rounded-lg"
+                          className="cursor-pointer px-3 mt-4 font-normal  py-2.5 
+                          bg-theme-secondaryText text-theme-primaryBackground text-xs rounded-lg"
                         >
                           Share profile
                         </p>
                       )}
-                      {galleryData.customText && galleryData.customUrl && (
+                      {/* {galleryData.customText && galleryData.customUrl && (
                         <a
                           className={`px-4 mt-4 py-2.5 ${
                             isOwner
-                              ? "border dark:border-secondaryText-dark dark:text-secondaryText-dark"
-                              : "dark:bg-secondaryText-dark dark:text-primaryBackground-dark"
+                              ? "border border-theme-secondaryText text-theme-secondaryText"
+                              : "bg-theme-secondaryText text-theme-primaryBackground"
                           } 
                            font-normal text-xs rounded-lg`}
                           href={galleryData.customUrl}
@@ -435,6 +450,19 @@ const Gallery = () => {
                         >
                           {galleryData.customText}
                         </a>
+                      )} */}
+                      {!isOwner && (
+                        <div
+                          className="cursor-pointer px-4 mt-4 font-normal py-2.5 border bg-theme-secondaryText
+                            text-sm rounded-lg border-none text-theme-primaryBackground"
+                          onClick={() =>
+                            navigate(
+                              `/user/${myData.username}/messages/list/${galleryData.username}`
+                            )
+                          }
+                        >
+                          Message
+                        </div>
                       )}
 
                       {!isOwner && (
@@ -448,16 +476,16 @@ const Gallery = () => {
                           }
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="cursor-pointer px-3 mt-4 font-normal py-2.5 border dark:border-secondaryText-dark
-                           dark:text-secondaryText-dark text-xs rounded-lg"
+                          className="cursor-pointer px-3 mt-4 font-normal  py-2.5 
+                          bg-theme-secondaryText text-theme-primaryBackground text-xs rounded-lg"
                         >
                           Share profile
                         </div>
                       )}
                       {isOwner && (
                         <a
-                          className={`px-4 mt-4  py-2.5 border dark:border-secondaryText-dark 
-                            dark:text-secondaryText-dark font-normal text-xs rounded-lg`}
+                          className={`px-4 mt-4  py-2.5 border border-theme-secondaryText 
+                          text-theme-secondaryText font-normal text-xs rounded-lg`}
                           href={galleryData.customUrl}
                           target="_blank"
                           rel="noopener noreferrer"
@@ -477,7 +505,7 @@ const Gallery = () => {
                     >
                       {galleryData.links.length >= 1 && (
                         <div
-                          className="w-64 my-3  border dark:border-chatDivider-dark "
+                          className="w-64 my-3  border border-theme-chatDivider "
                           style={{ height: "0.1px" }}
                         ></div>
                       )}
@@ -504,30 +532,50 @@ const Gallery = () => {
                           link.value && (
                             <a
                               href={link.url + link.value}
-                              className="text-white cursor-pointer"
+                              className="text-theme-secondaryText cursor-pointer"
                               key={index}
                               target="_blank"
                               rel="noopener noreferrer"
                             >
-                              <img
-                                src={link.image}
-                                alt={link.value}
-                                className="w-8 h-8"
-                              />
+                              {link.title === "Threads" ? (
+                                <>
+                                  <img
+                                    src={ThreadsLight}
+                                    className="dark:hidden w-8 h-8"
+                                    alt={link.value}
+                                  />
+                                  <img
+                                    src={link.image}
+                                    className="hidden dark:block w-8 h-8"
+                                    alt={link.value}
+                                  />
+                                </>
+                              ) : (
+                                <img
+                                  src={link.image}
+                                  className="w-8 h-8"
+                                  alt={link.value}
+                                />
+                              )}
                             </a>
                           )
                       )}
                       {galleryData.otherLink && (
                         <a
                           href={galleryData.otherLink}
-                          className="text-white cursor-pointer"
+                          className="text-theme-secondaryText cursor-pointer"
                           target="_blank"
                           rel="noopener noreferrer"
                         >
                           <img
                             src={Others}
                             alt="other-link"
-                            className="w-8 h-8"
+                            className="w-8 h-8 dark:block hidden"
+                          />
+                          <img
+                            src={DarkOther}
+                            alt="other-link"
+                            className="w-8 h-8 dark:hidden"
                           />
                         </a>
                       )}
@@ -560,23 +608,26 @@ const Gallery = () => {
               </div>
             </div>
             <div className="items-center text-center mt-3">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={(event) => handleTabClick(event, tab.href)}
-                  className={`mx-2 xs:px-8 px-4 py-3 text-sm transition-colors duration-300 ${
-                    activeTab === tab.href
-                      ? "border-b-2 dark:text-secondaryText-dark dark:border-secondaryText-dark"
-                      : "dark:text-primaryText-dark "
-                  }`}
-                  style={{ marginBottom: "-1px" }}
-                >
-                  {tab.name}
-                </button>
-              ))}
+              {tabs.map(
+                (tab) =>
+                  tab.name === "Channels" && (
+                    <button
+                      key={tab.id}
+                      onClick={(event) => handleTabClick(event, tab.href)}
+                      className={`mx-2 xs:px-8 px-4 py-3 text-sm transition-colors duration-300 ${
+                        activeTab === tab.href
+                          ? "border-b-2 text-theme-secondaryText border-theme-secondaryText"
+                          : "text-theme-emptyEvent "
+                      }`}
+                      style={{ marginBottom: "-1px" }}
+                    >
+                      {tab.name}
+                    </button>
+                  )
+              )}
             </div>
             <div
-              className="w-88px mx-auto border dark:border-chatDivider-dark "
+              className="w-88px mx-auto border border-theme-chatDivider "
               style={{ height: "0.1px" }}
             ></div>
             <div className="mt-6 mb-8">

@@ -26,7 +26,7 @@ const Initicon = ({ text, size }) => {
 
   return (
     <div
-      className="flex items-center justify-center dark:bg-chatDivider-dark text-sm dark:text-secondaryText-dark rounded-xl border  dark:border-secondaryText-dark"
+      className="flex items-center justify-center bg-theme-chatDivider text-sm text-theme-secondaryText rounded-xl border  border-theme-secondaryText"
       style={containerStyle}
     >
       {initials}

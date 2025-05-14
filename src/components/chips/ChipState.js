@@ -88,7 +88,7 @@ const ChipState = () => {
                   alt="curation-image"
                   className="w-14 h-10 rounded-md mr-4"
                 />
-                <p className="text-white text-base  font-normal">
+                <p className="text-theme-secondaryText text-base  font-normal">
                   {chipItemData.chip.curation.name}
                 </p>
               </div>
@@ -105,7 +105,7 @@ const ChipState = () => {
       </div>
       <div className="flex flex-col rounded-md sm:mt-0 mt-6 sm:w-1/2 w-[98%] bg-chipBackground p-6">
         <div className="flex flex-row justify-between items-center">
-          <h1 className="lg:text-3xl md:text-2xl xs:text-xl text-md text-white font-normal font-familjen-grotesk">
+          <h1 className="lg:text-3xl md:text-2xl xs:text-xl text-md text-theme-secondaryText font-normal font-familjen-grotesk">
             More from the author
           </h1>
           <button
@@ -131,7 +131,7 @@ const ChipState = () => {
             />
           )}
           <div className={`mt-1 text-center`}>
-            <h1 className="text-xl text-white font-normal font-familjen-grotesk">
+            <h1 className="text-xl text-theme-secondaryText font-normal font-familjen-grotesk">
               {profileData.name}
             </h1>
             <p className="mt-1 text-xs  font-normal text-viewAll font-inter">
@@ -157,7 +157,7 @@ const ChipState = () => {
                   {profileData.customText}
                 </a>
               )}
-              {/* {!owner &&  <button className={`px-4 mt-4  py-2 ${isSubscribed?"bg-dark":"bg-buttonBackground"} text-primary text-sm rounded-lg`} onClick={handleSubscribe}>{isSubscribed?"Subscribed":"Subscribe" }</button>} */}
+              {/* {!owner &&  <button className={`px-4 mt-4  py-2 ${isSubscribed?"bg":"bg-buttonBackground"} text-primary text-sm rounded-lg`} onClick={handleSubscribe}>{isSubscribed?"Subscribed":"Subscribe" }</button>} */}
             </div>
           </div>
         </div>

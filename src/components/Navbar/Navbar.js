@@ -155,7 +155,7 @@
 //           <input
 //             type="text"
 //             placeholder={isFocused ? "" : "Search"}
-//             className={`pl-10 pr-3 py-3  bg-dark text-white placeholder-textFieldColor ${
+//             className={`pl-10 pr-3 py-3  bg text-white placeholder-textFieldColor ${
 //               searchQuery ? "rounded-t-lg" : "rounded-lg"
 //             }
 //                         placeholder:text-center focus:outline-none w-full font-inter font-normal flex items-center`}
@@ -167,7 +167,7 @@
 //           />
 //           {searchQuery && (
 //             <div
-//               className={`absolute w-full bg-dark rounded-b-lg shadow-md shadow-black z-10 -mt-[1px]`}
+//               className={`absolute w-full bg rounded-b-lg shadow-md shadow-black z-10 -mt-[1px]`}
 //             >
 //               <div className="flex flex-col items-start">
 //                 <div className="flex w-full pt-1.5 border-b border-borderColor ">

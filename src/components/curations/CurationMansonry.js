@@ -30,14 +30,14 @@ const CurationMansonry = ({ curation, owner, gallery }) => {
           alt={curation.name}
         />
         <div
-          className="absolute top-1 right-1 rounded-full px-2 py-0.5 items-center text-xs text-white dark:bg-tertiaryBackground-dark bg-opacity-70  border-viewAll border"
+          className="absolute top-1 right-1 rounded-full px-2 py-0.5 items-center text-xs text-theme-secondaryText bg-theme-tertiaryBackground bg-opacity-70 border-theme-chatDivider border"
           style={{ borderWidth: "0.5px" }}
         >
           {curation.chips_count} chips
         </div>
       </div>
       <p
-        className="text-white text-sm sm:text-base mt-0.5 w-full font-inter font-normal text-left overflow-hidden"
+        className="text-theme-secondaryText ml-0.5  text-sm sm:text-base mt-0.5 w-full font-inter font-normal text-left overflow-hidden"
         style={{
           display: "-webkit-box",
           WebkitLineClamp: 2,

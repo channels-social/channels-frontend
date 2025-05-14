@@ -79,6 +79,16 @@ import GoogleAuthCallback from "./components/EmbedChannels/utility/Callback";
 import Integration from "./components/Integration/Integration";
 import Modals from "./utils/modals";
 import AdminHome from "./components/Admin/AdminHome";
+import PageDM from "./components/ChannelPages/DMPages/PageDM";
+import DMChat from "./components/ChannelPages/DMPages/DMChat";
+import DocsPage from "./components/Documentation/DocMainPage";
+import DMMessages from "./components/ChannelPages/DMPages/DMMessages";
+import ChannelAdmin from "./components/ChannelAdmin/ChannelAdmin";
+import TermsPage from "./components/Footer/Modals/TermsPage";
+import Shipping from "./components/Footer/Modals/Shipping";
+import ContactUs from "./components/Footer/Modals/ContactUs";
+import CancellationPolicy from "./components/Footer/Modals/Cancellation";
+import EventFullPage from "./components/ChannelPages/widgets/EventFullPage";
 
 const clientId =
   "391369792833-72medeq5g0o5sklosb58k7c98ps72foj.apps.googleusercontent.com";
@@ -100,14 +110,14 @@ const App = () => {
 
   const MainLayout = () => {
     const location = useLocation();
-    const allowedPaths = ["/get-started", "/channels/onboarding", "/"];
+    const allowedPaths = ["/get-started", "/channels/onboarding"];
     const isFooterVisible = allowedPaths.some((path) => {
       const regex = new RegExp(`^${path.replace(/:[^\s/]+/g, "([^/]+)")}$`);
       return regex.test(location.pathname);
     });
 
     return (
-      <div className="relative flex flex-col min-h-screen dark:bg-primaryBackground-dark w-full overflow-y-auto custom-scrollbar">
+      <div className="relative flex flex-col min-h-screen bg-theme-primaryBackground w-full overflow-y-auto custom-scrollbar">
         <Helmet>
           <meta charSet="utf-8" />
           <title>Channels.Social</title>
@@ -132,7 +142,7 @@ const App = () => {
     });
 
     return (
-      <div className="relative flex flex-col min-h-screen dark:bg-primaryBackground-dark w-full overflow-y-auto custom-scrollbar">
+      <div className="relative flex flex-col min-h-screen bg-theme-primaryBackground w-full overflow-y-auto custom-scrollbar">
         <Helmet>
           <meta charSet="utf-8" />
           <title>Channels.Social</title>
@@ -161,10 +171,15 @@ const App = () => {
                   <Route index element={<Gallery />} />{" "}
                   <Route path="/user/:username/welcome" element={<Welcome />} />{" "}
                   <Route path="/user/:username/profile" element={<Profile />} />{" "}
+                  <Route path="/user/:username/messages" element={<PageDM />} />
                   <Route
                     path="/user/:username/curation/:curId"
                     element={<ProfileChipsView />}
                   />{" "}
+                  <Route path="/user/:username/messages/" element={<PageDM />}>
+                    <Route path="list" element={<DMMessages />} />
+                    <Route path="list/:user" element={<DMChat />} />
+                  </Route>
                   <Route path="/curation/:curId" element={<CurationView />} />
                   <Route
                     path="/user/:username/channel/:channelId"
@@ -203,6 +218,8 @@ const App = () => {
                 path="/embed/google-auth/login"
                 element={<GoogleAuthPopup />}
               />
+              <Route path="/channels/admin/panel" element={<ChannelAdmin />} />
+
               <Route
                 path="/auth/google/callback"
                 element={<GoogleAuthCallback />}
@@ -210,6 +227,7 @@ const App = () => {
               <Route path="/admin/:username/home" element={<AdminHome />} />
 
               <Route path="/" element={<HomePage />} />
+              <Route path="/pricing" element={<HomePage />} />
 
               <Route
                 path="/get-started"
@@ -228,6 +246,11 @@ const App = () => {
                 <Route index element={<Navigate to="welcome" replace />} />
                 <Route path="welcome" element={<Welcome />} />
                 <Route path="profile" element={<Profile />} />
+                <Route path="messages" element={<PageDM />} />
+                <Route path="messages/" element={<PageDM />}>
+                  <Route path="list" element={<DMMessages />} />
+                  <Route path="list/:user" element={<DMChat />} />
+                </Route>
 
                 <Route path="curation/:curId" element={<ProfileChipsView />} />
                 <Route path="channel/:channelId" element={<ChannelPage />} />
@@ -246,14 +269,24 @@ const App = () => {
                 path="/user/:username/curation/:curId"
                 element={<ProfileChipsView />}
               />
+
               <Route path="/accept-invite" element={<AcceptInvite />} />
-              <Route path="/privacy/privacy-policy" element={<PrivacyPage />} />
+              <Route path="/privacy-policy" element={<PrivacyPage />} />
+              <Route path="/terms-and-conditions" element={<TermsPage />} />
+              <Route path="/shipping-policy" element={<Shipping />} />
+              <Route path="/contact-us" element={<ContactUs />} />
+              <Route
+                path="/cancellation-policy"
+                element={<CancellationPolicy />}
+              />
               <Route path="/query/feedback/channels" element={<QueryPage />} />
+              <Route path="/event/:eventId" element={<EventFullPage />} />
               <Route path="*" element={<Page404 />} />
               <Route
                 path="/reset-password/:token"
                 element={<ResetPassword />}
               />
+              <Route path="/documentation/channels" element={<DocsPage />} />
 
               <Route
                 path="/embed/channels/*"
@@ -268,8 +301,11 @@ const App = () => {
                   element={<ChannelPage />}
                 />
                 <Route path="get-started" element={<EmbedAuthPage />} />
+                <Route path="user/:username/messages/" element={<PageDM />}>
+                  <Route path="list" element={<DMMessages />} />
+                  <Route path="list/:user" element={<DMChat />} />
+                </Route>
 
-                {/* <Route path="auth-login" element={<EmbedAuthPage />} /> */}
                 <Route path="onboarding" element={<EmbedOnboardPage />} />
                 <Route path="user/:username/profile" element={<Profile />} />
                 <Route
@@ -281,40 +317,6 @@ const App = () => {
           )}
         </Routes>
         <Modals />
-        {/* <ChannelModal />
-        <PrivacyPolicy />
-        <TermsofService />
-        <ChannelUnsplash />
-        <TopicModal />
-        <ChipsModal />
-        <CurationModal />
-        <Unsplash />
-        <ProfileShareModal />
-        <ChannelShareModal />
-        <CreateCategoryModal />
-        <CommentChipModal />
-        <CategoryReorderModal />
-        <EditChipModal />
-        <DeleteChipModal />
-        <DeleteCurationModal />
-        <PushtoCategoryModal />
-        <PushtoCurationModal />
-        <ChipShareModal />
-        <ChannelCoverModal />
-        <DeleteFaqModal />
-        <DocumentModal />
-        <LogoutModal />
-        <DeleteChatModal />
-        <FeedbackModal />
-        <ShareModal />
-        <TopicShareModal />
-        <TopicReorderModal />
-        <EventModal />
-        <RemoveMemberModal />
-        <DeleteCategoryModal />
-        <EventUnsplashModal />
-        <EventCardModal />
-        <DeleteEventModal /> */}
       </GoogleOAuthProvider>
     </Router>
   );

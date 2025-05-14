@@ -1,10 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
 import TextField from "@mui/material/TextField";
 import CLogo from "../../assets/icons/logo.svg";
 import axios from "axios";
-import { hostUrl } from "../../utils/globals";
 import OtpInput from "react-otp-input";
 import { setLoginMode } from "../../redux/slices/modalSlice";
 import { setAuthCookies } from "./../../services/cookies";
@@ -17,14 +13,23 @@ import IconButton from "@mui/material/IconButton";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
 import googleLogo from "../../assets/channel_images/google_logo.svg";
-import { useLocation } from "react-router-dom";
 import { domainUrl } from "./../../utils/globals";
 import { getCsrfToken } from "../../services/csrfToken";
 import GoogleOneTapLogin from "./GoogleAuth";
+import {
+  React,
+  useState,
+  useEffect,
+  useRef,
+  useNavigate,
+  useDispatch,
+  useLocation,
+  hostUrl,
+} from "../../globals/imports";
 
 const AuthPage = ({ isSubdomain }) => {
   const navigate = useNavigate();
-  const [isLogin, setIsLogin] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [isOtp, setIsOtp] = useState(false);
   const location = useLocation();
@@ -532,11 +537,16 @@ const AuthPage = ({ isSubdomain }) => {
   return (
     <div className="flex flex-col sm:flex-row h-full">
       <GoogleOneTapLogin handleTapGoogleSuccess={handleTapGoogleSuccess} />
-      <div className="dark:bg-primaryBackground-dark  pl-3 pt-4 sm:pb-0 pb-4">
-        <img src={CLogo} alt="logo" />
+      <div className="bg-theme-secondaryBackground  pl-3 pt-4 sm:pb-0 pb-4">
+        <img
+          src={CLogo}
+          alt="logo"
+          className="cursor-pointer"
+          onClick={() => navigate("/")}
+        />
       </div>
-      <div className="w-full sm:w-1/2 h-full dark:bg-primaryBackground-dark xl:pl-[20%] sm:pt-20 pt-6 sm:items-start items-center flex flex-col justify-center ">
-        <h3 className=" text-xl sm:text-3xl w-3/4 sm:text-start text-center font-medium tracking-wider dark:text-secondaryText-dark font-inter">
+      <div className="w-full sm:w-1/2 h-full bg-theme-secondaryBackground xl:pl-[20%] sm:pt-20 pt-6 sm:items-start items-center flex flex-col justify-center ">
+        <h3 className=" text-xl sm:text-3xl w-3/4 sm:text-start text-center font-medium tracking-wider text-theme-secondaryText font-inter">
           {forgot
             ? "Forgot Password"
             : isLogin
@@ -545,7 +555,7 @@ const AuthPage = ({ isSubdomain }) => {
             ? "Verify it's you"
             : "Signup to get started"}
         </h3>
-        <p className="dark:text-secondaryText-dark text-sm mt-1">
+        <p className="text-theme-secondaryText text-sm mt-1">
           {forgot
             ? "(ಥ﹏ಥ)"
             : isLogin
@@ -556,7 +566,7 @@ const AuthPage = ({ isSubdomain }) => {
         </p>
         {forgot ? (
           <div className="mt-4 w-3/5">
-            <p className="text-white font-normal text-xs font-inter">
+            <p className="text-theme-secondaryText font-normal text-xs font-inter">
               Enter the email address associated with your account and we'll
               send you a link to reset your password.
             </p>
@@ -572,38 +582,35 @@ const AuthPage = ({ isSubdomain }) => {
                 fullWidth
                 InputProps={{
                   style: {
-                    color: "white",
+                    color: "var(--theme-primarysecondaryText)",
                     padding: "0px 3px",
-                    fontWeight: "300",
-                  }, // Adjust padding for less vertical spacing and ensure text color is white
+                    fontWeight: "400",
+                  },
                   inputProps: {
                     style: {
-                      color: "white", // This sets the text color
+                      color: "var(--theme-primaryText)",
                       fontSize: "14px",
                     },
-                    placeholder: "email address", // This is the actual placeholder text
+                    placeholder: "email address",
                   },
                 }}
                 InputLabelProps={{
-                  style: { color: "#A3A3A3" },
+                  style: { color: "var(--theme-subtitle)" },
                 }}
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": {
-                      borderColor: "#898989",
+                      borderColor: "var(--theme-chatDivider)",
                     },
                     "&:hover fieldset": {
-                      borderColor: "#898989",
+                      borderColor: "var(--theme-chatDivider)",
                     },
                     "&.Mui-focused fieldset": {
-                      borderColor: "#898989",
-                    },
-                    "&.Mui-focused .MuiInputLabel-root": {
-                      color: "#D0BCFF !important",
+                      borderColor: "var(--theme-chatDivider)",
                     },
                   },
                   "& .MuiInputBase-input::placeholder": {
-                    color: "#211F26",
+                    color: "var(--theme-placeholder)",
                     opacity: 1,
                   },
                   "& .MuiInputBase-root": {
@@ -618,17 +625,17 @@ const AuthPage = ({ isSubdomain }) => {
                 onClick={handleforgotPassword}
                 className={`w-full py-2.5 mt-6 rounded-xl ${
                   forgotEmail !== ""
-                    ? "dark:text-secondaryText-dark dark:bg-buttonEnable-dark"
-                    : "dark:text-buttonDisable-dark dark:text-opacity-40 dark:bg-buttonDisable-dark dark:bg-opacity-10"
+                    ? "text-theme-primaryBackground bg-theme-secondaryText"
+                    : "text-theme-buttonDisableText  bg-theme-buttonDisable "
                 }  font-normal text-sm`}
               >
                 Continue
               </button>
-              <p className="dark:text-error-dark font-normal mt-4 text-xs font-inter">
+              <p className="text-theme-error font-normal mt-4 text-xs font-inter">
                 {forgotError}
               </p>
             </div>
-            <p className="text-center text-white text-xs mt-8 mb-4">
+            <p className="text-center text-theme-secondaryText text-xs mt-8 mb-4">
               Don't have an account?
               <button
                 onClick={handleToggleForgot}
@@ -640,7 +647,7 @@ const AuthPage = ({ isSubdomain }) => {
           </div>
         ) : isOtp ? (
           <div className="mt-8">
-            <p className="text-white font-normal text-sm font-inter">
+            <p className="text-theme-secondaryText font-normal text-sm font-inter">
               Enter the verification code we just sent to your email id {email}
             </p>
             <div className="mt-5">
@@ -665,20 +672,20 @@ const AuthPage = ({ isSubdomain }) => {
                   />
                 )}
               />
-              <p className="w-3/5  dark:text-primaryText-dark text-xs mt-3 font-inter">
+              <p className="w-3/5  text-theme-primaryText text-xs mt-3 font-inter">
                 Didn't received code?
                 <button
                   onClick={handleResendCode}
-                  className="dark:text-secondaryText-dark underline ml-1 font-base font-inter font-normal"
+                  className="text-theme-secondaryText underline ml-1 font-base font-inter font-normal"
                 >
                   Resend
                 </button>
               </p>
-              <p className="w-3/5  dark:text-primaryText-dark text-xs mb-12 mt-10 font-inter">
+              <p className="w-3/5  text-theme-primaryText text-xs mb-12 mt-10 font-inter">
                 Entered wrong email?
                 <button
                   onClick={handleToggleOtp}
-                  className="dark:text-secondaryText-dark underline ml-1 font-base font-inter font-normal"
+                  className="text-theme-secondaryText underline ml-1 font-base font-inter font-normal"
                 >
                   Change
                 </button>
@@ -699,38 +706,38 @@ const AuthPage = ({ isSubdomain }) => {
                   fullWidth
                   InputProps={{
                     style: {
-                      color: "white",
+                      color: "var(--theme-primaryText)",
                       padding: "0px 3px",
-                      fontWeight: "300",
+                      fontWeight: "400",
                     },
                     inputProps: {
                       style: {
-                        color: "white",
+                        color: "var(--theme-primaryText)",
                         fontSize: "14px",
                       },
-                      placeholder: "full name",
+                      placeholder: "email address",
                     },
                   }}
                   InputLabelProps={{
-                    style: { color: "#A3A3A3" },
+                    style: { color: "var(--theme-subtitle)" },
                   }}
                   sx={{
                     "& .MuiOutlinedInput-root": {
                       "& fieldset": {
-                        borderColor: "#898989",
+                        borderColor: "var(--theme-chatDivider)",
                       },
                       "&:hover fieldset": {
-                        borderColor: "#898989",
+                        borderColor: "var(--theme-chatDivider)",
                       },
                       "&.Mui-focused fieldset": {
-                        borderColor: "#898989",
+                        borderColor: "var(--theme-chatDivider)",
                       },
                       "&.Mui-focused .MuiInputLabel-root": {
                         color: "#D0BCFF !important",
                       },
                     },
                     "& .MuiInputBase-input::placeholder": {
-                      color: "#211F26",
+                      color: "var(--theme-placeholder)",
                       opacity: 1,
                     },
                     "& .MuiInputBase-root": {
@@ -748,44 +755,44 @@ const AuthPage = ({ isSubdomain }) => {
                 type="email"
                 inputRef={emailRef}
                 helperText={errors.email}
+                onChange={(e) => setEmail(e.target.value)}
                 variant="outlined"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 fullWidth
                 InputProps={{
                   style: {
-                    color: "white",
+                    color: "var(--theme-primaryText)",
                     padding: "0px 3px",
-                    fontWeight: "300",
-                  }, // Adjust padding for less vertical spacing and ensure text color is white
+                    fontWeight: "400",
+                  },
                   inputProps: {
                     style: {
-                      color: "white", // This sets the text color
+                      color: "var(--theme-primaryText)",
                       fontSize: "14px",
                     },
-                    placeholder: "email address", // This is the actual placeholder text
+                    placeholder: "email address",
                   },
                 }}
                 InputLabelProps={{
-                  style: { color: "#A3A3A3" },
+                  style: { color: "var(--theme-subtitle)" },
                 }}
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": {
-                      borderColor: "#898989",
+                      borderColor: "var(--theme-chatDivider)",
                     },
                     "&:hover fieldset": {
-                      borderColor: "#898989",
+                      borderColor: "var(--theme-chatDivider)",
                     },
                     "&.Mui-focused fieldset": {
-                      borderColor: "#898989",
+                      borderColor: "var(--theme-chatDivider)",
                     },
                     "&.Mui-focused .MuiInputLabel-root": {
                       color: "#D0BCFF !important",
                     },
                   },
                   "& .MuiInputBase-input::placeholder": {
-                    color: "#211F26",
+                    color: "var(--theme-placeholder)",
                     opacity: 1,
                   },
                   "& .MuiInputBase-root": {
@@ -808,17 +815,18 @@ const AuthPage = ({ isSubdomain }) => {
                 fullWidth
                 InputProps={{
                   style: {
-                    color: "white",
+                    color: "var(--theme-primaryText)",
                     padding: "0px 3px",
-                    fontWeight: "300",
+                    fontWeight: "400",
                   },
                   inputProps: {
                     style: {
-                      color: "white",
+                      color: "var(--theme-primaryText)",
                       fontSize: "14px",
                     },
-                    placeholder: isLogin ? "password" : "create password",
+                    placeholder: "password",
                   },
+
                   endAdornment: (
                     <InputAdornment position="end" className="mr-2">
                       <IconButton
@@ -838,25 +846,25 @@ const AuthPage = ({ isSubdomain }) => {
                   ),
                 }}
                 InputLabelProps={{
-                  style: { color: "#A3A3A3" },
+                  style: { color: "var(--theme-subtitle)" },
                 }}
                 sx={{
                   "& .MuiOutlinedInput-root": {
                     "& fieldset": {
-                      borderColor: "#898989",
+                      borderColor: "var(--theme-chatDivider)",
                     },
                     "&:hover fieldset": {
-                      borderColor: "#898989",
+                      borderColor: "var(--theme-chatDivider)",
                     },
                     "&.Mui-focused fieldset": {
-                      borderColor: "#898989",
+                      borderColor: "var(--theme-chatDivider)",
                     },
                     "&.Mui-focused .MuiInputLabel-root": {
                       color: "#D0BCFF !important",
                     },
                   },
                   "& .MuiInputBase-input::placeholder": {
-                    color: "#211F26",
+                    color: "var(--theme-placeholder)",
                     opacity: 1,
                   },
                   "& .MuiInputBase-root": {
@@ -870,7 +878,7 @@ const AuthPage = ({ isSubdomain }) => {
             {isLogin && (
               <button
                 onClick={() => setForgot(true)}
-                className="dark:text-primaryText-dark w-3/5 mt-2  text-end text-xs mb-2"
+                className="text-theme-primaryText w-3/5 mt-2  text-end text-xs mb-2"
               >
                 forgot password?
               </button>
@@ -881,17 +889,17 @@ const AuthPage = ({ isSubdomain }) => {
                   type="checkbox"
                   checked={agreed}
                   onChange={(e) => setAgreed(e.target.checked)}
-                  className="w-4 h-4 text-black bg-dark rounded-sm checked:bg-primary focus:ring-primary checked:ring-primary"
+                  className="w-4 h-4 text-black bg rounded-sm checked:bg-theme-primary focus:ring-primary checked:ring-primary"
                 />
-                <label className="ml-2 text-xs dark:text-primaryText-dark ">
+                <label className="ml-2 text-xs text-theme-primaryText ">
                   I agree to the{" "}
-                  <span className="dark:text-buttonEnable-dark underline bg-transparent">
+                  <span className="text-theme-buttonEnable underline bg-transparent">
                     terms
                   </span>{" "}
                   &{" "}
                   <span
                     href="#"
-                    className="dark:text-buttonEnable-dark underline"
+                    className="text-theme-buttonEnable underline bg-transparent"
                   >
                     privacy policy
                   </span>
@@ -902,26 +910,28 @@ const AuthPage = ({ isSubdomain }) => {
               onClick={handleFormSubmit}
               className={` w-3/5 py-2.5 mt-6 rounded-xl ${
                 buttonEnabled
-                  ? "dark:text-secondaryText-dark dark:bg-buttonEnable-dark"
-                  : "dark:text-buttonDisable-dark dark:text-opacity-40 dark:bg-buttonDisable-dark dark:bg-opacity-10"
+                  ? "text-theme-primaryBackground bg-theme-secondaryText"
+                  : "text-theme-buttonDisableText  bg-theme-buttonDisable"
               }  font-normal text-sm`}
             >
               {isLogin ? "Login" : "Register"}
             </button>
             <div className="justify-center items-center w-3/5 my-4">
               {newError !== "" ? (
-                <p className="text-center dark:text-error-dark  text-xs">
+                <p className="text-center text-theme-error  text-xs">
                   {newError}
                 </p>
               ) : (
-                !isSubdomain && <p className="text-center text-white">or</p>
+                !isSubdomain && (
+                  <p className="text-center text-theme-secondaryText">or</p>
+                )
               )}
             </div>
             {!isSubdomain && (
               <button
                 onClick={() => googleLogin()}
                 className="w-3/5 px-1.5 py-2 mb-4 text-xs  font-normal items-center
-               text-white dark:bg-tertiaryBackground-dark rounded-xl border border-chatDivider-dark"
+               text-theme-secondaryText bg-theme-tertiaryBackground rounded-xl border border-theme-chatDivider"
               >
                 <img
                   src={googleLogo}
@@ -931,13 +941,13 @@ const AuthPage = ({ isSubdomain }) => {
                 {isLogin ? "Sign in with Google" : "Sign up with Google"}
               </button>
             )}
-            <p className="text-center dark:text-white text-xs mb-10 mt-2">
+            <p className="text-center text-theme-secondaryText text-xs mb-10 mt-2">
               {isLogin
                 ? "Don't have an account? "
                 : "Already have an account? "}
               <button
                 onClick={handleToggleLogin}
-                className="dark:text-secondaryText-dark underline "
+                className="text-theme-secondaryText underline ml-2"
               >
                 {loading ? "Please wait..." : isLogin ? "Register" : "Login"}
               </button>
@@ -945,7 +955,7 @@ const AuthPage = ({ isSubdomain }) => {
           </>
         )}
       </div>
-      <div className="hidden sm:flex sm:w-1/2 bg-primary items-center justify-start dark:bg-onboardBackground-dark ">
+      <div className="hidden sm:flex sm:w-1/2  items-center justify-start bg-theme-onboardBackground ">
         <img
           src="https://chips-social.s3.ap-south-1.amazonaws.com/channelsWebsite/LoginCover.svg"
           alt="Modal Illustration"

@@ -15,9 +15,9 @@
   }
 
   const apiKey = getApiKeyFromScript();
-  // const domain = window.location.hostname;
-  const domain = "channelsbychips.site";
-  const targetOrigin = "http://localhost:3001";
+  const domain = window.location.hostname;
+  // const domain = "channelsbychips.site";
+  // const targetOrigin = "https://localhost:3001";
 
   if (!apiKey) {
     console.error("❌ Missing API key in script URL.");
@@ -25,7 +25,7 @@
   }
 
   window.ChannelsWidget = function (params = {}) {
-    fetch(`http://localhost:3000/api/verify/api/key`, {
+    fetch(`https://api.channels.social/api/verify/api/key`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ apiKey, domain }),
@@ -41,13 +41,13 @@
         }
 
         window.openChannelsWidget = function (params = {}) {
-          // console.log("⚡ openChannelsWidget called with:", params);
           const embedData = {
             apiKey: apiKey,
             domain: domain,
             selectedChannel: params.selectedChannel || null,
             email: params.email || null,
             selectedTopic: params.selectedTopic || null,
+            theme: params.theme || "dark",
             autoJoin: params.autoJoin || false,
             channels: params.channels || [],
           };
@@ -59,7 +59,7 @@
             if (!iframe) {
               if (attempts < maxAttempts) {
                 attempts++;
-                setTimeout(tryToSendMessage, 100); // Try again after 100ms
+                setTimeout(tryToSendMessage, 100);
               } else {
                 console.log("❌ Iframe not found after max attempts.");
               }
@@ -67,14 +67,13 @@
             }
 
             iframe.addEventListener("load", () => {
-              // console.log("✅ Sending embedData to iframe...");
               iframe.contentWindow.postMessage(
                 {
                   type: "embedData",
                   source: "channels-widget",
                   payload: embedData,
                 },
-                "http://localhost:3001"
+                "https://channels.social"
               );
             });
           };

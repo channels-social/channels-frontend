@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import ArrowUp from "../../assets/icons/up-arrow.svg";
 import ArrowDown from "../../assets/icons/arrow_drop_down.svg";
 import PoweredBy from "../../assets/icons/poweredby.svg";
 import Close from "../../assets/icons/Close.svg";
+import { React, useState, useEffect, useNavigate } from "../../globals/imports";
 
 const channels = [
   { id: "1", name: "games", pages: ["general", "resources", "updates"] },
@@ -53,7 +52,7 @@ const PageSidebar = ({ channelName, pageName, closeSidebar }) => {
   };
 
   return (
-    <div className="w-full h-full dark:bg-primaryBackground-dark pt-2 flex flex-col relative ">
+    <div className="w-full h-full bg-theme-primaryBackground pt-2 flex flex-col relative ">
       {window.innerWidth < 640 && (
         <img
           src={Close}
@@ -63,17 +62,17 @@ const PageSidebar = ({ channelName, pageName, closeSidebar }) => {
         />
       )}
       <div className="overflow-y-auto mb-12 custom-scrollbar">
-        <h1 className="text-sm font-normal font-inter dark:text-primaryText-dark px-6 py-1 ">
+        <h1 className="text-sm font-normal font-inter text-theme-primaryText px-6 py-1 ">
           Profile
         </h1>
         {channels.map((channel, channelIndex) => (
           <div className="flex flex-col">
-            <div className="border border-[1] dark:border-tertiaryBackground-dark my-3"></div>
+            <div className="border  border-theme-tertiaryBackground my-3"></div>
             <div
               className="flex flex-row justify-between px-6 mb-3 items-center cursor-pointer"
               onClick={() => toggleChannel(channelIndex, channel.name)}
             >
-              <p className="text-md font-normal font-inter dark:text-primaryText-dark">
+              <p className="text-md font-normal font-inter text-theme-primaryText">
                 {channel.name.charAt(0).toUpperCase() + channel.name.slice(1)}
               </p>
               <img
@@ -97,15 +96,15 @@ const PageSidebar = ({ channelName, pageName, closeSidebar }) => {
                       }
                       className={`${
                         selectedPages[channelIndex] === pageIndex
-                          ? "dark:bg-tertiaryBackground-dark p-3 rounded-lg mx-3"
+                          ? "bg-theme-tertiaryBackground p-3 rounded-lg mx-3"
                           : "px-6"
-                      } dark:text-primaryText-dark text-sm font-normal font-inter py-3 cursor-pointer`}
+                      } text-theme-primaryText text-sm font-normal font-inter py-3 cursor-pointer`}
                     >
                       {page}{" "}
                     </div>
                     {pageIndex !== channel.pages.length - 1 && (
                       <div
-                        className={`border border-[1] mx-4 dark:border-tertiaryBackground-dark my-1`}
+                        className={`border  mx-4 border-theme-tertiaryBackground my-1`}
                       ></div>
                     )}
                   </div>

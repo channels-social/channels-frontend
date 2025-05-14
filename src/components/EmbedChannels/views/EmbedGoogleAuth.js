@@ -4,16 +4,17 @@ import axios from "axios";
 const GoogleAuthPopup = () => {
   console.log("work2");
 
-  const redirectToGoogleAuth = (redirectDomain, hostDomain) => {
+  const redirectToGoogleAuth = (redirectDomain, hostDomain, channel) => {
     const clientId =
       "391369792833-72medeq5g0o5sklosb58k7c98ps72foj.apps.googleusercontent.com";
     const redirectUri = encodeURIComponent(
-      "http://localhost:3001/auth/google/callback"
+      "https://channels.social/auth/google/callback"
     );
     const scope = encodeURIComponent("email profile");
     const stateObject = {
       redirectDomain,
       hostDomain,
+      channel,
     };
     const state = encodeURIComponent(JSON.stringify(stateObject));
 
@@ -26,14 +27,15 @@ const GoogleAuthPopup = () => {
     const urlParams = new URLSearchParams(window.location.search);
     const redirectDomain = urlParams.get("domain");
     const hostDomain = urlParams.get("hostDomain");
+    const channel = urlParams.get("channel");
 
     setTimeout(() => {
-      redirectToGoogleAuth(redirectDomain, hostDomain);
+      redirectToGoogleAuth(redirectDomain, hostDomain, channel);
     }, 100); // delay allows console.log to flush
   }, []);
 
   return (
-    <div className="dark:text-secondaryText-dark text-md font-normal text-center pt-12">
+    <div className="text-theme-secondaryText text-md font-normal text-center pt-12">
       Redirecting to Google Authentication...
     </div>
   );

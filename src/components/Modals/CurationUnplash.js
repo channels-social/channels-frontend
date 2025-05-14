@@ -84,13 +84,13 @@ const Unsplash = () => {
         />
         <div className="fixed z-50 inset-0 flex items-center justify-center">
           <Dialog.Content
-            className="dark:bg-tertiaryBackground-dark rounded-xl overflow-hidden shadow-xl transform transition-all w-3/4 h-3/4 lg:w-1/4 sm:w-1/2 pt-5 pl-5 flex flex-col"
+            className="bg-theme-tertiaryBackground rounded-xl overflow-hidden shadow-xl transform transition-all w-3/4 h-3/4 lg:w-1/4 sm:w-1/2 pt-5 pl-5 flex flex-col"
             onClick={(e) => e.stopPropagation()}
           >
             <Dialog.Title />
 
             <div className="flex justify-between items-center mb-4 pr-3">
-              <h2 className="dark:text-secondaryText-dark text-lg font-normal fonr-inter">
+              <h2 className="text-theme-secondaryText text-lg font-normal fonr-inter">
                 Unsplash
               </h2>
               <img
@@ -104,13 +104,13 @@ const Unsplash = () => {
               <div className="relative w-full">
                 <FontAwesomeIcon
                   icon={faSearch}
-                  className="absolute top-1/2 ml-3 transform -translate-y-1/2 text-white w-4 h-4"
+                  className="absolute top-1/2 ml-3 transform -translate-y-1/2 text-theme-secondaryText w-4 h-4"
                 />
                 <input
                   type="text"
                   placeholder="Search"
-                  className="pl-10 pr-3 py-3 rounded-xl dark:bg-transparent border dark:text-white  dark:border-chatDivider-dark 
-                  placeholder:dark:text-primaryText-dark placeholder:font-light focus:outline-none w-full font-inter font-normal"
+                  className="pl-10 pr-3 py-3 rounded-xl bg-transparent border text-theme-secondaryText  border-theme-chatDivider 
+                  placeholder:text-theme-primaryText placeholder:font-light focus:outline-none w-full font-inter font-normal"
                   style={{ fontSize: "15px" }}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -119,8 +119,8 @@ const Unsplash = () => {
               <button
                 className={` py-2 px-2 ml-2 mr-1 rounded-lg ${
                   searchQuery !== ""
-                    ? "dark:text-secondaryText-dark dark:bg-buttonEnable-dark"
-                    : "dark:text-buttonDisable-dark dark:text-opacity-40 dark:bg-buttonDisable-dark dark:bg-opacity-10"
+                    ? "text-theme-primaryBackground bg-theme-secondaryText"
+                    : "text-theme-buttonDisableText text-theme-opacity-40 bg-theme-buttonDisable bg-theme-opacity-10"
                 }  font-normal`}
                 onClick={handleSearch}
               >
@@ -129,7 +129,9 @@ const Unsplash = () => {
             </div>
             <div className="flex-grow overflow-y-auto custom-scrollbar">
               {loading ? (
-                <div className="text-center text-white mt-5">Loading...</div>
+                <div className="text-center text-theme-secondaryText mt-5">
+                  Loading...
+                </div>
               ) : (
                 <div className="grid grid-cols-2 gap-4 mt-4 mr-3">
                   {images.map((image, index) => (
@@ -143,7 +145,9 @@ const Unsplash = () => {
                         alt={image.name}
                         className="w-full h-44 object-cover rounded-lg"
                       />
-                      <p className="text-white text-xs mt-1">{image.name}</p>
+                      <p className="text-theme-secondaryText text-xs mt-1">
+                        {image.name}
+                      </p>
                       {selectedImage === image.url && (
                         <div className="absolute top-0 right-0 rounded-full border items-center border-white bg-selectedColor w-5 h-5">
                           <FontAwesomeIcon
@@ -161,8 +165,8 @@ const Unsplash = () => {
             {selectedImage && (
               <div className="sticky bottom-0 left-0 w-full px-5 py-2 bg-chipBackground">
                 <button
-                  className="w-full py-2.5 rounded-full dark:text-secondaryText-dark dark:bg-transparent 
-                  border dark:border-secondaryText-dark font-normal"
+                  className="w-full py-2.5 rounded-full text-theme-secondaryText bg-transparent 
+                  border border-theme-secondaryText font-normal"
                   onClick={handleConfirmSelection}
                 >
                   Confirm selection

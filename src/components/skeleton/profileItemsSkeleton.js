@@ -6,11 +6,14 @@ import Masonry from "react-responsive-masonry";
 
 const ProfileItemsSkeleton = () => {
   const items = [120, 320, 120, 350, 350, 120, 380, 130];
+  const isDarkTheme = document.documentElement.classList.contains("dark");
+  const baseColor = isDarkTheme ? "#545357" : "#e0e0e0";
+  const highlightColor = isDarkTheme ? "#c4c4c4" : "#f5f5f5";
 
   return (
     <SkeletonTheme
-      baseColor="#545357"
-      highlightColor="#c4c4c4"
+      baseColor={baseColor}
+      highlightColor={highlightColor}
       enableAnimation={false}
     >
       <ResponsiveMasonry columnsCountBreakPoints={{ 400: 2, 800: 3, 1060: 4 }}>

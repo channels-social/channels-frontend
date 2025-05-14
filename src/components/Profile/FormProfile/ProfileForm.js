@@ -274,13 +274,13 @@ const ProfileForm = ({ isOpen, onClose, onUnsplashClick, gallery = false }) => {
       <div className="absolute inset-0 "></div>
       <div
         ref={modalRef}
-        className="dark:bg-tertiaryBackground-dark rounded-t-lg w-full md:w-1/2 sm:w-[55%] lg:w-[35%] xl:w-[30%] sm:h-[85%] h-3/4 pt-2 relative z-30"
+        className="bg-theme-tertiaryBackground rounded-t-lg w-full md:w-1/2 sm:w-[55%] lg:w-[35%] xl:w-[30%] sm:h-[85%] h-3/4 pt-2 relative z-30"
       >
-        <div className="flex justify-between mb-4 pr-1">
+        <div className="flex flex-row justify-between mb-4 pr-1">
           <button
-            className={`dark:text-primaryText-dark font-normal font-inter text-sm py-2 px-5 ${
+            className={`text-theme-primaryText font-normal font-inter text-sm py-2 w-full ${
               profileData.activeTab === "profileDetails"
-                ? "border-b-2 dark:border-secondaryText-dark dark:text-white"
+                ? "border-b-2 border-theme-secondaryText text-theme-secondaryText"
                 : ""
             } transition-colors duration-200`}
             onClick={() => dispatch(setActiveTab("profileDetails"))}
@@ -288,9 +288,9 @@ const ProfileForm = ({ isOpen, onClose, onUnsplashClick, gallery = false }) => {
             Profile details
           </button>
           <button
-            className={`dark:text-primaryText-dark font-inter text-sm py-2 px-5 ${
+            className={`text-theme-primaryText font-inter text-sm py-2 w-full ${
               profileData.activeTab === "links"
-                ? "border-b-2 dark:border-secondaryText-dark dark:text-white"
+                ? "border-b-2 border-theme-secondaryText text-theme-secondaryText"
                 : ""
             }`}
             onClick={() => dispatch(setActiveTab("links"))}
@@ -298,9 +298,9 @@ const ProfileForm = ({ isOpen, onClose, onUnsplashClick, gallery = false }) => {
             Links
           </button>
           <button
-            className={`dark:text-primaryText-dark font-inter text-sm py-2 px-5 ${
+            className={`text-theme-primaryText font-inter text-sm py-2 w-full ${
               profileData.activeTab === "displayCards"
-                ? "border-b-2 dark:border-secondaryText-dark dark:text-white"
+                ? "border-b-2 border-theme-secondaryText text-theme-secondaryText"
                 : ""
             }`}
             onClick={() => dispatch(setActiveTab("displayCards"))}
@@ -317,14 +317,14 @@ const ProfileForm = ({ isOpen, onClose, onUnsplashClick, gallery = false }) => {
         <div className="flex justify-start space-x-4 px-8 mt-4 mb-4 absolute bottom-0 left-0 right-0">
           <button
             type="button"
-            className="px-12 py-2.5 text-sm font-inter font-normal dark:bg-buttonEnable-dark dark:text-white rounded-3xl "
+            className="px-12 py-2.5 text-sm font-inter font-normal bg-theme-secondaryText text-theme-primaryBackground rounded-3xl "
             onClick={handleSaveProfile}
           >
             {loading ? "Loading.." : "Save"}
           </button>
           <button
             type="button"
-            className="px-7 py-2.5 text-xs border font-inter dark:border-secondaryText-dark dark:text-secondaryText-dark rounded-3xl"
+            className="px-7 py-2.5 text-xs border font-inter border-theme-secondaryText text-theme-secondaryText rounded-3xl"
             onClick={handleClose}
           >
             Cancel

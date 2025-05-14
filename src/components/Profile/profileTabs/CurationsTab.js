@@ -1,8 +1,8 @@
 import React, { useState, useRef } from "react";
 import ProfileView from "./../Widgets/ProfileView";
 import AddIcon from "../../../assets/icons/addIcon.svg";
+import AddIconLight from "../../../assets/lightIcons/create_new_light.svg";
 import { useDispatch, useSelector } from "react-redux";
-import CategoryIcon from "../../../assets/icons/category.svg";
 
 import {
   updateItemsOrderCategory,
@@ -10,8 +10,13 @@ import {
 } from "../../../redux/slices/pushItemsSlice";
 import useModal from "./../../hooks/ModalHook";
 import ShareIcon from "../../../assets/icons/shareIcon.svg";
+import ShareIconLight from "../../../assets/lightIcons/share_icon_light.svg";
+import CategoryIcon from "../../../assets/icons/category.svg";
 import ChipIcon from "../../../assets/icons/chip_icon.svg";
+import CategoryIconLight from "../../../assets/lightIcons/category_light.svg";
 import CurationIcon from "../../../assets/icons/curation_icon.svg";
+import ChipIconLight from "../../../assets/lightIcons/chip_icon_light.png";
+import CurationIconLight from "../../../assets/lightIcons/curation_light.svg";
 
 const CurationsTab = ({ isOwner, items, gallery = false }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -89,14 +94,19 @@ const CurationsTab = ({ isOwner, items, gallery = false }) => {
             className="flex items-center cursor-pointer"
             onClick={toggleDropdown}
           >
-            <div className="rounded-lg mr-2 flex dark:bg-tertiaryBackground-dark p-1  justify-center items-center">
+            <div className="rounded-lg mr-2 flex bg-transparent p-1  justify-center items-center">
               <img
                 src={AddIcon}
                 alt="Add"
-                className="w-4 h-4 dark:text-secondaryText-dark"
+                className="dark:block hidden w-4 h-4 text-theme-secondaryText"
+              />
+              <img
+                src={AddIconLight}
+                alt="Add"
+                className="dark:hidden w-5 h-5 text-theme-secondaryText"
               />
             </div>
-            <p className="dark:text-emptyEvent-dark font-normal text-sm -ml-1">
+            <p className="text-theme-emptyEvent font-normal text-sm -ml-1">
               Create new
             </p>
           </div>
@@ -104,7 +114,7 @@ const CurationsTab = ({ isOwner, items, gallery = false }) => {
         <div className="relative flex pr-2">
           {isOwner && reorderItems === false && items.length > 1 && (
             <div
-              className="flex flex-col space-y-1 cursor-pointer text-sm font-light dark:text-emptyEvent-dark"
+              className="flex flex-col space-y-1 cursor-pointer text-sm font-light text-theme-emptyEvent"
               onClick={toggleDropdown2}
             >
               Reorder
@@ -113,7 +123,7 @@ const CurationsTab = ({ isOwner, items, gallery = false }) => {
           {isDropdownOpen2 && (
             <div
               ref={dropdownRef2}
-              className="absolute right-0 top-6 w-max rounded-md shadow-lg border dark:border-chatDivider-dark dark:bg-tertiaryBackground-dark ring-1 ring-black ring-opacity-5 z-50"
+              className="absolute right-0 top-6 w-max rounded-md shadow-lg border border-theme-chatDivider bg-theme-tertiaryBackground ring-1 ring-black ring-opacity-5 z-50"
             >
               <div
                 className="py-1"
@@ -125,9 +135,9 @@ const CurationsTab = ({ isOwner, items, gallery = false }) => {
                   className="flex flex-row px-4 items-center"
                   onClick={handleCategoryReorderModal}
                 >
-                  <img src={ShareIcon} alt="edit" className="w-4 h-4" />
+                  {/* <img src={ShareIcon} alt="edit" className="w-4 h-4" /> */}
                   <p
-                    className="block ml-1 py-2 text-sm dark:text-secondaryText-dark cursor-pointer font-light"
+                    className="block ml-1 py-2 text-sm text-theme-secondaryText cursor-pointer font-light"
                     role="menuitem"
                   >
                     Reorder Category
@@ -137,9 +147,9 @@ const CurationsTab = ({ isOwner, items, gallery = false }) => {
                   className="flex flex-row px-4 items-center"
                   onClick={handleReorderItems}
                 >
-                  <img src={ShareIcon} alt="edit" className="w-4 h-4" />
+                  {/* <img src={ShareIcon} alt="edit" className="w-4 h-4" /> */}
                   <p
-                    className="block  ml-1 py-2 text-sm dark:text-secondaryText-dark cursor-pointer font-light"
+                    className="block  ml-1 py-2 text-sm text-theme-secondaryText cursor-pointer font-light"
                     role="menuitem"
                   >
                     Reorder Items
@@ -152,8 +162,8 @@ const CurationsTab = ({ isOwner, items, gallery = false }) => {
         {isDropdownOpen && (
           <div
             ref={dropdownRef}
-            className="absolute top-full left-0 mt-1 ml-3 w-28 rounded-md shadow-lg border  dark:border-chatDivider-dark
-             dark:bg-tertiaryBackground-dark ring-1 ring-black ring-opacity-5 z-50"
+            className="absolute top-full left-0 mt-1 ml-3 w-28 rounded-md shadow-lg border  border-theme-chatDivider
+             bg-theme-tertiaryBackground ring-1 ring-black ring-opacity-5 z-50"
           >
             <div
               className="py-1"
@@ -165,9 +175,18 @@ const CurationsTab = ({ isOwner, items, gallery = false }) => {
                 className="flex flex-row px-3 items-center"
                 onClick={handleChipOpen}
               >
-                <img src={ChipIcon} alt="edit" className="w-4 h-4" />
+                <img
+                  src={ChipIcon}
+                  alt="edit"
+                  className="dark:block hidden w-4 h-4"
+                />
+                <img
+                  src={ChipIconLight}
+                  alt="edit"
+                  className="dark:hidden w-4 h-4"
+                />
                 <p
-                  className="block px-2 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
+                  className="block px-2 py-2 text-sm text-theme-secondaryText cursor-pointer"
                   role="menuitem"
                 >
                   Chip
@@ -177,9 +196,18 @@ const CurationsTab = ({ isOwner, items, gallery = false }) => {
                 className="flex flex-row px-3 items-center"
                 onClick={handleCurationOpenModal}
               >
-                <img src={CurationIcon} alt="edit" className="w-4 h-4" />
+                <img
+                  src={CurationIcon}
+                  alt="edit"
+                  className="dark:block hidden w-4 h-4"
+                />
+                <img
+                  src={CurationIconLight}
+                  alt="edit"
+                  className="dark:hidden w-4 h-4"
+                />
                 <p
-                  className="block px-2 py-2 text-sm   dark:text-secondaryText-dark cursor-pointer"
+                  className="block px-2 py-2 text-sm   text-theme-secondaryText cursor-pointer"
                   role="menuitem"
                 >
                   Curation
@@ -189,9 +217,18 @@ const CurationsTab = ({ isOwner, items, gallery = false }) => {
                 className="flex flex-row px-3 items-center"
                 onClick={handleCategoryOpenModal}
               >
-                <img src={CategoryIcon} alt="edit" className="w-4 h-4" />
+                <img
+                  src={CategoryIcon}
+                  alt="edit"
+                  className="dark:block hidden w-4 h-4"
+                />
+                <img
+                  src={CategoryIconLight}
+                  alt="edit"
+                  className="dark:hidden w-4 h-4"
+                />
                 <p
-                  className="block px-2 py-2 text-sm   dark:text-secondaryText-dark cursor-pointer"
+                  className="block px-2 py-2 text-sm   text-theme-secondaryText cursor-pointer"
                   role="menuitem"
                 >
                   Category
@@ -204,13 +241,13 @@ const CurationsTab = ({ isOwner, items, gallery = false }) => {
       {reorderItems === true && (
         <div className="flex flex-row justify-between items-center w-full">
           <div
-            className="dark:text-primaryBackground-dark dark:bg-secondaryText-dark cursor-pointer rounded-full px-3 py-1.5 text-sm font-normal ml-2"
+            className="text-theme-primaryBackground bg-theme-secondaryText cursor-pointer rounded-full px-3 py-1.5 text-sm font-normal ml-2"
             onClick={handleSaveChanges}
           >
             Save Reordering
           </div>
           <div
-            className="dark:text-primaryText-dark underline  cursor-pointer rounded-full px-3 py-1.5 text-sm font-normal ml-2"
+            className="text-theme-primaryText underline  cursor-pointer rounded-full px-3 py-1.5 text-sm font-normal ml-2"
             onClick={handleResetChanges}
           >
             Cancel

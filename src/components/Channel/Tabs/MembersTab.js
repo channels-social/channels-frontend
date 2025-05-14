@@ -1,10 +1,14 @@
-import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import {
   fetchMembers,
   setReorderTopicField,
 } from "../../../redux/slices/reorderTopicSlice";
-import useModal from "./../../hooks/ModalHook";
+import {
+  React,
+  useEffect,
+  useDispatch,
+  useSelector,
+  useModal,
+} from "../../../globals/imports";
 
 const MembersTab = ({ channelId, isOwner }) => {
   const dispatch = useDispatch();
@@ -26,7 +30,7 @@ const MembersTab = ({ channelId, isOwner }) => {
 
   if (memberStatus === "loading") {
     return (
-      <div className="dark:text-secondaryText-dark text-center mt-12 justify-center items-center">
+      <div className="text-theme-secondaryText text-center mt-12 justify-center items-center">
         Loading...
       </div>
     );
@@ -34,7 +38,7 @@ const MembersTab = ({ channelId, isOwner }) => {
 
   if (reorderMembers.length === 0) {
     return (
-      <div className="dark:text-secondaryText-dark text-center mt-12 justify-center items-center">
+      <div className="text-theme-secondaryText text-center mt-12 justify-center items-center">
         No members found.
       </div>
     );
@@ -62,13 +66,15 @@ const MembersTab = ({ channelId, isOwner }) => {
                   className="rounded-full w-10 h-10"
                 />
               ) : (
-                <div className="rounded-full w-10 h-10 dark:bg-emptyEvent-dark"></div>
+                <div className="rounded-full w-10 h-10 bg-theme-emptyEvent"></div>
               )}
               <div className="flex flex-col ml-2 justify-between">
-                <p className="dark:text-secondaryText-dark font-normal text-sm mr-2">
-                  {member.name}
-                </p>
-                <p className="dark:text-profileColor-dark mt-1  text-[10px] font-normal">
+                {member.name && (
+                  <p className="text-theme-profileColor mt-1  text-[10px] font-normal">
+                    {member.name}
+                  </p>
+                )}
+                <p className="text-theme-secondaryText font-normal text-sm mr-2">
                   {member.username}
                 </p>
               </div>
@@ -76,7 +82,7 @@ const MembersTab = ({ channelId, isOwner }) => {
             <div className="flex flex-row ">
               {isOwner && (
                 <div
-                  className="dark:bg-tertiaryBackground-dark rounded-md p-2 dark:text-primaryText-dark text-sm font-light cursor-pointer"
+                  className="bg-theme-tertiaryBackground rounded-md p-2 text-theme-primaryText text-sm font-light cursor-pointer"
                   onClick={() => handleRemoveMember(member, channelId)}
                 >
                   Remove
@@ -84,7 +90,7 @@ const MembersTab = ({ channelId, isOwner }) => {
               )}
             </div>
           </div>
-          <div className="border-t dark:border-t-chatDivider-dark w-full px-4"></div>
+          <div className="border-t border-t-theme-chatDivider w-full px-4"></div>
         </div>
       ))}
     </div>

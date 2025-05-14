@@ -37,10 +37,10 @@ const AcceptInvite = () => {
         alt="logo"
         className="ml-4 h-8 text-start items-start justify-start"
       />
-      <div className="dark:text-secondaryText-dark  justify-center flex flex-col mx-auto mt-10 ">
+      <div className="text-theme-secondaryText  justify-center flex flex-col mx-auto mt-10 ">
         <h2>{message}</h2>
         <div
-          className={`py-2 mt-4 px-3 cursor-pointer mx-auto dark:text-secondaryText-dark dark:bg-buttonEnable-dark w-max
+          className={`py-2 mt-4 px-3 cursor-pointer mx-auto text-theme-primaryBackground bg-theme-secondaryText w-max
                  
                    rounded-lg text-xs sm:text-sm font-inter`}
           onClick={() => navigate("/")}

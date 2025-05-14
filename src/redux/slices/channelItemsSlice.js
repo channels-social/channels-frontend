@@ -77,6 +77,23 @@ export const fetchMyChannels = createAsyncThunk(
     }
   }
 );
+export const fetchChannels = createAsyncThunk(
+  "channel/fetch-channels",
+  async (username, { rejectWithValue }) => {
+    try {
+      const response = await postRequestUnAuthenticated("/fetch/channels", {
+        username,
+      });
+      if (response.success) {
+        return response.channels;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 export const fetchEmbedChannels = createAsyncThunk(
   "channel/fetch-embed-channels",
   async (data, { rejectWithValue }) => {
@@ -225,7 +242,14 @@ const channelItemsSlice = createSlice({
       .addCase(fetchMyChannels.pending, (state) => {
         state.loading = true;
       })
+      .addCase(fetchChannels.pending, (state) => {
+        state.loading = true;
+      })
       .addCase(fetchMyChannels.fulfilled, (state, action) => {
+        state.loading = false;
+        state.channels = action.payload;
+      })
+      .addCase(fetchChannels.fulfilled, (state, action) => {
         state.loading = false;
         state.channels = action.payload;
       })

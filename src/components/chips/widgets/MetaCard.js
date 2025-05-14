@@ -10,14 +10,16 @@ const MetaCard = ({ title, description, imageUrl, link }) => {
     event.target.src = fallbackImage; // Set fallback image if the main image fails to load
   };
   return (
-    <div className="max-w-md bg-dark rounded-xl shadow-md overflow-hidden mr-4 ">
+    <div className="max-w-md bg rounded-xl border border-theme-chatDivider overflow-hidden mr-4 p-1">
       <a href={link} className="block">
         <div className="px-1.5 py-1.5">
-          <div className="text-sm font-normal font-inter dark:text-buttonEnable-dark">
+          <div className="text-sm font-normal font-inter text-theme-buttonEnable">
             {title}
           </div>
-          <p className="mt-1 dark:text-primaryText-dark text-xs font-normal font-inter">
-            {description}
+          <p className="mt-1 text-theme-primaryText text-xs font-normal font-inter">
+            {description.length > 100
+              ? `${description.slice(0, 100)}...`
+              : description}
           </p>
         </div>
         <div className="px-1 py-1">

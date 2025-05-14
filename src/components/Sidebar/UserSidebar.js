@@ -2,8 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useLocation, Link, useParams, useNavigate } from "react-router-dom";
 import ArrowUp from "../../assets/icons/up-arrow.svg";
 import Logo from "../../assets/icons/logo.svg";
+import DarkLogo from "../../assets/lightIcons/logo_light.svg";
 import Add from "../../assets/icons/add_btn.svg";
+import DarkAdd from "../../assets/lightIcons/create_channel_light.svg";
 import ArrowDown from "../../assets/icons/arrow_drop_down.svg";
+import ArrowDownLight from "../../assets/lightIcons/arrow_drop_down_light.svg";
+import ArrowUpLight from "../../assets/lightIcons/arrow_drop_up_light.svg";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchMyChannels,
@@ -17,11 +21,14 @@ import useModal from "./../hooks/ModalHook";
 import Close from "../../assets/icons/Close.svg";
 import SidebarSkeleton from "./../skeleton/SidebarSkeleton";
 import { domainUrl } from "./../../utils/globals";
+import { postRequestAuthenticated } from "./../../services/rest";
+import ThemeToggleButton from "./../../utils/theme";
 
 const UserSidebar = ({ closeSidebar }) => {
   const location = useLocation();
   const { handleOpenModal } = useModal();
   const navigate = useNavigate();
+  const [isDashboard, setIsDashboard] = useState(false);
 
   const dispatch = useDispatch();
   const [expandedChannels, setExpandedChannels] = useState({});
@@ -80,6 +87,22 @@ const UserSidebar = ({ closeSidebar }) => {
   }, [dispatch, channelId, channels.length]);
 
   useEffect(() => {
+    const checkInitialKey = async () => {
+      try {
+        const response = await postRequestAuthenticated(
+          "/check/api/key/generated"
+        );
+        if (response.success) {
+          setIsDashboard(true);
+        } else {
+        }
+      } catch (error) {}
+    };
+
+    checkInitialKey();
+  }, []);
+
+  useEffect(() => {
     dispatch(fetchCommunityChannel());
   }, [dispatch]);
 
@@ -90,6 +113,14 @@ const UserSidebar = ({ closeSidebar }) => {
 
   const handleFeedbackModal = () => {
     handleOpenModal("modalFeedbackOpen");
+  };
+
+  const handleAdminNavigation = () => {
+    if (isDashboard) {
+      navigate(`/admin/${myData.username}/home`);
+    } else {
+      navigate(`/api/integration/channels`);
+    }
   };
 
   const handleLogin = () => {
@@ -108,7 +139,7 @@ const UserSidebar = ({ closeSidebar }) => {
 
   if (error) return <p>Error loading channels: {error}</p>;
   return (
-    <div className="flex flex-col justify-between h-screen w-full overflow-y-auto custom-side-scrollbar">
+    <div className="flex flex-col justify-between h-screen w-full overflow-y-auto custom-side-scrollbar ">
       <div>
         <div className="w-full sm:hidden flex justify-end">
           <img
@@ -123,7 +154,12 @@ const UserSidebar = ({ closeSidebar }) => {
           <img
             src={Logo}
             alt="logo"
-            className="cursor-pointer  w-9 h-9   rounded-sm object-contain"
+            className="dark:block hidden cursor-pointer  w-9 h-9   rounded-sm object-contain"
+          />
+          <img
+            src={DarkLogo}
+            alt="logo"
+            className="dark:hidden cursor-pointer  w-9 h-9   rounded-sm object-contain"
           />
           {/* {myData.logo ? (
             <img
@@ -141,8 +177,8 @@ const UserSidebar = ({ closeSidebar }) => {
             to={`/user/${myData.username}/welcome`}
             className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6 ${
               location.pathname === `/user/${myData.username}/welcome`
-                ? "dark:text-secondaryText-dark dark:bg-tertiaryBackground-dark rounded-lg mx-3"
-                : "dark:text-primaryText-dark"
+                ? "text-theme-secondaryText bg-theme-sidebarHighlight rounded-lg mx-3"
+                : "text-theme-primaryText"
             }`}
             onClick={closeSidebar}
           >
@@ -150,7 +186,26 @@ const UserSidebar = ({ closeSidebar }) => {
           </Link>
 
           {isLoggedIn && (
-            <div className="border border-[1] dark:border-tertiaryBackground-dark my-2"></div>
+            <div className="border-t  border-t-theme-sidebarDivider my-2"></div>
+          )}
+
+          {isLoggedIn && (
+            <Link
+              to={`/user/${myData.username}/messages/list`}
+              className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6 ${
+                location.pathname.startsWith(
+                  `/user/${myData?.username}/messages/list`
+                )
+                  ? "text-theme-secondaryText bg-theme-sidebarHighlight rounded-lg mx-3"
+                  : "text-theme-primaryText"
+              }`}
+              onClick={closeSidebar}
+            >
+              DMs
+            </Link>
+          )}
+          {isLoggedIn && (
+            <div className="border-t  border-t-theme-sidebarDivider my-2"></div>
           )}
 
           {isLoggedIn && (
@@ -158,8 +213,8 @@ const UserSidebar = ({ closeSidebar }) => {
               to={`/user/${myData.username}/profile`}
               className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6 ${
                 location.pathname === `/user/${myData?.username}/profile`
-                  ? "dark:text-secondaryText-dark dark:bg-tertiaryBackground-dark rounded-lg mx-3"
-                  : "dark:text-primaryText-dark"
+                  ? "text-theme-secondaryText bg-theme-sidebarHighlight rounded-lg mx-3"
+                  : "text-theme-primaryText"
               }`}
               onClick={closeSidebar}
             >
@@ -169,19 +224,19 @@ const UserSidebar = ({ closeSidebar }) => {
 
           {channels.map((channel, channelIndex) => (
             <div key={channel._id} className="flex flex-col">
-              <div className="border border-[1] dark:border-tertiaryBackground-dark my-2"></div>
+              <div className="border-t  border-t-theme-sidebarDivider my-2"></div>
               <div
                 className={`flex flex-row justify-between px-6 mb-1 items-center cursor-pointer
               ${
                 location.pathname ===
                 `/user/${channel?.user?.username}/channel/${channel._id}`
-                  ? "dark:text-secondaryText-dark dark:bg-tertiaryBackground-dark rounded-lg mx-3 py-1"
-                  : "dark:text-primaryText-dark"
+                  ? "text-theme-secondaryText bg-theme-sidebarHighlight rounded-lg mx-3 py-1"
+                  : "text-theme-primaryText"
               } 
                 `}
               >
                 <p
-                  className="text-sm font-normal font-inter dark:text-primaryText-dark"
+                  className="text-sm font-normal font-inter text-theme-primaryText"
                   onClick={() =>
                     toggleChannel(channel._id, channel.user.username)
                   }
@@ -194,7 +249,19 @@ const UserSidebar = ({ closeSidebar }) => {
                   alt={
                     expandedChannels[channel._id] ? "up-arrow" : "down-arrow"
                   }
-                  className="h-7 w-7"
+                  className="dark:block hidden h-7 w-7"
+                />
+                <img
+                  src={
+                    expandedChannels[channel._id]
+                      ? ArrowUpLight
+                      : ArrowDownLight
+                  }
+                  onClick={() => toggleChannelExpanded(channel._id)}
+                  alt={
+                    expandedChannels[channel._id] ? "up-arrow" : "down-arrow"
+                  }
+                  className="dark:hidden h-7 w-7"
                 />
               </div>
               {expandedChannels[channel._id] && (
@@ -209,9 +276,9 @@ const UserSidebar = ({ closeSidebar }) => {
                             className={`block ${
                               location.pathname ===
                               `/user/${channel.user.username}/channel/${channel._id}/c-id/topic/${topic._id}`
-                                ? "dark:bg-tertiaryBackground-dark rounded-lg mx-3 my-1"
+                                ? "bg-theme-sidebarHighlight rounded-lg mx-3 my-1"
                                 : ""
-                            } px-6 py-2.5 text-sm font-inter font-light cursor-pointer dark:text-primaryText-dark`}
+                            } px-6 py-2.5 text-sm font-inter font-light cursor-pointer text-theme-primaryText`}
                             onClick={closeSidebar}
                           >
                             # {topic.name}
@@ -224,8 +291,8 @@ const UserSidebar = ({ closeSidebar }) => {
                       className="flex flex-row items-center w-max mx-6 my-1.5 cursor-pointer  "
                       onClick={() => handleTopicModal(channel._id)}
                     >
-                      <p className="dark:text-primaryText-dark text-md">+</p>
-                      <p className="text-sm font-normal font-inter ml-2 dark:text-primaryText-dark ">
+                      <p className="text-theme-primaryText text-md">+</p>
+                      <p className="text-sm font-normal font-inter ml-2 text-theme-primaryText ">
                         Add a topic
                       </p>
                     </div>
@@ -234,15 +301,24 @@ const UserSidebar = ({ closeSidebar }) => {
               )}
             </div>
           ))}
-          <div className="border border-[1] dark:border-tertiaryBackground-dark my-2"></div>
+          <div className="border-t  border-t-theme-sidebarDivider my-2"></div>
 
           {isLoggedIn && (
             <div
               className="flex items-center px-6 py-2 mb-2 cursor-pointer rounded-lg "
               onClick={handleChannelModal}
             >
-              <img src={Add} alt="Add Channel" className="w-6" />
-              <p className="text-sm font-normal font-inter dark:text-primaryText-dark pl-2">
+              <img
+                src={Add}
+                alt="Add Channel"
+                className="w-6 dark:block hidden"
+              />
+              <img
+                src={DarkAdd}
+                alt="Add Channel"
+                className="w-6 dark:hidden"
+              />
+              <p className="text-sm font-normal font-inter text-theme-primaryText pl-2">
                 Create a new channel
               </p>
             </div>
@@ -250,17 +326,33 @@ const UserSidebar = ({ closeSidebar }) => {
         </nav>
       </div>
       <div className="mb-2 mt-2">
+        {isLoggedIn && (
+          <div
+            className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6 text-theme-primaryText`}
+            onClick={handleAdminNavigation}
+          >
+            {isDashboard ? "Dashboard" : "Integrate Channels"}
+          </div>
+        )}
+        <div className="border-t  border-t-theme-sidebarDivider my-2"></div>
         <div
+          className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6 text-theme-primaryText`}
+          onClick={() => navigate("/documentation/channels")}
+        >
+          Documentation
+        </div>
+        {/* <div className="border-t  border-t-theme-sidebarDivider my-2"></div> */}
+        {/* <div
           className={`flex flex-row justify-between pl-6 pr-4 mb-1 items-center cursor-pointer  ${
             location.pathname ===
             `/user/${communityChannel?.user?.username}/channel/${communityChannel?._id}`
-              ? "dark:text-secondaryText-dark dark:bg-tertiaryBackground-dark rounded-lg mx-3 "
-              : "dark:text-primaryText-dark"
+              ? "text-theme-secondaryText bg-theme-sidebarHighlight rounded-lg mx-3 "
+              : "text-theme-primaryText"
           } `}
-        >
-          <Link
+        > */}
+        {/* <Link
             to={`/user/${communityChannel?.user?.username}/channel/${communityChannel?._id}`}
-            className={`block py-2.5 text-sm font-inter font-light cursor-pointer dark:text-primaryText-dark `}
+            className={`block py-2.5 text-sm font-inter font-light cursor-pointer text-theme-primaryText `}
             onClick={closeSidebar}
           >
             Channels Community
@@ -269,9 +361,15 @@ const UserSidebar = ({ closeSidebar }) => {
             src={expandedCommunityChannel ? ArrowUp : ArrowDown}
             onClick={handleCommunityExpansion}
             alt={expandedCommunityChannel ? "up-arrow" : "down-arrow"}
-            className="h-7 w-7"
+            className="dark:block hidden h-7 w-7"
           />
-        </div>
+          <img
+            src={expandedCommunityChannel ? ArrowUpLight : ArrowDownLight}
+            onClick={handleCommunityExpansion}
+            alt={expandedCommunityChannel ? "up-arrow" : "down-arrow"}
+            className="dark:hidden h-7 w-7"
+          /> */}
+        {/* </div> */}
         <div>
           {expandedCommunityChannel &&
             communityChannel?.topics?.map((topic, topicIndex) => (
@@ -281,37 +379,38 @@ const UserSidebar = ({ closeSidebar }) => {
                   className={`block ${
                     location.pathname ===
                     `/user/${communityChannel?.user?.username}/channel/${communityChannel._id}/c-id/topic/${topic._id}`
-                      ? "dark:bg-tertiaryBackground-dark rounded-lg mx-3 my-1"
+                      ? "bg-theme-sidebarHighlight rounded-lg mx-3 my-1"
                       : ""
-                  } px-6 py-2.5 text-sm font-inter font-light cursor-pointer dark:text-primaryText-dark`}
+                  } px-6 py-2.5 text-sm font-inter font-light cursor-pointer text-theme-primaryText`}
                 >
                   # {topic.name}
                 </Link>
               </div>
             ))}
         </div>
-        <div className="border border-[1] dark:border-tertiaryBackground-dark my-2"></div>
-
-        <div
-          className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6 dark:text-primaryText-dark`}
+        <div className="border-t  border-t-theme-sidebarDivider my-2"></div>
+        {/* <div
+          className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6 text-theme-primaryText`}
           onClick={handleFeedbackModal}
         >
           Feedback
+        </div> */}
+        <div className="px-4">
+          <ThemeToggleButton />
         </div>
-        <div className="border border-[1] dark:border-tertiaryBackground-dark my-2"></div>
+        <div className="border-t  border-t-theme-sidebarDivider my-2"></div>
         <a
           href="https://calendly.com/channels_social/talk-to-us"
           target="_blank"
           rel="noopener noreferrer"
-          className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6 dark:text-primaryText-dark`}
+          className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6 text-theme-primaryText`}
         >
           Help
         </a>
-
-        <div className="border border-[1] dark:border-tertiaryBackground-dark my-2"></div>
+        <div className="border-t  border-t-theme-sidebarDivider my-2"></div>
         {isLoggedIn && (
           <p
-            className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6 dark:text-primaryText-dark`}
+            className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6 text-theme-primaryText`}
             onClick={handleLogout}
           >
             Logout
@@ -320,7 +419,7 @@ const UserSidebar = ({ closeSidebar }) => {
         {!isLoggedIn && (
           <p
             onClick={handleLogin}
-            className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6  dark:text-primaryText-dark`}
+            className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6  text-theme-primaryText`}
           >
             Login
           </p>

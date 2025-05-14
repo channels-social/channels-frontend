@@ -15,11 +15,36 @@ import {
 
 export const fetchTopicChats = createAsyncThunk(
   "channelChat/fetchChats",
-  async (topicId, { rejectWithValue }) => {
+  async ({ topicId, limit = 15, skip = 0 }, { rejectWithValue }) => {
     try {
       const response = await postRequestUnAuthenticated("/fetch/topic/chats", {
-        topicId: topicId,
+        topicId,
+        limit,
+        skip,
       });
+      if (response.success) {
+        return {
+          chats: response.chats,
+          hasMore: response.hasMore,
+          skip,
+        };
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const fetchBrandChats = createAsyncThunk(
+  "channelChat/fetchBrandChats",
+  async (domain, { rejectWithValue }) => {
+    try {
+      const response = await postRequestAuthenticated("/fetch/brand/chats", {
+        domain: domain,
+      });
+      console.log(response);
       if (response.success) {
         return response.chats;
       } else {
@@ -38,6 +63,26 @@ export const createTopicChat = createAsyncThunk(
         "/create/channel/chat",
         data
       );
+      console.log(response);
+      if (response.success) {
+        return response.chat;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+export const createBrandChat = createAsyncThunk(
+  "channelChat/createbrandChat",
+  async (data, { rejectWithValue }) => {
+    try {
+      const response = await postRequestAuthenticatedWithFile(
+        "/create/brand/chat",
+        data
+      );
+      console.log(response);
       if (response.success) {
         return response.chat;
       } else {
@@ -192,6 +237,7 @@ export const chatSlice = createSlice({
   name: "chatSlice ",
   initialState: {
     chats: [],
+    brandChats: [],
     chatStatus: "idle",
     chatError: null,
     isScroll: true,
@@ -209,6 +255,8 @@ export const chatSlice = createSlice({
     chatReplyId: "",
     topicReplyId: "",
     loading: false,
+    loadingMore: false,
+    brandLoading: false,
   },
   reducers: {
     setChatField: (state, action) => {
@@ -248,15 +296,39 @@ export const chatSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchTopicChats.pending, (state) => {
-        state.loading = true;
+      .addCase(fetchTopicChats.pending, (state, action) => {
+        const { skip } = action.meta.arg;
+        if (skip === 0) {
+          state.loading = true;
+        } else {
+          state.loadingMore = true;
+        }
       })
       .addCase(fetchTopicChats.fulfilled, (state, action) => {
-        state.loading = false;
-        state.chats = action.payload;
+        const { chats, skip } = action.payload;
+
+        if (skip === 0) {
+          state.chats = chats;
+          state.loading = false;
+        } else {
+          state.chats = [...state.chats, ...chats];
+          state.loadingMore = false;
+        }
       })
       .addCase(fetchTopicChats.rejected, (state, action) => {
         state.loading = false;
+        state.loadingMore = false;
+        state.chatError = action.payload || action.error.message;
+      })
+      .addCase(fetchBrandChats.pending, (state) => {
+        state.brandLoading = true;
+      })
+      .addCase(fetchBrandChats.fulfilled, (state, action) => {
+        state.brandLoading = false;
+        state.brandChats = action.payload;
+      })
+      .addCase(fetchBrandChats.rejected, (state, action) => {
+        state.brandLoading = false;
         state.chatError = action.payload || action.error.message;
       })
       .addCase(pushToResource.pending, (state) => {
@@ -328,6 +400,17 @@ export const chatSlice = createSlice({
         state.chats.push(action.payload);
       })
       .addCase(createTopicChat.rejected, (state, action) => {
+        state.chatStatus = "idle";
+        state.chatError = action.payload || action.error.message;
+      })
+      .addCase(createBrandChat.pending, (state) => {
+        state.chatStatus = "loading";
+      })
+      .addCase(createBrandChat.fulfilled, (state, action) => {
+        state.chatStatus = "idle";
+        state.brandChats.push(action.payload);
+      })
+      .addCase(createBrandChat.rejected, (state, action) => {
         state.chatStatus = "idle";
         state.chatError = action.payload || action.error.message;
       })

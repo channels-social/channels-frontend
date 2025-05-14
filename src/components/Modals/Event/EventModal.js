@@ -2,9 +2,11 @@ import React, { useState, useRef, useEffect } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import Close from "../../../assets/icons/Close.svg";
 import Upload from "../../../assets/icons/Upload.svg";
+import UploadLight from "../../../assets/lightIcons/upload_light.svg";
 import useModal from "./../../hooks/ModalHook";
 import { closeModal } from "../../../redux/slices/modalSlice";
 import Unsplash from "../../../assets/icons/Unsplash.svg";
+import UnsplashLight from "../../../assets/lightIcons/unsplash_light.svg";
 
 import "react-datepicker/dist/react-datepicker.css";
 import LocationIcon from "../../../assets/icons/location-marker.svg";
@@ -21,6 +23,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import MyTimePicker from "./../widgets/TimePicker";
 import Event from "../../../assets/icons/calendar.svg";
+import EventLight from "../../../assets/lightIcons/calendar_light.svg";
 import { postRequestUnAuthenticated } from "./../../../services/rest";
 import { getAddressFromCoords } from "../../../utils/methods";
 import EventTimePicker from "./../widgets/EventTimePicker";
@@ -233,6 +236,16 @@ const EventModal = () => {
     dispatch(setEventField({ field: "cover_image_source", value: "" }));
     setFile(null);
   };
+
+  const handletoggleChange = (value) => {
+    if (value === "online") {
+      dispatch(setEventField({ field: "location", value: "" }));
+      dispatch(setEventField({ field: "locationText", value: "" }));
+    } else if (value === "offline") {
+      dispatch(setEventField({ field: "meet_url", value: "" }));
+    }
+    dispatch(setEventField({ field: "type", value: value }));
+  };
   const handleTimeZoneChange = (e) => {
     dispatch(setEventField({ field: "timezone", value: e.target.value }));
     setTimeZone(e.target.value);
@@ -247,6 +260,8 @@ const EventModal = () => {
       formDataToSend.append("topic", event.topic);
       formDataToSend.append("joining", event.joining);
       formDataToSend.append("description", event.description);
+      formDataToSend.append("type", event.type);
+      formDataToSend.append("meet_url", event.meet_url);
       formDataToSend.append("startDate", event.startDate);
       formDataToSend.append("endDate", event.endDate);
       formDataToSend.append("startTime", event.startTime);
@@ -282,6 +297,8 @@ const EventModal = () => {
       formDataToSend.append("topic", event.topic);
       formDataToSend.append("joining", event.joining);
       formDataToSend.append("description", event.description);
+      formDataToSend.append("type", event.type);
+      formDataToSend.append("meet_url", event.meet_url);
       formDataToSend.append("startDate", event.startDate);
       formDataToSend.append("endDate", event.endDate);
       formDataToSend.append("startTime", event.startTime);
@@ -315,8 +332,8 @@ const EventModal = () => {
   const isEventEmpty = event.name.trim() === "" || event.startDate === "";
 
   const buttonClass = isEventEmpty
-    ? "dark:text-buttonDisable-dark dark:text-opacity-40 dark:bg-buttonDisable-dark dark:bg-opacity-10"
-    : "dark:bg-secondaryText-dark dark:text-primaryBackground-dark";
+    ? "text-theme-buttonDisableText text-theme-opacity-40 bg-theme-buttonDisable bg-theme-opacity-10"
+    : "bg-theme-secondaryText text-theme-primaryBackground";
   const isOpen = useSelector((state) => state.modals.modalEventOpen);
 
   const ReadOnlyDateInput = React.forwardRef(
@@ -327,9 +344,9 @@ const EventModal = () => {
         onClick={onClick}
         ref={ref}
         placeholder={placeholder}
-        className="w-full py-1 text-sm pr-10 font-light rounded dark:bg-transparent
-       border-b border-b-chatDivider-dark placeholder-font-light placeholder-text-sm 
-       dark:text-secondaryText-dark focus:outline-none placeholder:text-emptyEvent-dark"
+        className="w-full py-1 text-sm pr-10 font-light rounded bg-transparent
+       border-b border-theme-chatDivider placeholder-font-light placeholder-text-sm 
+       text-theme-secondaryText focus:outline-none placeholder:text-emptyEvent"
       />
     )
   );
@@ -340,14 +357,14 @@ const EventModal = () => {
         <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-70 z-50" />
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <Dialog.Content
-            className="dark:bg-secondaryBackground-dark rounded-xl overflow-hidden z-50
+            className="bg-theme-secondaryBackground rounded-xl overflow-hidden z-50
            shadow-xl transform transition-all min-h-[20%] max-h-[90%] overflow-y-auto custom-scrollbar w-[90%]
             xs:w-3/4 sm:w-1/2 md:w-2/5 lg:w-[35%] xl:w-[30%]"
           >
             <Dialog.Title />
             <div className="flex flex-col p-5">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="dark:text-secondaryText-dark text-lg font-normal fonr-inter">
+                <h2 className="text-theme-secondaryText text-lg font-normal fonr-inter">
                   {event.type === "edit" ? "Edit Event" : "New Event"}
                 </h2>
                 <img
@@ -358,15 +375,15 @@ const EventModal = () => {
                 />
               </div>
               <div className="mb-4">
-                <p className="dark:text-secondaryText-dark text-sm font-light font-inter mb-1">
+                <p className="text-theme-secondaryText text-sm font-light font-inter mb-1">
                   Name
                 </p>
                 <input
                   id="curation-name"
                   className="w-full  p-0.5 rounded bg-chipBackground 
                    placeholder:font-light placeholder:text-sm text-md font-light
-                   focus:outline-none dark:bg-transparent border-b dark:border-b-chatDivider-dark 
-                    dark:text-secondaryText-dark  placeholder:dark:text-emptyEvent-dark"
+                   focus:outline-none bg-transparent border-b border-theme-chatDivider
+                    text-theme-secondaryText  placeholder:text-theme-emptyEvent"
                   type="text"
                   name="name"
                   value={event.name}
@@ -379,7 +396,7 @@ const EventModal = () => {
 
               <div className="mb-4">
                 <div className="flex flex-row justify-between items-center w-full">
-                  <p className="dark:text-secondaryText-dark text-sm font-light font-inter mb-1 w-1/2">
+                  <p className="text-theme-secondaryText text-sm font-light font-inter mb-1 w-1/2">
                     Date & time
                   </p>
                   <select
@@ -387,14 +404,14 @@ const EventModal = () => {
                     value={timeZone}
                     onChange={handleTimeZoneChange}
                     className="focus:outline-none py-1 cursor-pointer w-[120px]
-                     dark:bg-transparent dark:text-emptyEvent-dark font-normal text-sm"
+                     bg-transparent text-theme-emptyEvent font-normal text-sm"
                   >
                     {moment.tz.names().map((zone) => (
                       <option
                         key={zone}
                         value={zone}
-                        className="dark:bg-tertiaryBackground-dark dark:text-primaryText-dark
-                         hover:bg-primaryBackground-dark focus:bg-primaryBackground-dark"
+                        className="bg-theme-tertiaryBackground text-theme-primaryText
+                         hover:bg-primaryBackground focus:bg-primaryBackground"
                       >
                         {zone}
                       </option>
@@ -415,7 +432,13 @@ const EventModal = () => {
                       src={Event}
                       alt="event"
                       style={{ position: "absolute", top: "0", right: "0" }}
-                      className-="w-5 h-5 "
+                      className-="dark:block hidden w-5 h-5 "
+                    />
+                    <img
+                      src={EventLight}
+                      alt="event"
+                      style={{ position: "absolute", top: "0", right: "0" }}
+                      className-="dark:hidden w-5 h-5 "
                     />
                   </div>
                   <div className="relative w-[45%]">
@@ -431,7 +454,13 @@ const EventModal = () => {
                       src={Event}
                       alt="event"
                       style={{ position: "absolute", top: "0", right: "0" }}
-                      className-="w-5 h-5 "
+                      className-="dark:block hidden w-5 h-5 "
+                    />
+                    <img
+                      src={EventLight}
+                      alt="event"
+                      style={{ position: "absolute", top: "0", right: "0" }}
+                      className-="dark:hidden w-5 h-5 "
                     />
                   </div>
                 </div>
@@ -443,22 +472,70 @@ const EventModal = () => {
                 handleEndTimeChange={handleEndTimeChange}
               />
 
-              <div className="relative mt-4">
-                <p className="dark:text-secondaryText-dark text-sm font-light font-inter mb-0.5">
-                  Location
+              <div className="mt-4">
+                <p className="text-theme-secondaryText text-sm font-light font-inter mb-1">
+                  Event type
                 </p>
-                <input
-                  className="w-full py-1 mr-3 text-sm mt-1 pr-3 font-light rounded no-scrollbar dark:bg-transparent
-                        border-b dark:border-b-chatDivider-dark placeholder-font-light placeholder-text-sm dark:text-secondaryText-dark
-                        focus:outline-none placeholder:dark:text-emptyEvent-dark resize-none"
-                  placeholder="Enter location"
-                  name="location"
-                  ref={locationRef}
-                  onFocus={() => setLocationFocus(true)}
-                  onChange={handleInputChange}
-                  value={event.locationText}
-                  autoComplete="off"
-                />
+                <div className="flex mt-3 items-center border border-theme-chatDivider rounded-md overflow-hidden w-max">
+                  <button
+                    type="button"
+                    onClick={() => handletoggleChange("offline")}
+                    className={`px-6 py-2 text-sm font-inter font-light transition-colors duration-200 ${
+                      event.type === "offline"
+                        ? "bg-theme-secondaryText text-theme-primaryBackground"
+                        : "bg-transparent text-theme-secondaryText"
+                    }`}
+                  >
+                    Offline
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handletoggleChange("online")}
+                    className={`px-6 py-2 text-sm font-inter font-light transition-colors duration-200 ${
+                      event.type === "online"
+                        ? "bg-theme-secondaryText text-theme-primaryBackground"
+                        : "bg-transparent text-theme-secondaryText"
+                    }`}
+                  >
+                    Online
+                  </button>
+                </div>
+              </div>
+
+              <div className="relative mt-4">
+                {
+                  <p className="text-theme-secondaryText text-sm font-light font-inter mb-0.5">
+                    {event.type === "offline"
+                      ? "Location"
+                      : "Virtual event link"}
+                  </p>
+                }
+                {event.type === "offline" && (
+                  <input
+                    className="w-full py-1 mr-3 text-sm mt-1 pr-3 font-light rounded no-scrollbar bg-transparent
+                        border-b border-theme-chatDivider placeholder-font-light placeholder-text-sm text-theme-secondaryText
+                        focus:outline-none placeholder:text-theme-emptyEvent resize-none"
+                    placeholder="Enter location"
+                    name="location"
+                    ref={locationRef}
+                    onFocus={() => setLocationFocus(true)}
+                    onChange={handleInputChange}
+                    value={event.locationText}
+                    autoComplete="off"
+                  />
+                )}
+                {event.type === "online" && (
+                  <input
+                    className="w-full py-1 mr-3 text-sm mt-1 pr-3 font-light rounded no-scrollbar bg-transparent
+                        border-b border-theme-chatDivider placeholder-font-light placeholder-text-sm text-theme-secondaryText
+                        focus:outline-none placeholder:text-theme-emptyEvent resize-none"
+                    placeholder="https://meet.google.com/tnt-sccs.."
+                    name="meet_url"
+                    onChange={handleInputChange}
+                    value={event.meet_url}
+                    autoComplete="off"
+                  />
+                )}
                 {(locationFocus || suggestions.length > 0) && (
                   <img
                     src={Close}
@@ -470,24 +547,24 @@ const EventModal = () => {
                 {locationFocus && (
                   <div
                     ref={dropdownRef}
-                    className="absolute top-14  dark:bg-tertiaryBackground-dark text-white text-xs pr-1 mr-2 rounded-lg  w-[100%] z-50 flex flex-col"
+                    className="absolute top-14  bg-theme-tertiaryBackground text-theme-secondaryText text-xs pr-1 mr-2 rounded-lg  w-[100%] z-50 flex flex-col"
                   >
                     <p
-                      className="dark:text-secondaryText-dark py-2 text-sm font-normal px-2 cursor-pointer"
+                      className="text-theme-secondaryText py-2 text-sm font-normal px-2 cursor-pointer"
                       onClick={getCurrentLocation}
                     >
                       Current location
                     </p>
-                    <div className="border-t dark:border-t-chatDivider-dark pb-1 px-2"></div>
+                    <div className="border-t border-t-theme-chatDivider pb-1 px-2"></div>
                     <ul>
                       {suggestions.map((suggestion, index) => (
                         <div
                           key={index}
-                          className="py-2 px-2 cursor-pointer flex flex-row hover:dark:bg-primaryBackground-dark"
+                          className="py-2 px-2 cursor-pointer flex flex-row hover:bg-theme-primaryBackground text-theme-secondaryText"
                           onClick={() => handleSuggestionClick(suggestion)}
                         >
                           <img
-                            className="text-white w-4 h-4 mr-1"
+                            className="text-theme-secondaryText w-4 h-4 mr-1"
                             alt="location"
                             src={LocationIcon}
                           />
@@ -500,7 +577,7 @@ const EventModal = () => {
               </div>
 
               <div className="relative mb-2 mt-4">
-                <p className="dark:text-secondaryText-dark text-sm font-light font-inter mb-0.5">
+                <p className="text-theme-secondaryText text-sm font-light font-inter mb-0.5">
                   Description
                 </p>
                 <textarea
@@ -513,23 +590,23 @@ const EventModal = () => {
                   ref={inputRef}
                   name="description"
                   maxLength={maxDesc}
-                  className="w-full py-1 mr-3 text-sm mt-1 pr-3 font-light rounded no-scrollbar dark:bg-transparent
-                  border-b dark:border-b-chatDivider-dark placeholder-font-light placeholder-text-sm dark:text-secondaryText-dark
-                  focus:outline-none placeholder:dark:text-emptyEvent-dark resize-none"
+                  className="w-full py-1 mr-3 text-sm mt-1 pr-3 font-light rounded no-scrollbar bg-transparent
+                  border-b border-theme-chatDivider placeholder-font-light placeholder-text-sm text-theme-secondaryText
+                  focus:outline-none placeholder:text-theme-emptyEvent resize-none"
                   rows="1"
                   placeholder="Add a Description (optional)"
                 />
               </div>
               <div className="mb-4 mt-1">
-                <p className="dark:text-secondaryText-dark text-sm font-light font-inter">
+                <p className="text-theme-secondaryText text-sm font-light font-inter mb-1">
                   Who can join this event?
                 </p>
-                <div className="flex mt-3 items-center space-x-6">
+                <div className="flex mt-3 items-center space-x-12">
                   <label
                     className={`${
                       event.joining === "public"
-                        ? "dark:text-secondaryText-dark"
-                        : "dark:text-primaryText-dark"
+                        ? "text-theme-secondaryText"
+                        : "text-theme-primaryText"
                     } text-sm font-light flex items-center`}
                   >
                     <input
@@ -545,8 +622,8 @@ const EventModal = () => {
                   <label
                     className={`${
                       event.joining === "private"
-                        ? "dark:text-secondaryText-dark"
-                        : "dark:text-primaryText-dark"
+                        ? "text-theme-secondaryText"
+                        : "text-theme-primaryText"
                     } text-sm font-light flex items-center`}
                   >
                     <input
@@ -563,19 +640,24 @@ const EventModal = () => {
               </div>
 
               <div className="mb-4">
-                <p className="dark:text-white text-sm font-light font-inter">
+                <p className="text-theme-secondaryText text-sm font-light font-inter">
                   Add cover image to this event
                 </p>
                 {!event.cover_image && (
                   <div className="flex flex-row mt-3">
-                    <div className="relative border dark:border-chatDivider-dark w-1/2 px-2 py-4 rounded-xl cursor-pointer">
-                      <div className="flex flex-col items-center justify-center">
+                    <div className="relative border border-theme-chatDivider w-1/2 px-2 py-4 rounded-xl cursor-pointer">
+                      <div className="flex flex-col mt-0.5 items-center justify-center">
                         <img
                           src={Upload}
                           alt="Upload"
-                          className="w-5 h-5 mb-2"
+                          className="dark:block hidden w-5 h-5 mb-2"
                         />
-                        <p className="dark:text-secondaryText-dark text-xs font-light font-inter">
+                        <img
+                          src={UploadLight}
+                          alt="Upload"
+                          className="dark:hidden w-4 h-4 mb-2"
+                        />
+                        <p className="text-theme-secondaryText text-xs font-light font-inter">
                           Upload image
                         </p>
                         <input
@@ -587,16 +669,21 @@ const EventModal = () => {
                       </div>
                     </div>
                     <div
-                      className="w-1/2 py-4 px-1 border xs:px-2 rounded-xl ml-4 cursor-pointer dark:border-chatDivider-dark"
+                      className="w-1/2 py-4 px-1 border xs:px-2 rounded-xl ml-4 cursor-pointer border-theme-chatDivider"
                       onClick={handleUnsplashModal}
                     >
                       <div className="flex flex-col items-center">
                         <img
                           src={Unsplash}
                           alt="Unsplash"
-                          className="w-5 h-5 mb-2"
+                          className="dark:block hidden w-5 h-5 mb-2"
                         />
-                        <p className="dark:text-secondaryText-dark text-xs text-center font-light font-inter">
+                        <img
+                          src={UnsplashLight}
+                          alt="Unsplash"
+                          className="dark:hidden w-5 h-5 mb-2"
+                        />
+                        <p className="text-theme-secondaryText text-xs text-center font-light font-inter">
                           Select from Unsplash
                         </p>
                       </div>
@@ -610,7 +697,7 @@ const EventModal = () => {
                       alt="channel-image"
                       className="w-44 h-36 object-cover rounded-xl "
                     />
-                    <div className="absolute right-0 top-0 bg-dark rounded-full w-6 h-6 flex justify-center items-center border">
+                    <div className="absolute right-0 top-0 bg rounded-full w-6 h-6 flex justify-center items-center border">
                       <img
                         src={Close}
                         alt="close"

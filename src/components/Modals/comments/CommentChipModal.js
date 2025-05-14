@@ -103,7 +103,7 @@ const CommentChipModal = () => {
         />
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <Dialog.Content
-            className={`dark:bg-tertiaryBackground-dark rounded-xl  overflow-hidden shadow-xl  h-4/5 transform transition-all w-[90%] xs:w-4/5 sm:w-1/2  lg:w-1/3`}
+            className={`bg-theme-tertiaryBackground rounded-xl  overflow-hidden shadow-xl  h-4/5 transform transition-all w-[90%] xs:w-4/5 sm:w-1/2  lg:w-1/3`}
           >
             <Dialog.Title></Dialog.Title>
             <div className="flex flex-col h-full">
@@ -114,7 +114,7 @@ const CommentChipModal = () => {
                 <div className="mt-1"></div>
               </div>
               <div
-                className={`w-[100%] my-4  border dark:border-chatDivider-dark`}
+                className={`w-[100%] my-4  border border-theme-chatDivider`}
                 style={{ height: "1px" }}
               ></div>
               <div
@@ -125,7 +125,7 @@ const CommentChipModal = () => {
               >
                 {status === "loading" ? (
                   <p
-                    className={`text-sm dark:text-primaryText-dark ${
+                    className={`text-sm text-theme-primaryText ${
                       comments.length === 0 ? "mt-4" : "mt-8"
                     } text-center font-light`}
                   >
@@ -133,7 +133,7 @@ const CommentChipModal = () => {
                   </p>
                 ) : comments.length === 0 ? (
                   <p
-                    className={`text-sm dark:text-primaryText-dark ${
+                    className={`text-sm text-theme-primaryText ${
                       comments.length === 0 ? "mt-4" : "mt-8"
                     } text-center font-light`}
                   >
@@ -161,7 +161,7 @@ const CommentChipModal = () => {
                           </span>
                         </p>
                         <div
-                          className="bg-dark p-1 rounded-full cursor-pointer"
+                          className="bg p-1 rounded-full cursor-pointer"
                           onClick={clearReplyData}
                         >
                           <img src={Close} alt="close" className="w-3 h-3 " />
@@ -175,14 +175,14 @@ const CommentChipModal = () => {
                       <div className="relative flex items-center w-full">
                         <FontAwesomeIcon
                           icon={faSmile}
-                          className="absolute left-2 bottom-1  transform -translate-y-1/2 cursor-pointer dark:text-secondaryText-dark w-5 h-5"
+                          className="absolute left-2 bottom-1  transform -translate-y-1/2 cursor-pointer text-theme-secondaryText w-5 h-5"
                           onClick={() => setShowEmojiPicker(!showEmojiPicker)}
                         />
                         <input
                           type="text"
                           placeholder="Add your thoughts.."
                           className="pl-10 pr-3 py-2.5 rounded-3xl border border-dividerLine bg-transparent
-                           text-white placeholder:dark:text-primaryText-dark placeholder:font-light focus:outline-none w-full font-inter font-light"
+                           text-white placeholder:text-theme-primaryText placeholder:font-light focus:outline-none w-full font-inter font-light"
                           style={{ fontSize: "15px" }}
                           value={comment}
                           ref={inputRef}
@@ -206,13 +206,13 @@ const CommentChipModal = () => {
                       <div
                         className={`${
                           comment
-                            ? "dark:bg-secondaryText-dark"
-                            : "dark:bg-chatDivider-dark"
+                            ? "bg-theme-secondaryText"
+                            : "bg-theme-chatDivider"
                         } rounded-3xl px-3 py-2.5 cursor-pointer`}
                         onClick={() => onCreateComment(item._id)}
                       >
                         {addstatus === "loading" ? (
-                          <div className="w-5 h-5 border-2 border-t-transparent dark:border-chatDivider-dark rounded-full animate-spin"></div>
+                          <div className="w-5 h-5 border-2 border-t-transparent border-theme-chatDivider rounded-full animate-spin"></div>
                         ) : (
                           <img
                             src={comment ? UpArrowComment : UpArrow}

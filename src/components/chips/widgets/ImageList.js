@@ -1,10 +1,10 @@
-import React, { useRef, useState } from 'react';
-import { FaPlay, FaArrowLeft, FaArrowRight } from 'react-icons/fa';
-import * as Dialog from '@radix-ui/react-dialog';
-import Close from '../../../assets/icons/Close.svg';
+import React, { useRef, useState } from "react";
+import { FaPlay, FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import * as Dialog from "@radix-ui/react-dialog";
+import Close from "../../../assets/icons/Close.svg";
 import { IoExpand } from "react-icons/io5";
 
-const ImageList = ({ imageCards,isAllExclusive }) => {
+const ImageList = ({ imageCards, isAllExclusive }) => {
   const isSingleImage = imageCards.length === 1;
   const containerRef = useRef(null);
   const isDragging = useRef(false);
@@ -16,8 +16,8 @@ const ImageList = ({ imageCards,isAllExclusive }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const openFullScreen = (images, startIndex) => {
-    const filteredImages = images.filter(card => card.type === 'image');
-    
+    const filteredImages = images.filter((card) => card.type === "image");
+
     // Prevent opening modal if there are no images
     if (filteredImages.length === 0) {
       return;
@@ -36,7 +36,7 @@ const ImageList = ({ imageCards,isAllExclusive }) => {
     isDragging.current = true;
     startX.current = e.pageX - containerRef.current.offsetLeft;
     scrollLeft.current = containerRef.current.scrollLeft;
-    containerRef.current.classList.add('dragging');
+    containerRef.current.classList.add("dragging");
   };
 
   const handleMouseMove = (e) => {
@@ -49,7 +49,7 @@ const ImageList = ({ imageCards,isAllExclusive }) => {
 
   const handleMouseUpOrLeave = () => {
     isDragging.current = false;
-    containerRef.current.classList.remove('dragging');
+    containerRef.current.classList.remove("dragging");
   };
 
   const handleVideoClick = (cardId) => {
@@ -70,53 +70,74 @@ const ImageList = ({ imageCards,isAllExclusive }) => {
 
   return (
     <>
-      <div 
+      <div
         ref={containerRef}
-        className={`flex overflow-x-auto space-x-4  no-scrollbar ${isSingleImage ? 'justify-center mr-4' : ' cursor-grab'}`}
+        className={`flex overflow-x-auto space-x-4  no-scrollbar ${
+          isSingleImage ? "justify-center mr-4" : " cursor-grab"
+        }`}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUpOrLeave}
         onMouseLeave={handleMouseUpOrLeave}
       >
-        {imageCards.map((card, index) => ( (!card.exclusive || isAllExclusive )&& 
-          <div
-            key={card.id}
-            className={`${
-              isSingleImage ? 'w-full' : 'min-w-[210px] max-w-full'
-            } bg-dark rounded-xl shadow-md overflow-hidden object-contain`}
-          >
-            {card.type === 'video' ? (
-              <div className="relative w-full h-52">
-                {activeVideoId === card.id ? (
-                  <video controls className="w-full h-52 object-cover rounded-t-xl">
-                    <source src={card.url} type="video/mp4" />
-                    Your browser does not support the video tag.
-                  </video>
+        {imageCards.map(
+          (card, index) =>
+            (!card.exclusive || isAllExclusive) && (
+              <div
+                key={card.id}
+                className={`${
+                  isSingleImage ? "w-full" : "min-w-[210px] max-w-full"
+                } bg rounded-xl shadow-md overflow-hidden object-contain`}
+              >
+                {card.type === "video" ? (
+                  <div className="relative w-full h-52">
+                    {activeVideoId === card.id ? (
+                      <video
+                        controls
+                        className="w-full h-52 object-cover rounded-t-xl"
+                      >
+                        <source src={card.url} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
+                    ) : (
+                      <div className="w-full h-full relative">
+                        <img
+                          src={card.thumbnail}
+                          alt="video-thumbnail"
+                          className="w-full h-52 object-cover rounded-t-xl"
+                        />
+                        <button
+                          className="absolute inset-0 flex items-center justify-center text-theme-secondaryText text-2xl bg-black bg-opacity-50 rounded-t-xl"
+                          onClick={() => handleVideoClick(card.id)}
+                        >
+                          <FaPlay className="w-10 h-10" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 ) : (
-                  <div className="w-full h-full relative">
-                    <img src={card.thumbnail} alt="video-thumbnail" className="w-full h-52 object-cover rounded-t-xl" />
+                  <div className="relative">
+                    <img
+                      src={card.url}
+                      alt="carousel"
+                      className="w-full h-52 object-cover rounded-t-xl"
+                    />
                     <button
-                      className="absolute inset-0 flex items-center justify-center text-white text-2xl bg-black bg-opacity-50 rounded-t-xl"
-                      onClick={() => handleVideoClick(card.id)}
+                      className="absolute top-1 right-1 text-theme-secondaryText text-xl bg-black bg-opacity-50 p-2 rounded-full"
+                      onClick={() =>
+                        openFullScreen(
+                          imageCards.filter((card) => card.type === "image"),
+                          index
+                        )
+                      }
                     >
-                      <FaPlay className="w-10 h-10" />
+                      <IoExpand />
                     </button>
                   </div>
                 )}
               </div>
-            ) : (
-              <div className="relative">
-                <img src={card.url} alt="carousel" className="w-full h-52 object-cover rounded-t-xl" />
-                <button
-                  className="absolute top-1 right-1 text-white text-xl bg-black bg-opacity-50 p-2 rounded-full"
-                  onClick={() => openFullScreen(imageCards.filter(card => card.type === 'image'), index)}
-                >
-                  <IoExpand />
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
+            )
+        )}
       </div>
 
       <Dialog.Root open={isModalOpen} onOpenChange={closeModal}>
@@ -137,7 +158,7 @@ const ImageList = ({ imageCards,isAllExclusive }) => {
                   <>
                     {currentImageIndex > 0 && (
                       <button
-                        className="absolute left-3 text-white text-2xl bg-black bg-opacity-50 p-2 rounded-full"
+                        className="absolute left-3 text-theme-secondaryText text-2xl bg-black bg-opacity-50 p-2 rounded-full"
                         onClick={handlePreviousImage}
                       >
                         <FaArrowLeft />
@@ -145,7 +166,7 @@ const ImageList = ({ imageCards,isAllExclusive }) => {
                     )}
                     {currentImageIndex < fullScreenImages.length - 1 && (
                       <button
-                        className="absolute right-3 text-white text-2xl bg-black bg-opacity-50 p-2 rounded-full"
+                        className="absolute right-3 text-theme-secondaryText text-2xl bg-black bg-opacity-50 p-2 rounded-full"
                         onClick={handleNextImage}
                       >
                         <FaArrowRight />
@@ -154,10 +175,14 @@ const ImageList = ({ imageCards,isAllExclusive }) => {
                   </>
                 )}
                 <div
-                  className="absolute top-1 right-1 p-2 bg-dark rounded-full text-white text-2xl cursor-pointer"
+                  className="absolute top-1 right-1 p-2 bg rounded-full  text-2xl text-theme-secondaryText cursor-pointer"
                   onClick={closeModal}
                 >
-                  <img src={Close} alt="Close" className="w-6 h-6 cursor-pointer" />
+                  <img
+                    src={Close}
+                    alt="Close"
+                    className="w-6 h-6 cursor-pointer"
+                  />
                 </div>
               </div>
             </Dialog.Content>

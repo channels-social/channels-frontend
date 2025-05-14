@@ -3,6 +3,7 @@ import { useLocation, Link, useParams, useNavigate } from "react-router-dom";
 import ArrowUp from "../../../assets/icons/up-arrow.svg";
 import Logo from "../../../assets/icons/logo.svg";
 import Add from "../../../assets/icons/add_btn.svg";
+import AddLight from "../../../assets/lightIcons/create_channel_light.svg";
 import ArrowDown from "../../../assets/icons/arrow_drop_down.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { setEmbedCredentials } from "../embedSlices/embedAuthSlice";
@@ -114,20 +115,20 @@ const EmbedSidebar = ({ closeSidebar, loading }) => {
         <div className="mt-2">
           {embedHome.channels.map((channel, channelIndex) => (
             <div key={channel._id} className="flex flex-col">
-              <div className="border border-[1] dark:border-tertiaryBackground-dark my-2"></div>
+              <div className="border  border-theme-tertiaryBackground my-2"></div>
               <div
                 className={`flex flex-row justify-between px-6 mb-1 items-center cursor-pointer
                ${
                  location.pathname.includes(
                    `/embed/channels/user/${channel?.user?.username}/channel/${channel._id}`
                  )
-                   ? "dark:text-secondaryText-dark dark:bg-tertiaryBackground-dark rounded-lg mx-3 py-1"
-                   : "dark:text-primaryText-dark"
+                   ? "text-theme-secondaryText bg-theme-tertiaryBackground rounded-lg mx-3 py-1"
+                   : "text-theme-primaryText"
                }
                  `}
               >
                 <p
-                  className="text-sm font-normal font-inter dark:text-primaryText-dark"
+                  className="text-sm font-normal font-inter text-theme-primaryText"
                   onClick={() =>
                     toggleChannel(channel._id, channel.user.username)
                   }
@@ -158,18 +159,18 @@ const EmbedSidebar = ({ closeSidebar, loading }) => {
                             className={`block ${
                               location.pathname ===
                               `/user/${channel.user.username}/channel/${channel._id}/c-id/topic/${topic._id}`
-                                ? "dark:bg-tertiaryBackground-dark rounded-lg mx-3 my-1"
+                                ? "bg-theme-tertiaryBackground rounded-lg mx-3 my-1"
                                 : ""
-                            } px-6 py-2.5 text-sm font-inter font-light cursor-pointer dark:text-primaryText-dark`}
+                            } px-6 py-2.5 text-sm font-inter font-light cursor-pointer text-theme-primaryText`}
                             onClick={closeSidebar}
                           >
                             # {topic.name}
                           </Link>
-                          {topic.unreadCount > 0 && (
-                            <div className="rounded-full w-5 h-5 text-center dark:bg-buttonEnable-dark dark:text-secondaryText-dark text-[10px] pt-0.5">
+                          {/* {topic.unreadCount > 0 && (
+                            <div className="rounded-full w-5 h-5 text-center bg-theme-buttonEnable text-theme-secondaryText text-[10px] pt-0.5">
                               {topic.unreadCount}
                             </div>
-                          )}
+                          )} */}
                         </div>
                       )
                   )}
@@ -178,8 +179,8 @@ const EmbedSidebar = ({ closeSidebar, loading }) => {
                       className="flex flex-row items-center w-max mx-6 my-1.5 cursor-pointer  "
                       onClick={() => handleTopicModal(channel._id)}
                     >
-                      <p className="dark:text-primaryText-dark text-md">+</p>
-                      <p className="text-sm font-normal font-inter ml-2 dark:text-primaryText-dark ">
+                      <p className="text-theme-primaryText text-md">+</p>
+                      <p className="text-sm font-normal font-inter ml-2 text-theme-primaryText ">
                         Add a topic
                       </p>
                     </div>
@@ -188,15 +189,24 @@ const EmbedSidebar = ({ closeSidebar, loading }) => {
               )}
             </div>
           ))}
-          <div className="border border-[1] dark:border-tertiaryBackground-dark my-2"></div>
+          <div className="border  border-theme-tertiaryBackground my-2"></div>
 
           {isLoggedIn && username === myData.username && (
             <div
               className="flex items-center px-6 py-2 mb-2 cursor-pointer rounded-lg "
               onClick={handleChannelModal}
             >
-              <img src={Add} alt="Add Channel" className="w-6" />
-              <p className="text-sm font-normal font-inter dark:text-primaryText-dark pl-2">
+              <img
+                src={Add}
+                alt="Add Channel"
+                className="dark:block hidden w-6"
+              />
+              <img
+                src={AddLight}
+                alt="Add Channel"
+                className="dark:hidden w-6"
+              />
+              <p className="text-sm font-normal font-inter text-theme-primaryText pl-2">
                 Create a new channel
               </p>
             </div>
@@ -206,7 +216,7 @@ const EmbedSidebar = ({ closeSidebar, loading }) => {
       <div className="mb-2 mt-2">
         {isLoggedIn && (
           <p
-            className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6 dark:text-primaryText-dark`}
+            className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6 text-theme-primaryText`}
             onClick={handleLogout}
           >
             Logout
@@ -215,7 +225,7 @@ const EmbedSidebar = ({ closeSidebar, loading }) => {
         {!isLoggedIn && (
           <p
             onClick={handleLogin}
-            className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6  dark:text-primaryText-dark`}
+            className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6  text-theme-primaryText`}
           >
             Login
           </p>

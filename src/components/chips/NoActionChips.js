@@ -33,7 +33,7 @@ const NoActionChips = ({ item }) => {
         {
           <Linkify componentDecorator={componentDecorator}>
             <div className="w-full pr-1 overflow-hidden">
-              <p className="dark:text-secondaryText-dark text-sm font-light font-inter whitespace-pre-wrap break-words">
+              <p className="text-theme-secondaryText text-sm font-light font-inter whitespace-pre-wrap break-words">
                 {isExpanded
                   ? item.text
                   : `${item.text.slice(0, maxLength)}${
@@ -42,7 +42,7 @@ const NoActionChips = ({ item }) => {
                 {item.text.length > maxLength && (
                   <span
                     onClick={toggleReadMore}
-                    className="dark:text-white cursor-pointer ml-1"
+                    className="text-theme-secondaryText cursor-pointer ml-1"
                   >
                     {isExpanded ? "<- Show Less" : "Read More ->"}
                   </span>

@@ -32,10 +32,12 @@ const QueryPage = () => {
 
   return (
     <div className="flex flex-col justify-start items-center w-full">
-      <h2 className="text-white mb-4 text-2xl mt-4">All Queries</h2>
+      <h2 className="text-theme-secondaryText mb-4 text-2xl mt-4">
+        All Queries
+      </h2>
       <div className="mt-5 w-full">
         {queries?.length === 0 ? (
-          <p className="mt-20 dark:text-secondaryText-dark text-xl text-center">
+          <p className="mt-20 text-theme-secondaryText text-xl text-center">
             No Feedbacks yet.
           </p>
         ) : (
@@ -46,13 +48,13 @@ const QueryPage = () => {
                   <div className="flex flex-col justify-start space-y-1 w-4/5">
                     <li
                       key={index}
-                      className="dark:text-primaryText-dark font-light text-xs"
+                      className="text-theme-primaryText font-light text-xs"
                     >
                       {query.email}
                     </li>
                     <li
                       key={index}
-                      className="dark:text-secondaryText-dark font-normal w-full text-sm"
+                      className="text-theme-secondaryText font-normal w-full text-sm"
                     >
                       {query.text}
                     </li>
@@ -61,7 +63,7 @@ const QueryPage = () => {
                         {query.images.map((file, index) => (
                           <div
                             key={index}
-                            className="relative min-w-32 bg-gray-200 dark:bg-dark rounded-xl shadow-md overflow-hidden flex-shrink-0"
+                            className="relative min-w-32 bg-gray-200 bg-theme-dark rounded-xl shadow-md overflow-hidden flex-shrink-0"
                           >
                             <img
                               src={file}
@@ -80,7 +82,7 @@ const QueryPage = () => {
                     className="text-red-500 cursor-pointer"
                   />
                 </div>
-                <div className="border border-[1] dark:border-tertiaryBackground-dark my-2"></div>
+                <div className="border  border-theme-tertiaryBackground my-2"></div>
               </div>
             ))}
           </ul>

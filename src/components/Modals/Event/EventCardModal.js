@@ -262,7 +262,7 @@ const EventCardModal = () => {
         />
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <Dialog.Content
-            className="dark:bg-tertiaryBackground-dark rounded-xl overflow-hidden focus:outline-none
+            className="bg-theme-tertiaryBackground rounded-xl overflow-hidden focus:outline-none
           shadow-xl transform transition-all w-1/2 md:w-1/3 lg:w-1/4 "
           >
             <Dialog.Title></Dialog.Title>
@@ -272,10 +272,10 @@ const EventCardModal = () => {
                 alt="event-image"
                 className="rounded-lg max-h-40 w-full object-cover"
               />
-              <p className="dark:text-sidebarColor-dark font-normal text-sm mt-3">
+              <p className="text-theme-sidebarColor font-normal text-sm mt-3">
                 {date} • {time}
               </p>
-              <p className="dark:text-secondaryText-dark text-sm font-medium font-inter mt-1">
+              <p className="text-theme-secondaryText text-sm font-medium font-inter mt-1">
                 {event.name}
               </p>
               <div
@@ -283,23 +283,23 @@ const EventCardModal = () => {
                 onClick={() => handleLocation(event.location)}
               >
                 <img src={MapPin} alt="map-pin" className="w-3 h-3" />
-                <div className="ml-1 mt-0.5 dark:text-emptyEvent-dark text-xs font-light font-inter">
+                <div className="ml-1 mt-0.5 text-theme-emptyEvent text-xs font-light font-inter">
                   {event.locationText}
                 </div>
               </div>
-              <div className="ml-0.5 mt-4 dark:text-emptyEvent-dark text-xs font-normal font-inter">
+              <div className="ml-0.5 mt-4 text-theme-emptyEvent text-xs font-normal font-inter">
                 About this event
               </div>
-              <p className="dark:text-secondaryText-dark text-xs font-normal mt-1">
+              <p className="text-theme-secondaryText text-xs font-normal mt-1">
                 {event.description}
               </p>
-              <div className="border-t dark:border-t-chatDivider-dark w-full my-2"></div>
+              <div className="border-t border-t-theme-chatDivider w-full my-2"></div>
               {event.joining === "public" ? (
-                <div className="  dark:text-emptyEvent-dark text-xs font-light font-inter italic">
+                <div className="  text-theme-emptyEvent text-xs font-light font-inter italic">
                   This is a public event. Which means anyone can join.
                 </div>
               ) : (
-                <div className="  dark:text-emptyEvent-dark text-xs font-light font-inter italic">
+                <div className="  text-theme-emptyEvent text-xs font-light font-inter italic">
                   This is a private event, so entry requires approval. You'll
                   receive an email once the admin reviews and approves your
                   request.
@@ -309,7 +309,7 @@ const EventCardModal = () => {
               event.user === myData._id ? (
                 <div className="">
                   <button
-                    className="cursor-pointer text-xs w-full mt-3 dark:bg-secondaryText-dark dark:text-primaryBackground-dark rounded-md font-normal text-center px-2 py-2.5"
+                    className="cursor-pointer text-xs w-full mt-3 bg-theme-secondaryText text-theme-primaryBackground rounded-md font-normal text-center px-2 py-2.5"
                     onClick={() => setIsDropdownOpen(true)}
                   >
                     Add to Calendar
@@ -320,7 +320,7 @@ const EventCardModal = () => {
                       onClick={(e) => e.stopPropagation()}
                     >
                       <div
-                        className="border rounded-lg dark:border-chatDivider-dark dark:bg-tertiaryBackground-dark"
+                        className="border rounded-lg border-theme--chatDivider bg-theme-tertiaryBackground"
                         ref={dropdownRef}
                         onClick={(e) => {
                           e.stopPropagation();
@@ -328,21 +328,21 @@ const EventCardModal = () => {
                         }}
                       >
                         <div
-                          className="flex flex-col cursor-pointer text-sm font-light dark:text-secondaryText-dark hover:dark:bg-primaryBackground-dark hover:rounded-t-lg px-6 py-3"
+                          className="flex flex-col cursor-pointer text-sm font-light text-theme-secondaryText hover:bg-theme-primaryBackground hover:rounded-t-lg px-6 py-3"
                           onClick={handleGoogleCalendar}
                         >
                           <p>Google</p>
                         </div>
-                        <div className="border-t dark:border-t-chatDivider-dark"></div>
+                        <div className="border-t border-theme--t-chatDivider"></div>
                         <div
-                          className="flex flex-col cursor-pointer text-sm font-light dark:text-secondaryText-dark hover:dark:bg-primaryBackground-dark px-6 py-3"
+                          className="flex flex-col cursor-pointer text-sm font-light text-theme-secondaryText hover:bg-theme-primaryBackground px-6 py-3"
                           onClick={handleDownloadICS}
                         >
                           <p>ICS/Apple</p>
                         </div>
-                        <div className="border-t dark:border-t-chatDivider-dark"></div>
+                        <div className="border-t border-theme--t-chatDivider"></div>
                         <div
-                          className="flex flex-col cursor-pointer text-sm font-light dark:text-secondaryText-dark hover:rounded-b-lg hover:dark:bg-primaryBackground-dark px-6 py-3"
+                          className="flex flex-col cursor-pointer text-sm font-light text-theme-secondaryText hover:rounded-b-lg hover:bg-theme-primaryBackground px-6 py-3"
                           onClick={handleOutlookCalendar}
                         >
                           <p>Outlook</p>
@@ -352,12 +352,12 @@ const EventCardModal = () => {
                   )}
                 </div>
               ) : event.requested_users.includes(myData._id) ? (
-                <div className="cursor-pointer text-sm dark:bg-emptyEvent-dark dark:text-primaryBackground-dark rounded-md font-normal text-center px-3 py-2">
+                <div className="cursor-pointer text-sm bg-theme-emptyEvent text-theme-primaryBackground rounded-md font-normal text-center px-3 py-2">
                   Requested
                 </div>
               ) : (
                 <div
-                  className="cursor-pointer text-sm dark:bg-secondaryText-dark dark:text-primaryBackground-dark rounded-md font-normal text-center px-3 py-2"
+                  className="cursor-pointer text-sm bg-theme-secondaryText text-theme-primaryBackground rounded-md font-normal text-center px-3 py-2"
                   onClick={handleJoinEvent}
                 >
                   {event.joining === "public" ? "Join event" : "Request access"}

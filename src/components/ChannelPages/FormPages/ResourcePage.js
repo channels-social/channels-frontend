@@ -125,42 +125,42 @@ const ResourcePage = () => {
 
   return (
     <div className="flex flex-col">
-      <div className="flex flex-row justify-between">
+      <div className="flex flex-row justify-around space-x-4">
         <div
-          className={`rounded-full text-xs border dark:border-chatBackground-dark px-3.5 py-1.5 cursor-pointer ${
+          className={`rounded-full text-xs  font-light border border-theme-sidebarDivider text-center w-full py-1.5 cursor-pointer ${
             filterItems.includes("image")
-              ? "dark:bg-secondaryText-dark"
-              : "dark:text-chatBackground-dark"
+              ? "bg-theme-secondaryText text-theme-primaryBackground"
+              : "text-theme-secondaryText"
           }`}
           onClick={() => handleFilterItems("image")}
         >
           Images
         </div>
         <div
-          className={`rounded-full text-xs border dark:border-chatBackground-dark px-3.5 py-1.5 cursor-pointer ${
+          className={`rounded-full text-xs  font-light border border-theme-sidebarDivider text-center w-full py-1.5 cursor-pointer ${
             filterItems.includes("document")
-              ? "dark:bg-secondaryText-dark dark:text-primaryBackground-dark"
-              : "dark:text-chatBackground-dark"
+              ? "bg-theme-secondaryText text-theme-primaryBackground"
+              : "text-theme-secondaryText"
           }`}
           onClick={() => handleFilterItems("document")}
         >
           Documents
         </div>
         <div
-          className={`rounded-full text-xs border dark:border-chatBackground-dark px-3.5 py-1.5 cursor-pointer ${
+          className={`rounded-full text-xs border font-light border-theme-sidebarDivider text-center w-full py-1.5 cursor-pointer ${
             filterItems.includes("video")
-              ? "dark:bg-secondaryText-dark dark:text-primaryBackground-dark"
-              : "dark:text-chatBackground-dark"
+              ? "bg-theme-secondaryText text-theme-primaryBackground"
+              : "text-theme-secondaryText"
           }`}
           onClick={() => handleFilterItems("video")}
         >
           Videos
         </div>
         {/* <div
-          className={`rounded-full text-xs border dark:border-chatBackground-dark px-3.5 py-1.5 cursor-pointer ${
+          className={`rounded-full text-xs border border-theme-chatBackground px-3.5 py-1.5 cursor-pointer ${
             filterItems.contains("Custom")
-              ? "dark:bg-secondaryText-dark dark:text-primaryBackground-dark"
-              : "dark:text-chatBackground-dark"
+              ? "bg-theme-secondaryText text-theme-primaryBackground"
+              : "text-theme-chatBackground"
           }`}
           onClick={() => setFilterItems("Custom")}
         >
@@ -171,7 +171,7 @@ const ResourcePage = () => {
         <img
           src={Search}
           alt="search"
-          className="absolute left-3 top-4 text-textFieldColor w-5 h-5"
+          className="absolute left-3 top-3.5 text-textFieldColor w-5 h-5"
         />
         {searchQuery && (
           <img
@@ -184,17 +184,17 @@ const ResourcePage = () => {
         <input
           type="text"
           placeholder="Search with file name, sender's name or date"
-          className={` pl-9 pr-3 py-3 mb-2 bg-dark dark:bg-transparent dark:text-secondaryText-dark 
-            placeholder-textFieldColor border-2 dark:border-chatBackground-dark ${"rounded-lg"} text-sm
-            placeholder:text-sm placeholder:dark:text-primaryText-dark
-            placeholder:text-left focus:outline-none w-full font-inter font-normal flex `}
+          className={` pl-9 pr-3 py-3 mb-2 bg bg-transparent text-theme-secondaryText 
+            placeholder-textFieldColor border-[1px] border-theme-sidebarDivider ${"rounded-lg"} text-sm
+            placeholder:text-xs placeholder:text-theme-emptyEvent placeholder:font-light
+            placeholder:text-left focus:outline-none w-full font-inter font-light flex `}
           value={searchQuery}
           onChange={handleInputChange}
         />
       </div>
 
       {resourceChats.length === 0 ? (
-        <div className="dark:text-primaryText-dark mt-20 text-center font-light text-sm">
+        <div className="text-theme-primaryText mt-20 text-center font-light text-sm">
           No Resources found...
         </div>
       ) : (
@@ -212,7 +212,7 @@ const ResourcePage = () => {
                       }
                       onMouseLeave={handleMouseLeaveMedia}
                     >
-                      <div className="dark:text-emptyEvent-dark font-extralight text-xs">
+                      <div className="text-theme-emptyEvent font-extralight text-xs mb-1">
                         {chat.user.username}{" "}
                         {new Date(chat.createdAt).toLocaleString()}
                       </div>
@@ -234,7 +234,7 @@ const ResourcePage = () => {
                           Your browser does not support the video tag.
                         </video>
                       ) : media.type === "document" ? (
-                        <div className="w-full rounded-lg dark:bg-secondaryBackground-dark relative mt-2 ">
+                        <div className="w-full rounded-lg bg-theme-secondaryBackground relative mt-2 ">
                           <div className="flex flex-row items-center justify-start w-full">
                             <img
                               src={documentImage}
@@ -243,10 +243,10 @@ const ResourcePage = () => {
                               onClick={() => handleClick(media)}
                             />
                             <div className="flex flex-col my-1  w-full-minus-68">
-                              <p className="dark:text-secondaryText-dark text-xs overflow-hidden text-ellipsis whitespace-nowrap font-normal">
+                              <p className="text-theme-secondaryText text-xs overflow-hidden text-ellipsis whitespace-nowrap font-normal">
                                 {media.name}
                               </p>
-                              <p className="dark:text-primaryText-dark mt-1  text-[10px] xs:text-xs font-light font-inter">
+                              <p className="text-theme-primaryText mt-1  text-[10px] xs:text-xs font-light font-inter">
                                 {media.size} Kb
                               </p>
                             </div>
@@ -275,8 +275,8 @@ const ResourcePage = () => {
                         showMediaMenu.chatId === chat._id &&
                         showMediaMenu.mediaIndex === index && (
                           <div
-                            className="absolute top-10 right-0 w-max dark:bg-tertiaryBackground-dark border
-           dark:border-modalBorder-dark shadow-lg rounded-lg  z-10"
+                            className="absolute top-10 right-0 w-max bg-theme-tertiaryBackground border
+           border-theme-modalBorder shadow-lg rounded-lg  z-10"
                           >
                             <div
                               className="py-1"
@@ -292,7 +292,7 @@ const ResourcePage = () => {
                               >
                                 {/* <img src={ReplyIcon} alt="reply" /> */}
                                 <p
-                                  className="block ml-2 py-2 text-sm dark:text-primaryText-dark cursor-pointer"
+                                  className="block ml-2 py-2 text-sm text-theme-primaryText cursor-pointer"
                                   role="menuitem"
                                 >
                                   Remove from Resource

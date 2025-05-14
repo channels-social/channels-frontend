@@ -1,14 +1,23 @@
 import React, { useState, useEffect } from "react";
 import ArrowUp from "../../../assets/icons/up-arrow.svg";
 import ArrowDown from "../../../assets/icons/arrow_drop_down.svg";
+import { postRequestAuthenticated } from "./../../../services/rest";
 
-const SummaryPage = () => {
+const SummaryPage = ({ topic }) => {
   const today = new Date();
   const [selectedDate, setSelectedDate] = useState(today);
   const [selectedMonth, setSelectedMonth] = useState(today.getMonth());
   const [selectedYear, setSelectedYear] = useState(today.getFullYear());
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [currentLoading, setCurrentLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [summary, setSummary] = useState("");
+  const [topicSummary, setTopicSummary] = useState([]);
   const [dates, setDates] = useState([]);
+
+  const selectedDateStr = selectedDate.toISOString().split("T")[0];
+  const matchedSummary = topicSummary.find((s) => s.date === selectedDateStr);
 
   const generateMonthYearOptions = () => {
     const options = [];
@@ -23,6 +32,54 @@ const SummaryPage = () => {
     }
 
     return options;
+  };
+
+  useEffect(() => {
+    setError("");
+    const getSummary = async () => {
+      setLoading(true);
+      try {
+        const response = await postRequestAuthenticated(
+          "/fetch/topic/summary",
+          {
+            topic: topic._id,
+          }
+        );
+        console.log(response);
+        setLoading(false);
+
+        if (response.success) {
+          setTopicSummary(response.summary);
+        } else {
+          setError(response.message);
+        }
+      } catch (error) {
+        setError(error);
+      }
+    };
+    getSummary();
+  }, []);
+
+  const generateSummary = async () => {
+    setError("");
+    setCurrentLoading(true);
+    try {
+      const response = await postRequestAuthenticated(
+        "/generate/summary/data",
+        {
+          topic: topic._id,
+        }
+      );
+      console.log(response);
+      setCurrentLoading(false);
+      if (response.success) {
+        setSummary(response.summary);
+      } else {
+        setError(response.message);
+      }
+    } catch (error) {
+      setError(error);
+    }
   };
 
   // const dayInitials = () => {
@@ -73,34 +130,46 @@ const SummaryPage = () => {
   const monthYearOptions = generateMonthYearOptions();
 
   return (
-    <div className="dark:bg-tertiaryBackground-dark  flex flex-col h-full">
+    <div className="bg-transparent  flex flex-col h-full">
       <div className="relative mb-2">
-        <div
-          className="flex flex-row items-center ml-2"
-          onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-        >
-          <button className="w-max px-2 py-1 rounded-lg dark:bg-tertiaryBackground-dark dark:text-secondaryText-dark ">
-            {new Date(selectedYear, selectedMonth).toLocaleString("default", {
-              month: "long",
-              year: "numeric",
-            })}
-          </button>
-          <img
-            src={isDropdownOpen ? ArrowUp : ArrowDown}
-            alt={isDropdownOpen ? "up-arrow" : "down-arrow"}
-            className="h-6 w-6"
-          />
+        <div className="flex flex-row items-center ml-2 justify-between">
+          <div
+            className="flex flex-row items-center"
+            onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+          >
+            <button className="w-max px-2 py-1 rounded-lg bg-theme-tertiaryBackground text-theme-secondaryText sm:text-sm text-xs">
+              {new Date(selectedYear, selectedMonth).toLocaleString("default", {
+                month: "long",
+                year: "numeric",
+              })}
+            </button>
+            <img
+              src={isDropdownOpen ? ArrowUp : ArrowDown}
+              alt={isDropdownOpen ? "up-arrow" : "down-arrow"}
+              className="h-6 w-6"
+            />
+          </div>
+
+          {selectedDate.toDateString() === today.toDateString() && (
+            <div
+              className="px-2 py-2  rounded-lg underline text-theme-secondaryText cursor-pointer
+    text-center w-max sm:text-sm text-xs"
+              onClick={generateSummary}
+            >
+              Generate Summary
+            </div>
+          )}
         </div>
         {isDropdownOpen && (
-          <div className="absolute z-10  w-full h-max dark:bg-tertiaryBackground-dark border dark:border-chatBackground-dark rounded-lg shadow-lg">
+          <div className="absolute z-10  w-full h-max bg-theme-tertiaryBackground  border border-theme-chatDivider rounded-lg shadow-lg">
             {monthYearOptions.map((option, index) => (
               <button
                 key={index}
                 onClick={() => handleMonthChange(option.month, option.year)}
-                className={`w-full px-4 py-2 text-left text-sm dark:text-secondaryText-dark hover:bg-chatBackground-dark ${
+                className={`w-full px-4 py-2 text-left text-sm text-theme-secondaryText hover:bg-chatBackground hover:bg-theme-primaryBackground ${
                   selectedMonth === option.month && selectedYear === option.year
-                    ? "bg-primary text-white"
-                    : ""
+                    ? "bg-primary text-theme-secondaryText"
+                    : "text-theme-emptyEvent"
                 }`}
               >
                 {new Date(option.year, option.month).toLocaleString("default", {
@@ -118,9 +187,9 @@ const SummaryPage = () => {
           <div key={date.toISOString()} className="flex flex-col ">
             <button
               onClick={() => setSelectedDate(date)}
-              className={`flex items-center dark:text-secondaryText-dark justify-center w-6 h-7 rounded-3xl text-xs font-light flex-shrink-0 ${
+              className={`flex items-center text-theme-secondaryText justify-center w-6 h-7 rounded-3xl text-xs font-light flex-shrink-0 ${
                 selectedDate.toDateString() === date.toDateString()
-                  ? "border border-secondaryText-dark"
+                  ? "border border-secondaryText"
                   : ""
               }`}
             >
@@ -130,8 +199,8 @@ const SummaryPage = () => {
               onClick={() => setSelectedDate(date)}
               className={`flex items-center mt-3 justify-center w-7 h-7 rounded-full text-sm font-light flex-shrink-0 ${
                 selectedDate.toDateString() === date.toDateString()
-                  ? "dark:bg-secondaryText-dark dark:text-primaryBackground-dark"
-                  : "dark:text-secondaryText-dark"
+                  ? "bg-theme-secondaryText text-theme-primaryBackground"
+                  : "text-theme-secondaryText"
               }`}
             >
               {date.getDate() <= "9" ? "0" + date.getDate() : date.getDate()}
@@ -139,9 +208,31 @@ const SummaryPage = () => {
           </div>
         ))}
       </div>
-      <div className="mt-20 dark:text-secondaryText-dark text-center mx-auto">
-        Coming soon...
-      </div>
+      {selectedDate.toDateString() === today.toDateString() ? (
+        summary ? (
+          <div className="mt-4 text-theme-secondaryText  flex flex-col text-sm px-2 space-y-4 leading-5">
+            <p className="text-lg font-normal  mb-2">Summary : </p>
+            {summary}
+          </div>
+        ) : (
+          <div className="mt-20 mx-auto text-center text-theme-secondaryText text-sm px-2 ">
+            {currentLoading
+              ? "Generating summary..."
+              : "No summary generated yet for today."}
+          </div>
+        )
+      ) : matchedSummary ? (
+        <div className="mt-4 text-theme-secondaryText  flex flex-col text-sm px-2 space-y-4 leading-5">
+          <p className="text-lg font-normal">Summary : </p>
+          {matchedSummary.summary}
+        </div>
+      ) : (
+        <div className="mt-20 mx-auto text-center text-theme-secondaryText text-sm px-2 ">
+          {loading
+            ? "Loading data...."
+            : "No summary generated yet for this date."}
+        </div>
+      )}
     </div>
   );
 };

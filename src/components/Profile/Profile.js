@@ -1,16 +1,10 @@
-import React, { useState, useRef, useEffect } from "react";
 import ArrowForward from "../../assets/icons/arrow_forward_dark.svg";
-import { useLocation } from "react-router-dom";
 import ArrowBack from "../../assets/icons/arrow_back.svg";
+import ArrowBackLight from "../../assets/lightIcons/arrow_back_light.svg";
 import ProfileIcon from "../../assets/icons/profile.svg";
 import ProfileForm from "./FormProfile/ProfileForm";
 import ProfileCarousel from "./Widgets/ProfileCarousel";
 import UnsplashModal from "./../Modals/UnsplashModal";
-import { useDispatch, useSelector } from "react-redux";
-import useModal from "./../hooks/ModalHook";
-import { useParams, useNavigate } from "react-router-dom";
-import { hostUrl } from "../../utils/globals";
-
 import {
   fetchProfile,
   selectProfileStatus,
@@ -22,13 +16,30 @@ import { Outlet } from "react-router-dom";
 import EmptyProfileCard from "./Widgets/EmptyProfileCard";
 import { domainUrl } from "./../../utils/globals";
 import { setProfileEngagement } from "./../../redux/slices/profileEngagementSlice";
-import { isEmbeddedOrExternal } from "./../../services/rest";
 import Others from "../../assets/icons/Subtract.svg";
-import { postRequestUnAuthenticated } from "./../../services/rest";
+import DarkOther from "../../assets/lightIcons/browser_light.svg";
+import ThreadsLight from "../../assets/lightIcons/threads_light.svg";
 import Linkify from "react-linkify";
 import ChannelsTab from "./profileTabs/ChannelsTab";
 import CurationsTab from "./profileTabs/CurationsTab";
 import FaqsTab from "./profileTabs/FaqsTab";
+import { getAppPrefix } from "./../EmbedChannels/utility/embedHelper";
+
+import {
+  React,
+  useState,
+  useEffect,
+  useRef,
+  useNavigate,
+  useDispatch,
+  useSelector,
+  useParams,
+  useModal,
+  useLocation,
+  postRequestUnAuthenticated,
+  hostUrl,
+  isEmbeddedOrExternal,
+} from "../../globals/imports";
 
 const Profile = () => {
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
@@ -235,29 +246,43 @@ const Profile = () => {
 
   return (
     <div
-      className={`w-full pt-4 px-4 h-screen dark:bg-secondaryBackground-dark overflow-y-auto custom-scrollbar relative`}
+      className={`w-full pt-4 px-4 h-screen bg-theme-secondaryBackground overflow-y-auto custom-scrollbar relative`}
       onClick={handleClickOutside}
     >
+      <div className="sm:hidden flex absolute left-3 top-3 text-theme-secondaryText">
+        <img
+          src={ArrowBack}
+          alt="arrow-back"
+          className="dark:block hidden text-theme-secondaryText w-5 h-5 cursor-pointer"
+          onClick={() => navigate(-1)}
+        />
+        <img
+          src={ArrowBackLight}
+          alt="arrow-back"
+          className="dark:hidden text-theme-secondaryText w-5 h-5 cursor-pointer"
+          onClick={() => navigate(-1)}
+        />
+      </div>
       {isInvite && (
         <div
-          className="absolute z-60 top-0 -left-1 w-full flex flex-col dark:bg-primaryBackground-dark  px-4 pt-2 pb-3 border-b
-         dark:border-b-chatDivider-dark"
+          className="absolute z-60 top-0 -left-1 w-full flex flex-col bg-theme-primaryBackground  px-4 pt-2 pb-3 border-b
+         border-theme-chatDivider"
         >
-          <p className="dark:text-secondaryText-dark font-normal text-sm">
+          <p className="text-theme-secondaryText font-normal text-sm">
             {loading
               ? "Processing... Please wait."
               : `This user requests to join the ${channelName} channel. Your decision?`}
           </p>
           <div className="flex flex-row mt-2">
             <button
-              className="cursor-pointer rounded-md py-1 px-2 dark:bg-buttonEnable-dark dark:text-secondaryText-dark font-light text-sm"
+              className="cursor-pointer rounded-md py-1 px-2 text-theme-primaryBackground bg-theme-secondaryText font-light text-sm"
               onClick={handleInviteAccept}
             >
               Accept Invite
             </button>
             <button
-              className="cursor-pointer ml-3 border rounded-md px-2 py-1 dark:border-secondaryText-dark 
-              dark:text-secondaryText-dark font-light text-sm"
+              className="cursor-pointer ml-3 border rounded-md px-2 py-1 border-theme-secondaryText 
+              text-theme-secondaryText font-light text-sm"
               onClick={handleDeclineAccept}
             >
               Decline
@@ -272,7 +297,7 @@ const Profile = () => {
           <div className="">
             <div
               className={`${
-                isOwner || hasImages ? "md:dark:bg-tertiaryBackground-dark" : ""
+                isOwner || hasImages ? "md:bg-theme-tertiaryBackground" : ""
               }  rounded-lg lg:px-6 md:px-4 px-0 py-4 sm:py-6 w-full`}
             >
               <div
@@ -293,14 +318,19 @@ const Profile = () => {
                     <img
                       src={profileData.logo}
                       alt="Profile"
-                      className="rounded-full w-24 h-24 border dark:border-white object-cover"
+                      className="rounded-full w-24 h-24 border border-theme-white object-cover"
                       style={{ borderWidth: "2px" }}
                     />
+                  ) : profileData.color_logo ? (
+                    <div
+                      className="rounded-full w-24 h-24 border border-theme-white shrink-0"
+                      style={{ backgroundColor: profileData.color_logo }}
+                    ></div>
                   ) : (
                     <img
                       src={ProfileIcon}
                       alt="Profile"
-                      className="rounded-full w-24 h-24 dark:bg-chatDivider-dark border dark:border-secondaryText-dark p-6 object-cover"
+                      className="rounded-full w-24 h-24 bg-theme-chatDivider border border-theme-secondaryText p-6 object-cover"
                     />
                   )}
                   <div
@@ -309,11 +339,11 @@ const Profile = () => {
                     }`}
                   >
                     <p
-                      className={`sm:text-2xl text-xl  dark:text-secondaryText-dark font-normal font-inter`}
+                      className={`sm:text-2xl text-xl  text-theme-secondaryText font-normal font-inter`}
                     >
                       {profileData.name}
                     </p>
-                    <p className="mt-1 text-xs font-light dark:text-profileColor-dark font-inter">
+                    <p className="mt-1 text-xs font-light text-theme-emptyEvent font-inter">
                       {profileData.username}.{domainUrl}
                     </p>
                     {/* <p
@@ -325,7 +355,7 @@ const Profile = () => {
                     {
                       <Linkify componentDecorator={componentDecorator}>
                         <p
-                          className="mt-2 text-sm font-light dark:text-description-dark whitespace-pre-wrap 
+                          className="mt-2 text-sm font-light text-theme-emptyEvent whitespace-pre-wrap 
                         overflow-hidden overflow-wrap break-word"
                         >
                           {isExpanded
@@ -338,7 +368,7 @@ const Profile = () => {
                           {profileData.description.length > maxLength && (
                             <span
                               onClick={toggleReadMore}
-                              className="dark:text-secondaryText-dark cursor-pointer ml-1"
+                              className="text-theme-secondaryText cursor-pointer ml-1"
                             >
                               {isExpanded ? (
                                 <>
@@ -368,7 +398,7 @@ const Profile = () => {
                  {profileData.description}
                 </p> */}
                     {(profileData.location || profileData.contact) && (
-                      <p className="mt-2 font-light text-xs dark:text-profileColor-dark">
+                      <p className="mt-2 font-light text-sm text-theme-emptyEvent">
                         {profileData.location}
                         {profileData.contact && profileData.location
                           ? " | "
@@ -394,19 +424,19 @@ const Profile = () => {
                           }
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="cursor-pointer px-3 mt-4 font-normal  py-2.5 dark:bg-secondaryText-dark
-                           dark:text-primaryBackground-dark text-xs rounded-lg"
+                          className="cursor-pointer px-3 mt-4 font-normal  py-2.5 
+                          bg-theme-secondaryText text-theme-primaryBackground text-xs rounded-lg"
                         >
                           Share profile
                         </div>
                       )}
 
-                      {profileData.customText && profileData.customUrl && (
+                      {/* {profileData.customText && profileData.customUrl && (
                         <a
                           className={`px-4 mt-4 py-2.5 ${
                             isOwner
-                              ? "border dark:border-secondaryText-dark dark:text-secondaryText-dark"
-                              : "dark:bg-secondaryText-dark dark:text-primaryBackground-dark"
+                              ? "border border-theme-secondaryText text-theme-secondaryText"
+                              : "bg-theme-secondaryText text-theme-primaryBackground"
                           } 
                            font-normal text-xs rounded-lg`}
                           href={profileData.customUrl}
@@ -415,28 +445,26 @@ const Profile = () => {
                         >
                           {profileData.customText}
                         </a>
-                      )}
+                      )} */}
                       {!isOwner && (
                         <div
+                          className="cursor-pointer px-4 mt-4 font-normal py-2.5 border bg-theme-secondaryText
+                            text-sm rounded-lg border-none text-theme-primaryBackground"
                           onClick={() =>
-                            openShareModal(
-                              `https://` +
-                                profileData.username +
-                                `.${domainUrl}`
+                            navigate(
+                              `${getAppPrefix()}/user/${
+                                myData.username
+                              }/messages/list/${profileData.username}`
                             )
                           }
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="cursor-pointer px-3 mt-4 font-normal py-2.5 border dark:border-secondaryText-dark
-                           dark:text-secondaryText-dark text-xs rounded-lg"
                         >
-                          Share profile
+                          Message
                         </div>
                       )}
                       {isOwner && (
                         <button
-                          className={`px-4 mt-4  py-2.5 border dark:border-secondaryText-dark 
-                            dark:text-secondaryText-dark font-normal text-xs rounded-lg`}
+                          className={`px-4 mt-4  py-2.5 border border-theme-secondaryText 
+                            text-theme-secondaryText font-normal text-xs rounded-lg`}
                           onClick={openBottomSheet}
                         >
                           {profileData.logo && profileData.description !== ""
@@ -454,7 +482,7 @@ const Profile = () => {
                     >
                       {profileData.links.length >= 1 && (
                         <div
-                          className="w-64 my-3  border dark:border-chatDivider-dark "
+                          className="w-64 my-3  border border-theme-chatDivider "
                           style={{ height: "0.1px" }}
                         ></div>
                       )}
@@ -471,30 +499,50 @@ const Profile = () => {
                           link.value && (
                             <a
                               href={link.url + link.value}
-                              className="text-white cursor-pointer"
+                              className="text-theme-secondaryText cursor-pointer"
                               key={index}
                               target="_blank"
                               rel="noopener noreferrer"
                             >
-                              <img
-                                src={link.image}
-                                alt={link.value}
-                                className="w-8 h-8"
-                              />
+                              {link.title === "Threads" ? (
+                                <>
+                                  <img
+                                    src={ThreadsLight}
+                                    className="dark:hidden w-8 h-8"
+                                    alt={link.value}
+                                  />
+                                  <img
+                                    src={link.image}
+                                    className="hidden dark:block w-8 h-8"
+                                    alt={link.value}
+                                  />
+                                </>
+                              ) : (
+                                <img
+                                  src={link.image}
+                                  className="w-8 h-8"
+                                  alt={link.value}
+                                />
+                              )}
                             </a>
                           )
                       )}
                       {profileData.otherLink && (
                         <a
                           href={profileData.otherLink}
-                          className="text-white cursor-pointer"
+                          className="text-theme-secondaryText cursor-pointer"
                           target="_blank"
                           rel="noopener noreferrer"
                         >
                           <img
                             src={Others}
                             alt="other-link"
-                            className="w-8 h-8"
+                            className="w-8 h-8 dark:block hidden"
+                          />
+                          <img
+                            src={DarkOther}
+                            alt="other-link"
+                            className="w-8 h-8 dark:hidden"
                           />
                         </a>
                       )}
@@ -528,25 +576,32 @@ const Profile = () => {
               </div>
             </div>
             <div className="items-center text-center mt-3">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={(event) => handleTabClick(event, tab.href)}
-                  className={`mx-2 xs:px-8 px-4 py-3 text-sm transition-colors duration-300 ${
-                    activeTab === tab.href
-                      ? "border-b-2 dark:text-secondaryText-dark dark:border-secondaryText-dark"
-                      : "dark:text-primaryText-dark "
-                  }`}
-                  style={{ marginBottom: "-1px" }}
-                >
-                  {tab.name}
-                </button>
-              ))}
+              {tabs.map(
+                (tab) =>
+                  (!isEmbeddedOrExternal() || tab.name === "Channels") && (
+                    <button
+                      key={tab.id}
+                      onClick={(event) => handleTabClick(event, tab.href)}
+                      className={`mx-2 xs:px-8 px-4 py-3 text-sm transition-colors duration-300 ${
+                        activeTab === tab.href
+                          ? "border-b-2 text-theme-secondaryText border-theme-secondaryText"
+                          : "text-theme-emptyEvent "
+                      }`}
+                      style={{ marginBottom: "-1px" }}
+                    >
+                      {tab.name}
+                    </button>
+                  )
+              )}
             </div>
-            <div
-              className="w-88px mx-auto border dark:border-chatDivider-dark "
-              style={{ height: "0.1px" }}
-            ></div>
+            {!isEmbeddedOrExternal() && (
+              <div
+                className={`
+                w-88px
+              mx-auto border border-theme-chatDivider `}
+                style={{ height: "0.1px" }}
+              ></div>
+            )}
             <div className="mt-6 mb-8">
               {activeTab === "" ? (
                 <ChannelsTab gallery={false} />

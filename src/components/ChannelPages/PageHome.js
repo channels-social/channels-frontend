@@ -1,22 +1,30 @@
-import React, { useState, useEffect } from "react";
-import PageHeader from "./PageHeader";
-import { useParams, useLocation, useSearchParams } from "react-router-dom";
 import PageForm from "./PageForm";
 import PageChat from "./PageChat";
-import { useDispatch, useSelector } from "react-redux";
 import {
   fetchTopic,
   setTopicField,
-  visitTopic,
+  fetchTopicSubscription,
 } from "../../redux/slices/topicSlice";
 import { fetchChannel } from "../../redux/slices/channelSlice";
-import EmptyTopicPage from "./widgets/EmptyTopicPage";
 import TopicHomeSkeleton from "./../skeleton/Topic/TopicHomeSkeleton";
 import InviteTopicPage from "./../Channel/InviteTopicPage";
-import socket, { connectSocketWithUser } from "../../utils/socket";
+import { connectSocketWithUser } from "../../utils/socket";
+import { getAppPrefix } from "./../EmbedChannels/utility/embedHelper";
+
+import {
+  React,
+  useState,
+  useEffect,
+  useNavigate,
+  useDispatch,
+  useSelector,
+  useParams,
+  useLocation,
+  useSearchParams,
+} from "../../globals/imports";
 
 const PageHome = () => {
-  const { channelName, channelId, topicId } = useParams();
+  const { channelId, topicId } = useParams();
 
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
   const dispatch = useDispatch();
@@ -33,6 +41,7 @@ const PageHome = () => {
   const username = fromGallery ? galleryUsername : params.username;
   const [searchParams] = useSearchParams();
   const inviteCode = searchParams.get("code");
+  const navigate = useNavigate();
 
   const toggleBottomSheet = () => {
     setIsBottomSheetOpen(!isBottomSheetOpen);
@@ -41,6 +50,7 @@ const PageHome = () => {
   useEffect(() => {
     dispatch(fetchTopic(topicId));
     dispatch(fetchChannel(channelId));
+    dispatch(fetchTopicSubscription(topicId));
     const timer = setTimeout(() => {
       setLoading(false);
     }, 500);
@@ -55,14 +65,29 @@ const PageHome = () => {
   const isLoading =
     topicStatus === "loading" || channel.loading === true || loading;
 
-  const isChannelMember = channel?.members?.includes(myData._id);
+  const isChannelMember = channel?.members?.includes(myData?._id);
   const isTopicOwner = topic.user === myData._id;
-  const isInvitedToTopic = topic?.channel?.members?.includes(myData._id);
+  const isInvitedToTopic = topic?.channel?.members?.includes(myData?._id);
   const isGuest = !isLoggedIn;
 
-  if (isLoading) {
-    return <TopicHomeSkeleton />;
-  }
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (!isLoggedIn) {
+        navigate(
+          `${getAppPrefix()}/get-started?redirect=${getAppPrefix()}/user/${username}/channel/${channelId}/c-id/topic/${topicId}`
+        );
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [isLoggedIn, navigate]);
+
+  const isUnauthorized =
+    (!isChannelMember && !isTopicOwner) ||
+    (topic.channel.visibility === "me" && !isTopicOwner) ||
+    (topic.channel.visibility === "invite" &&
+      !isInvitedToTopic &&
+      !isTopicOwner);
 
   if (inviteCode) {
     dispatch(setTopicField({ field: "loadingStatus", value: "idle" }));
@@ -76,48 +101,60 @@ const PageHome = () => {
     );
   }
 
-  const isUnauthorized =
-    isGuest ||
-    (!isChannelMember && !isTopicOwner) ||
-    (topic.channel.visibility === "me" && !isTopicOwner) ||
-    (topic.channel.visibility === "invite" &&
-      !isInvitedToTopic &&
-      !isTopicOwner);
+  if (isLoading) {
+    return <TopicHomeSkeleton />;
+  }
 
-  if (isUnauthorized) {
-    return <EmptyTopicPage />;
+  if (isLoggedIn && isUnauthorized && myData._id) {
+    return (
+      <div className="w-full h-screen bg-theme-secondaryBackground text-center flex flex-col justify-center font-bold text-lg text-theme-secondaryText">
+        <p>You don't have authorization to this topic</p>
+        <div
+          className="cursor-pointer text-sm font-normal text-center mt-4 rounded-lg mx-auto
+         bg-theme-secondaryText py-2 px-3 text-theme-primaryBackground w-max"
+          onClick={() =>
+            navigate(`${getAppPrefix()}/user/${username}/channel/${channelId}`)
+          }
+        >
+          Return to Channel Page
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="w-full h-full dark:bg-secondaryBackground-dark flex flex-row ">
-      <div className="flex flex-col w-full h-full">
-        <PageHeader
+    <div className="w-full h-full bg-theme-secondaryBackground flex flex-row ">
+      <div className="flex-1 overflow-hidden">
+        {/* <PageHeader
           channelName={channelName}
           topic={topic}
           // toggleSidebar={toggleSidebar}
           toggleBottomSheet={toggleBottomSheet}
-          isOpen={isBottomSheetOpen}
+          isOpen={isBottomSheetOpen} 
           username={username}
           channelId={channelId}
           // isSidebarOpen={isSidebarOpen}
-        />
+        /> */}
         <PageChat
           topicId={topicId}
           topic={topic}
           channelId={channelId}
           isLoggedIn={isLoggedIn}
           myData={myData}
+          channelName={channel.name}
+          toggleBottomSheet={toggleBottomSheet}
+          isOpen={isBottomSheetOpen}
+          username={username}
         />
       </div>
-      {/* <div className="hidden lg:flex w-max h-full">
-        <PageForm channelName={channelName} topic={topic} />
-      </div> */}
-      <PageForm
-        isOpen={isBottomSheetOpen}
-        onClose={closeBottomSheet}
-        channelName={channelName}
-        topic={topic}
-      />
+
+      <div className="">
+        <PageForm
+          isOpen={isBottomSheetOpen}
+          onClose={closeBottomSheet}
+          topic={topic}
+        />
+      </div>
     </div>
   );
 };

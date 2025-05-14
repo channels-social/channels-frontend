@@ -15,7 +15,7 @@ const DocumentPreview = ({ document }) => {
 
   return (
     <div
-      className=" w-full rounded-lg dark:bg-secondaryBackground-dark cursor-pointer h-max"
+      className=" w-full rounded-lg border border-theme-chatDivider cursor-pointer h-max"
       onClick={handleClick}
     >
       <div className="flex flex-row items-center justify-start w-full">
@@ -25,10 +25,10 @@ const DocumentPreview = ({ document }) => {
           className="h-14 w-15 object-fill"
         />
         <div className="flex flex-col my-1 ml-3 w-full-minus-68">
-          <p className="dark:text-secondaryText-dark text-xs overflow-hidden text-ellipsis whitespace-nowrap font-normal">
+          <p className="text-theme-secondaryText text-xs overflow-hidden text-ellipsis whitespace-nowrap font-normal">
             {document.name}
           </p>
-          <p className="dark:text-primaryText-dark mt-1  text-[10px] xs:text-xs font-light font-inter">
+          <p className="text-theme-primaryText mt-1  text-[10px] xs:text-xs font-light font-inter">
             {document.pages}
           </p>
         </div>

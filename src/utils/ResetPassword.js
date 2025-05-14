@@ -94,7 +94,8 @@ const ResetPassword = () => {
         password,
       });
       if (response.success) {
-        // setResetDone(true);
+        setPassword("");
+        setConfirmPassword("");
       }
       setMessage(response.data.message);
     } catch (error) {
@@ -103,19 +104,19 @@ const ResetPassword = () => {
   };
 
   const postButtonClass = !buttonEnabled
-    ? "dark:text-buttonDisable-dark dark:text-opacity-40 dark:bg-buttonDisable-dark dark:bg-opacity-10"
-    : "dark:bg-secondaryText-dark dark:text-primaryBackground-dark";
+    ? "text-theme-buttonDisableText  bg-theme-buttonDisable "
+    : "bg-theme-secondaryText text-theme-primaryBackground";
 
   return (
-    <div className="flex items-center flex-col h-screen bg-primaryBackground">
+    <div className="flex items-center flex-col h-screen bg-secondaryBackground">
       <div className="flex justify-center mb-6 mt-6">
         <img src={logo} alt="Chips" />
       </div>
       <div className="w-full max-w-xs p-6  rounded-xl mt-16 bg-chipBackground">
-        <h3 className="text-lg font-medium tracking-wider text-white">
+        <h3 className="text-lg font-medium tracking-wider text-theme-secondaryText">
           Reset Password
         </h3>
-        <p className="dark:text-primaryText-dark text-xs mt-3">•͡˘㇁•͡˘</p>
+        <p className="text-theme-primaryText text-xs mt-3">•͡˘㇁•͡˘</p>
         <div className="border-t border-dividerLine my-2 "></div>
         <div className="mt-8">
           <TextField
@@ -139,7 +140,7 @@ const ResetPassword = () => {
               endAdornment: (
                 <InputAdornment position="end" className="mr-2">
                   <IconButton
-                    className="mr-2 dark:text-primaryText-dark"
+                    className="mr-2 text-theme-primaryText"
                     aria-label="toggle password visibility"
                     onClick={handleClickShowPassword}
                     onMouseDown={handleMouseDownPassword}
@@ -151,25 +152,25 @@ const ResetPassword = () => {
               ),
             }}
             InputLabelProps={{
-              style: { color: "#A3A3A3" },
+              style: { color: "var(--theme-subtitle)" },
             }}
             sx={{
               "& .MuiOutlinedInput-root": {
                 "& fieldset": {
-                  borderColor: "#938F99",
+                  borderColor: "var(--theme-chatDivider)",
                 },
                 "&:hover fieldset": {
-                  borderColor: "#938F99",
+                  borderColor: "var(--theme-chatDivider)",
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "#938F99",
+                  borderColor: "var(--theme-chatDivider)",
                 },
                 "&.Mui-focused .MuiInputLabel-root": {
                   color: "#D0BCFF !important",
                 },
               },
               "& .MuiInputBase-input::placeholder": {
-                color: "#211F26",
+                color: "var(--theme-placeholder)",
                 opacity: 1,
               },
               "& .MuiInputBase-root": {
@@ -191,47 +192,44 @@ const ResetPassword = () => {
             onChange={(e) => setConfirmPassword(e.target.value)}
             fullWidth
             InputProps={{
-              style: { color: "white", padding: "0px 3px", fontWeight: "300" },
+              style: {
+                color: "var(--theme-primaryText)",
+                padding: "0px 3px",
+                fontWeight: "400",
+              },
               inputProps: {
                 style: {
-                  color: "white",
+                  color: "var(--theme-primaryText)",
                   fontSize: "14px",
                 },
-                placeholder: "confirm new password",
+                placeholder: "email address",
               },
             }}
             InputLabelProps={{
-              style: { color: "#A3A3A3" },
+              style: { color: "var(--theme-subtitle)" },
             }}
             sx={{
               "& .MuiOutlinedInput-root": {
                 "& fieldset": {
-                  borderColor: "#938F99",
+                  borderColor: "var(--theme-chatDivider)",
                 },
                 "&:hover fieldset": {
-                  borderColor: "#938F99",
+                  borderColor: "var(--theme-chatDivider)",
                 },
                 "&.Mui-focused fieldset": {
-                  borderColor: "#938F99",
+                  borderColor: "var(--theme-chatDivider)",
                 },
                 "&.Mui-focused .MuiInputLabel-root": {
                   color: "#D0BCFF !important",
                 },
-
-                "&.Mui-error fieldset": {
-                  borderColor: "#F2B8B5",
-                },
               },
               "& .MuiInputBase-input::placeholder": {
-                color: "#211F26",
+                color: "var(--theme-placeholder)",
                 opacity: 1,
               },
               "& .MuiInputBase-root": {
                 maxHeight: "45px",
                 lineHeight: "45px",
-              },
-              "& .MuiFormHelperText-root": {
-                color: "#F2B8B5",
               },
             }}
           />
@@ -243,20 +241,20 @@ const ResetPassword = () => {
           >
             Reset Password
           </button>
-          <p className="dark:text-error-dark font-normal mt-4 text-xs font-inter">
+          <p className="text-theme-error font-normal mt-4 text-sm font-inter">
             {message}
           </p>
           <p
-            className="mt-5 justify-center items-center mx-auto rounded-3xl border dark:border-secondaryText-dark  dark:text-secondaryText-dark text-sm py-2 px-4 w-max"
+            className="mt-5 justify-center items-center mx-auto rounded-3xl border border-theme-secondaryText  text-theme-secondaryText text-sm py-2 px-4 w-max"
             onClick={handleNavigateHome}
           >
             Return to Home
           </p>
-          <p className="text-center text-white text-xs mb-10 mt-8">
+          <p className="text-center text-theme-secondaryText text-xs mb-10 mt-8">
             Don't have an account?
             <button
               onClick={handleRegisterClick}
-              className="dark:text-secondaryText-dark underline ml-1 "
+              className="text-theme-secondaryText underline ml-1 "
             >
               Register
             </button>

@@ -3,12 +3,15 @@ import Skeleton, { SkeletonTheme } from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
 const TopicSkeleton = () => {
+  const isDarkTheme = document.documentElement.classList.contains("dark");
+  const baseColor = isDarkTheme ? "#545357" : "#e0e0e0";
+  const highlightColor = isDarkTheme ? "#c4c4c4" : "#f5f5f5";
   return (
-    <div className="dark:bg-secondaryBackground-dark w-full h-full flex flex-col px-4 py-3">
+    <div className="bg-theme-secondaryBackground w-full h-full flex flex-col px-4 py-3">
       <SkeletonTheme
-        baseColor="#545357"
-        highlightColor="#c4c4c4"
-        enableAnimation={false}
+        baseColor={baseColor}
+        highlightColor={highlightColor}
+        enableAnimation={true}
       >
         <Skeleton height={120} borderRadius={8} />
         <div className="flex flex-row justify-start mt-4 w-full">

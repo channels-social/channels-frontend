@@ -29,7 +29,7 @@ const Landing = () => {
 
   return (
     <div className="flex flex-col w-full">
-      <div className="w-full  dark:bg-secondaryBackground-dark sm:hidden flex">
+      <div className="w-full  bg-theme-primaryBackground sm:hidden flex">
         <img
           src={Menu}
           alt="close"
@@ -37,11 +37,11 @@ const Landing = () => {
           onClick={toggleSidebar}
         />
       </div>
-      <div className="flex flex-row h-screen w-[100%]">
+      <div className="flex flex-row sm:h-screen w-[100%] ">
         <div
           className={`fixed top-0 left-0 h-full transition-transform duration-300 z-40 sm:relative sm:translate-x-0  sm:flex ${
             isSidebarOpen ? "translate-x-0 " : "-translate-x-full "
-          } lg:w-[250px]  md:w-1/4 sm:w-[30%] w-[250px]  dark:bg-primaryBackground-dark`}
+          } lg:w-[248px]  md:w-1/4 sm:w-[30%] w-[250px]  bg-theme-sidebarBackground`}
         >
           <UserSidebar closeSidebar={closeSidebar} />
         </div>

@@ -1,26 +1,35 @@
-import React, { useState, useRef, useEffect } from "react";
-import Menu from "../../assets/icons/menu.svg";
-import Close from "../../assets/icons/Close.svg";
 import DropDown from "../../assets/icons/arrow_drop_down.svg";
-import EditIcon from "../../assets/icons/Edit.svg";
-import { useDispatch, useSelector } from "react-redux";
+import DropDownLight from "../../assets/lightIcons/arrow_drop_down_light.svg";
+import ProfileIcon from "../../assets/icons/profile.svg";
+import { fetchOtherTopics } from "../../redux/slices/reorderTopicSlice.js";
 import {
   setCreateTopicField,
   setCreateTopicItems,
 } from "../../redux/slices/createTopicSlice";
+import { fetchChannels } from "./../../redux/slices/channelItemsSlice";
 import {
   createTopicInvite,
   setTopicField,
 } from "../../redux/slices/topicSlice";
 import { setModalModal } from "../../redux/slices/modalSlice";
-import Send from "../../assets/icons/Send.svg";
+import { getAppPrefix } from "./../EmbedChannels/utility/embedHelper";
 
-import useModal from "./../hooks/ModalHook";
-import { useParams, useLocation } from "react-router-dom";
+import {
+  React,
+  useState,
+  useEffect,
+  useRef,
+  useNavigate,
+  useDispatch,
+  useSelector,
+  useModal,
+  isEmbeddedOrExternal,
+} from "../../globals/imports";
 
 const PageHeader = ({
   channelName,
   topic,
+  topicId,
   toggleBottomSheet,
   // toggleSidebar,
   isOpen,
@@ -32,6 +41,12 @@ const PageHeader = ({
   const { handleOpenModal } = useModal();
   const dropdownRef = useRef(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const reorderTopics = useSelector((state) => state.reorderTopic);
+  const channels = useSelector((state) => state.channelItems.channels);
+  const myData = useSelector((state) => state.myData);
+  const [channelsData, setChannelsData] = useState([]);
+  const hasFetched = useRef(false);
+  const navigate = useNavigate();
 
   const handleEditModal = () => {
     const transformedData = {
@@ -62,6 +77,31 @@ const PageHeader = ({
     };
   }, [isDropdownOpen]);
 
+  useEffect(() => {
+    if (username && !hasFetched.current) {
+      dispatch(fetchChannels(username))
+        .unwrap()
+        .then((channels) => {
+          setChannelsData(channels);
+          hasFetched.current = true;
+        })
+        .catch((error) => {
+          alert(error);
+        });
+    }
+  }, [username, dispatch]);
+
+  // useEffect(() => {
+  //   dispatch(fetchChannels(username));
+  // }, []);
+
+  useEffect(() => {
+    const formDataToSend = new FormData();
+    formDataToSend.append("topicId", topicId);
+    formDataToSend.append("channelId", channelId);
+    dispatch(fetchOtherTopics(formDataToSend));
+  }, []);
+
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
@@ -86,130 +126,171 @@ const PageHeader = ({
       });
   };
 
-  const myData = useSelector((state) => state.myData);
+  const toggleTopic = (newTopicId) => {
+    navigate(
+      `${getAppPrefix()}/user/${username}/channel/${channelId}/c-id/topic/${newTopicId}`
+    );
+  };
+
+  const toggleChannel = (newChannelId) => {
+    navigate(`${getAppPrefix()}/user/${username}/channel/${newChannelId}`);
+  };
+
+  const handleBrandProfile = () => {
+    navigate(`${getAppPrefix()}/user/${username}/profile`);
+  };
+
+  const handleMessagePage = () => {
+    navigate(`${getAppPrefix()}/user/${myData.username}/messages/list`);
+  };
+
   const isOwner = topic.user === myData._id;
 
   return (
-    <div className="flex flex-col w-full h-16">
-      <div className="flex flex-row py-3 justify-between items-center px-6 ">
-        <div className="flex flex-col">
-          {/* <div
+    <div className="flex flex-col w-full bg-theme-secondaryBackground border-b border-b-theme-chatDivider">
+      <div
+        className={`flex flex-row ${
+          isEmbeddedOrExternal() ? "" : "py-3"
+        }  justify-between items-center px-6 `}
+      >
+        {/* <div
             className="flex-row items-center w-max cursor-pointer sm:hidden flex"
             // onClick={toggleBottomSheet}
           >
-            <p className="dark:text-secondaryText-dark text-2xl font-normal font-inter tracking-wide">
+            <p className="text-theme-secondaryText text-2xl font-normal font-inter tracking-wide">
               {topic.name.charAt(0).toUpperCase() + topic.name.slice(1)}
             </p>
           </div> */}
-          <div className="flex-row items-center flex">
-            <p className=" dark:text-secondaryText-dark text-2xl font-normal font-inter tracking-wide">
+        {!isEmbeddedOrExternal() && (
+          <div className="flex-row items-center flex relative">
+            <p className="sm:hidden flex text-theme-secondaryText xs:text-xl text-lg sm:text-2xl font-normal font-inter tracking-wide">
+              {channelName.charAt(0).toUpperCase() + channelName.slice(1)}
+            </p>
+            <p className="sm:flex hidden text-theme-secondaryText text-2xl font-normal font-inter tracking-wide">
               {topic.name.charAt(0).toUpperCase() + topic.name.slice(1)}
             </p>
-            <div className="relative">
-              {isOwner && (
-                <img
-                  src={DropDown}
-                  alt="arrow-right"
-                  className="w-6 h-6 ml-1 cursor-pointer "
-                  onClick={toggleDropdown}
-                />
-              )}
-              {isDropdownOpen && (
+
+            <img
+              src={DropDown}
+              alt="arrow-right"
+              className="hidden dark:inline-block w-6 h-6 ml-1 cursor-pointer sm:hidden"
+              onClick={toggleDropdown}
+            />
+
+            <img
+              src={DropDownLight}
+              alt="arrow-right"
+              className="inline-block dark:hidden w-6 h-6 ml-1 cursor-pointer sm:hidden"
+              onClick={toggleDropdown}
+            />
+
+            {isDropdownOpen && (
+              <div
+                ref={dropdownRef}
+                className="absolute left-0 top-6 mt-2 w-max rounded-md shadow-lg border 
+      border-theme-chatDivider bg-theme-tertiaryBackground ring-1 ring-black ring-opacity-5 z-50"
+              >
                 <div
-                  ref={dropdownRef}
-                  className="absolute top-5 left-2 w-max rounded-md shadow-lg border items-start
-                 dark:border-chatDivider-dark dark:bg-tertiaryBackground-dark  ring-1 ring-black ring-opacity-5 z-50"
+                  className="py-1"
+                  role="menu"
+                  aria-orientation="vertical"
+                  aria-labelledby="options-menu"
                 >
-                  <div
-                    className="py-1"
-                    role="menu"
-                    aria-orientation="vertical"
-                    aria-labelledby="options-menu"
+                  {channelsData?.map(
+                    (channel) =>
+                      channel.name !== channelName && (
+                        <div
+                          key={channel._id}
+                          className="flex px-3 items-center sm:py-2 py-2 text-center 
+                          text-theme-primaryText font-light cursor-pointer hover:bg-theme-sidebarHighlight"
+                          onClick={() => toggleChannel(channel._id)}
+                        >
+                          <p className="mr-1">{channel.name}</p>
+                        </div>
+                      )
+                  )}
+                  <div className="border-t border-t-theme-chatDivider"></div>
+                  <p
+                    className="flex px-3 items-center sm:py-2 py-2 text-center text-theme-primaryText font-light cursor-pointer hover:bg-theme-sidebarHighlight"
+                    onClick={handleBrandProfile}
                   >
-                    <div
-                      className="flex flex-row px-3 items-center"
-                      onClick={handleEditModal}
-                    >
-                      <img
-                        src={EditIcon}
-                        alt="edit-icon"
-                        className="w-3.5 h-3.5 ml-1 cursor-pointer"
-                      />
-                      <p
-                        className="block ml-2 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
-                        role="menuitem"
-                      >
-                        Edit
-                      </p>
-                    </div>
-                    <div
-                      className="flex flex-row px-3 items-center"
-                      onClick={() => handleOwnerShareTopic(topic._id)}
-                    >
-                      <img src={Send} alt="edit" className="w-5 h-5" />
-                      <p
-                        className="block  ml-2 py-2 text-sm dark:text-secondaryText-dark cursor-pointer"
-                        role="menuitem"
-                      >
-                        Share
-                      </p>
-                    </div>
-                  </div>
+                    Brand Profile
+                  </p>
+                  <div className="border-t border-t-theme-chatDivider"></div>
+                  <p
+                    className="flex px-3 items-center sm:py-2 py-2 text-center text-theme-primaryText font-light cursor-pointer hover:bg-theme-sidebarHighlight"
+                    onClick={handleMessagePage}
+                  >
+                    Messages
+                  </p>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
-          {/* <p className="text-xs dark:text-primaryText-dark font-normal tracking-tight">
+        )}
+
+        {/* {isEmbeddedOrExternal() && ( */}
+        {!isEmbeddedOrExternal() && (
+          <div
+            className="rounded-full h-7 w-7 sm:hidden flex"
+            onClick={() =>
+              navigate(`/embed/channels/user/${myData.username}/profile`)
+            }
+          >
+            {/* <img
+            src={myData.logo ? myData.logo : ProfileIcon}
+            alt="profile"
+            className="w-full h-full object-cover cursor-pointer"
+          /> */}
+            {myData.logo ? (
+              <img
+                src={myData.logo}
+                alt="profile-icon"
+                className="rounded-full w-full h-full object-cover shrink-0"
+              />
+            ) : myData?.color_logo ? (
+              <div
+                className="rounded-full w-full h-full shrink-0"
+                style={{ backgroundColor: myData.color_logo }}
+              ></div>
+            ) : (
+              <img
+                src={ProfileIcon}
+                alt="profile-icon"
+                className="rounded-full w-full h-full object-cover shrink-0"
+              />
+            )}
+          </div>
+        )}
+        {/* )} */}
+        {/* <p className="text-xs text-theme-primaryText font-normal tracking-tight">
             {topic.allowedVisibleUsers.length} members
           </p> */}
-        </div>
-        <div className="flex flex-row">
-          {/* {isOwner && (
-            <img
-              src={EditIcon}
-              alt="edit-icon"
-              onClick={handleEditModal}
-              className="w-4 h-4 mr-4 mt-1 cursor-pointer"
-            />
-          )} */}
-          <img
-            src={isOpen ? Close : Menu}
-            alt="menu"
-            className={`cursor-pointer xl:hidden sm:flex hidden ${
-              isOpen ? "w-4 h-4" : "w-7 h-7"
-            } `}
-            onClick={toggleBottomSheet}
-          />
-          {isOpen ? (
-            <img
-              src={Close}
-              alt="menu"
-              className={`cursor-pointer flex sm:hidden ${
-                isOpen ? "w-4 h-4" : "w-7 h-7"
-              } `}
-              onClick={toggleBottomSheet}
-            />
-          ) : (
-            <div
-              className="sm:hidden flex space-x-1 cursor-pointer"
-              onClick={toggleBottomSheet}
-            >
-              <div className="w-1 h-1 dark:bg-primaryText-dark rounded-full"></div>
-              <div className="w-1 h-1 dark:bg-primaryText-dark rounded-full"></div>
-              <div className="w-1 h-1 dark:bg-primaryText-dark rounded-full"></div>
-            </div>
-          )}
-          {/* <img
-            src={isOpen ? Close : Menu}
-            alt="menu"
-            className={`cursor-pointer sm:hidden flex ${
-              isOpen ? "w-4 h-4" : "w-7 h-7"
-            } `}
-            // onClick={toggleSidebar}
-          /> */}
-        </div>
       </div>
-      <div className="xl:hidden block border border-[1] dark:border-chatDivider-dark mt-1"></div>
+      {/* <div className="block border  border-theme-chatDivider mt-1"></div> */}
+      <div className="sm:hidden flex flex-row space-x-3 w-full overflow-x-auto pl-6 pr-2 pt-0.5 mb-0.5 pb-3">
+        {reorderTopics.otherTopics.map((topic) => {
+          return (
+            <div
+              key={topic._id}
+              className={`flex ${
+                topic._id === topicId
+                  ? "bg-theme-secondaryText text-theme-primaryBackground"
+                  : "border flex-flex-row border-theme-emptyEvent text-theme-secondaryText"
+              } px-3  items-center font-light
+                sm:py-1.5 py-1 text-center  whitespace-nowrap rounded-full cursor-pointer`}
+              onClick={() => toggleTopic(topic._id)}
+            >
+              <p className="mr-1 text-xs">{topic.name}</p>
+              {/* {topic.unreadCount > 0 && (
+                <div className="w-5 h-5 flex items-center justify-center text-xs bg-theme-sidebarColor rounded-full text-theme-secondaryText">
+                  {topic.unreadCount}
+                </div>
+              )} */}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 };

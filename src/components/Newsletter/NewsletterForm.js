@@ -4,7 +4,9 @@ import ArrowForwardDark from "../../assets/icons/arrow_forward_dark.svg";
 import ArrowDropDown from "../../assets/icons/arrow_drop_down.svg";
 import ArrowDropUp from "../../assets/icons/arrow_drop_up.svg";
 import Upload from "../../assets/icons/Upload.svg";
+import UploadLight from "../../assets/lightIcons/upload_light.svg";
 import Unsplash from "../../assets/icons/Unsplash.svg";
+import UnsplashLight from "../../assets/lightIcons/unsplash_light.svg";
 import Close from "../../assets/icons/Close.svg";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -150,7 +152,7 @@ const NewsletterForm = () => {
 
   const isNameEmpty = newsletter.description?.trim() === "";
   const buttonClass = isNameEmpty
-    ? "bg-dark text-primaryGrey"
+    ? "bg text-primaryGrey"
     : "bg-primary text-buttonText";
 
   const getDaysLeftInCurrentMonth = () => {
@@ -285,7 +287,16 @@ const NewsletterForm = () => {
               <div className="flex flex-row mt-3">
                 <div className="relative bg-curationUnsplash w-1/2 px-2 py-5 rounded-xl cursor-pointer">
                   <div className="flex flex-col items-center justify-center">
-                    <img src={Upload} alt="Upload" className="w-5 h-5 mb-2" />
+                    <img
+                      src={Upload}
+                      alt="Upload"
+                      className="dark:block hidden w-5 h-5 mb-2"
+                    />
+                    <img
+                      src={UploadLight}
+                      alt="Upload"
+                      className="dark:hidden w-5 h-5 mb-2"
+                    />
                     <p className="text-primary text-xs font-light font-inter">
                       Upload image
                     </p>
@@ -305,7 +316,12 @@ const NewsletterForm = () => {
                     <img
                       src={Unsplash}
                       alt="Unsplash"
-                      className="w-5 h-5 mb-2"
+                      className="dark:block hidden w-5 h-5 mb-2"
+                    />
+                    <img
+                      src={UnsplashLight}
+                      alt="Unsplash"
+                      className="dark:hidden w-5 h-5 mb-2"
                     />
                     <p className="text-primary text-xs text-center font-light font-inter">
                       Select from Unsplash
@@ -321,7 +337,7 @@ const NewsletterForm = () => {
                   alt="curation-image"
                   className="w-full h-44 object-cover rounded-xl"
                 />
-                <div className="absolute right-0 top-0 bg-dark rounded-full w-6 h-6 flex justify-center items-center border">
+                <div className="absolute right-0 top-0 bg rounded-full w-6 h-6 flex justify-center items-center border">
                   <img
                     src={Close}
                     alt="close"
@@ -352,7 +368,7 @@ const NewsletterForm = () => {
                 />
                 <div
                   className={`text-white p-1.5 absolute right-2 rounded-full cursor-pointer ${
-                    newsletter.email === "" ? "bg-dark" : "bg-primary"
+                    newsletter.email === "" ? "bg" : "bg-primary"
                   } `}
                   onClick={handleTestNewsletter}
                 >
@@ -414,7 +430,7 @@ const NewsletterForm = () => {
               />
               <div
                 className={`text-white p-1.5 absolute right-2 rounded-full cursor-pointer ${
-                  newsletter.email === "" ? "bg-dark" : "bg-primary"
+                  newsletter.email === "" ? "bg" : "bg-primary"
                 } `}
                 onClick={handleTestNewsletter}
               >

@@ -85,8 +85,9 @@ const TopicModal = () => {
   const maxChars = 30;
   const isNameEmpty = topic.name.trim() === "";
   const buttonClass = isNameEmpty
-    ? "dark:text-buttonDisable-dark dark:text-opacity-40 dark:bg-buttonDisable-dark dark:bg-opacity-10"
-    : "dark:text-secondaryText-dark dark:bg-buttonEnable-dark";
+    ? "text-theme-buttonDisableText text-theme-opacity-40 bg-theme-buttonDisable bg-theme-opacity-10"
+    : "bg-theme-secondaryText text-theme-primaryBackground";
+
   const isOpen = useSelector((state) => state.modals.modalTopicOpen);
 
   return (
@@ -94,11 +95,11 @@ const TopicModal = () => {
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-70 z-50" />
         <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <Dialog.Content className="dark:bg-tertiaryBackground-dark rounded-xl overflow-hidden shadow-xl transform transition-all min-h-[20%] max-h-[90%] overflow-y-auto custom-scrollbar w-[90%] xs:w-3/4 sm:w-1/2 md:w-2/5 lg:w-[35%] xl:w-[30%]">
+          <Dialog.Content className="bg-theme-tertiaryBackground rounded-xl overflow-hidden shadow-xl transform transition-all min-h-[20%] max-h-[90%] overflow-y-auto custom-scrollbar w-[90%] xs:w-3/4 sm:w-1/2 md:w-2/5 lg:w-[35%] xl:w-[30%]">
             <Dialog.Title />
             <div className="flex flex-col p-5">
               <div className="flex justify-between items-center mb-4">
-                <h2 className="dark:text-white text-lg font-normal font-inter">
+                <h2 className="text-theme-secondaryText text-lg font-normal font-inter">
                   New Topic
                 </h2>
                 <img
@@ -110,17 +111,17 @@ const TopicModal = () => {
               </div>
               <div className="mb-4">
                 <div className="flex flex-row justify-between">
-                  <p className="dark:text-white text-sm font-normal font-inter">
+                  <p className="text-theme-secondaryText text-sm font-normal font-inter">
                     Name of the topic
                   </p>
-                  <div className="dark:text-subtitle-dark text-xs font-light font-inter">
+                  <div className="text-theme-subtitle text-xs font-light font-inter">
                     {charCount}/{maxChars}
                   </div>
                 </div>
                 <input
                   id="topic-name"
-                  className="w-full mt-2 p-1 rounded bg-transparent border-b dark:border-b-chatDivider-dark
-                   placeholder:font-normal placeholder:text-sm text-white focus:outline-none placeholder:dark:text-placeholder-dark"
+                  className="w-full mt-2 p-1 rounded bg-transparent border-b border-theme-chatDivider text-sm font-light
+                   placeholder:font-light placeholder:text-sm text-theme-secondaryText focus:outline-none placeholder:text-theme-placeholder"
                   type="text"
                   name="name"
                   value={topic.name}
@@ -141,11 +142,11 @@ const TopicModal = () => {
               </div>
 
               {/* <div className="mb-4 mt-1">
-                <p className="dark:text-white text-sm font-normal font-inter">
+                <p className="text-theme-secondaryText text-sm font-normal font-inter">
                   Who can view this topic?
                 </p>
                 <div className="flex mt-3 items-center space-x-6">
-                  <label className="dark:text-primaryText-dark text-sm font-normal flex items-center">
+                  <label className="text-theme-primaryText text-sm font-normal flex items-center">
                     <input
                       type="radio"
                       name="visibility"
@@ -156,7 +157,7 @@ const TopicModal = () => {
                     />
                     <span>Everyone in channel</span>
                   </label>
-                  <label className="dark:text-primaryText-dark text-sm font-normal flex items-center">
+                  <label className="text-theme-primaryText text-sm font-normal flex items-center">
                     <input
                       type="radio"
                       name="visibility"
@@ -167,7 +168,7 @@ const TopicModal = () => {
                     />
                     <span>Invite only</span>
                   </label>
-                  <label className="dark:text-primaryText-dark text-sm font-normal flex items-center">
+                  <label className="text-theme-primaryText text-sm font-normal flex items-center">
                     <input
                       type="radio"
                       name="visibility"
@@ -181,11 +182,11 @@ const TopicModal = () => {
                 </div>
               </div> */}
               <div className="mb-4 mt-1">
-                <p className="dark:text-white text-sm font-normal font-inter">
+                <p className="text-theme-secondaryText text-sm font-normal font-inter">
                   Who can write in this topic?
                 </p>
                 <div className="flex mt-3 items-center space-x-6">
-                  <label className="dark:text-primaryText-dark text-sm font-normal flex items-center">
+                  <label className="text-theme-primaryText text-sm font-normal flex items-center">
                     <input
                       type="radio"
                       name="editability"
@@ -196,7 +197,7 @@ const TopicModal = () => {
                     />
                     <span>Anyone</span>
                   </label>
-                  <label className="dark:text-primaryText-dark text-sm font-normal flex items-center">
+                  <label className="text-theme-primaryText text-sm font-normal flex items-center">
                     <input
                       type="radio"
                       name="editability"
@@ -207,7 +208,7 @@ const TopicModal = () => {
                     />
                     <span>Invite only</span>
                   </label>
-                  <label className="dark:text-primaryText-dark text-sm font-normal flex items-center">
+                  <label className="text-theme-primaryText text-sm font-normal flex items-center">
                     <input
                       type="radio"
                       name="editability"
@@ -227,7 +228,7 @@ const TopicModal = () => {
                 </div>
               )}
               <button
-                className={`w-full mt-3 py-2.5 font-normal text-sm rounded-full ${buttonClass}`}
+                className={`w-full mt-3 py-2.5 font-normal text-sm rounded-lg ${buttonClass}`}
                 disabled={isNameEmpty}
                 onClick={topic.isEdit ? handleEditTopic : handleCreateTopic}
               >

@@ -80,6 +80,26 @@ export const visitTopic = createAsyncThunk(
     }
   }
 );
+export const fetchTopicSubscription = createAsyncThunk(
+  "topic/fetchTopicSubscription",
+  async (topicId, { rejectWithValue }) => {
+    try {
+      const response = await postRequestUnAuthenticated(
+        "/fetch/topic/subscription",
+        {
+          topic: topicId,
+        }
+      );
+      if (response.success) {
+        return response;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 const initialState = {
   name: "",
@@ -94,6 +114,8 @@ const initialState = {
   topicNameError: false,
   loading: false,
   code: "",
+  payment_subscription: false,
+  payment_plan: "",
 };
 
 export const topicSlice = createSlice({
@@ -126,6 +148,16 @@ export const topicSlice = createSlice({
         state.topicstatus = "idle";
         state.channel = action.payload.channel;
       })
+
+      .addCase(fetchTopicSubscription.fulfilled, (state, action) => {
+        if ("subscription" in action.payload) {
+          state.payment_subscription = action.payload.subscription;
+        }
+        if ("plan" in action.payload) {
+          state.payment_plan = action.payload.plan;
+        }
+      })
+
       .addCase(updateTopic.fulfilled, (state, action) => {
         Object.assign(state, initialState, action.payload);
         state.topicstatus = "idle";

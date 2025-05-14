@@ -143,45 +143,43 @@ const Integration = () => {
   const metaData = `<meta name="channels-verification" content="${verificationToken}"/>`;
 
   return (
-    <div className="flex flex-col px-10 pt-10 overflow-y-auto h-full">
-      <h3 className="dark:text-secondaryText-dark text-2xl font-normal">
+    <div className="flex flex-col sm:px-10 px-4 pt-10 overflow-y-auto h-full">
+      <h3 className="text-theme-secondaryText text-2xl font-normal">
         Channels API Integration
       </h3>
-      <p className="dark:text-primaryText-dark font-light text-sm mt-1 ">
+      <p className="text-theme-primaryText font-light text-sm mt-1 ">
         Your domain needs to be verified for integration
       </p>
-      <div className="border-t dark:border-t-chatDivider-dark my-4 "></div>
+      <div className="border-t border-t-theme-chatDivider my-4 "></div>
       {loading && (
-        <div className="dark:text-secondaryText-dark text-sm font-normal mt-8 ml-4">
+        <div className="text-theme-secondaryText text-sm font-normal mt-8 ml-4">
           Verification in progress.
           <br /> Please Wait...
         </div>
       )}
       {error && (
-        <div className="dark:text-error-dark text-sm font-normal mt-4">
-          {error}
-        </div>
+        <div className="text-theme-error text-sm font-normal mt-4">{error}</div>
       )}
 
       {!loading && page === 0 && (
-        <div className="w-1/3 flex flex-col">
-          <p className="dark:text-secondaryText-dark text-sm mt-4 font-light">
+        <div className="xl:w-1/3 lg:w-2/5 md:w-1/2 w-3/4 flex flex-col">
+          <p className="text-theme-secondaryText text-sm mt-4 font-light">
             Enter your organization domain
           </p>
           <input
             type="text"
             value={domain}
             onChange={(e) => setDomain(e.target.value)}
-            className="mt-3 pt-3 pb-3 pl-4 pr-3  rounded-md border font-light font-inter dark:border-primaryText-dark
-         dark:bg-transparent dark:text-secondaryText-dark  focus:outline-none placeholder:font-light placeholder:text-sm 
-         dark:placeholder:text-chatBackground-dark"
+            className="mt-3 pt-3 pb-3 pl-4 pr-3  rounded-md border font-light font-inter border-theme-primaryText
+         bg-transparent text-theme-secondaryText  focus:outline-none placeholder:font-light placeholder:text-sm 
+         dark:placeholder:text-chatBackground"
             placeholder="Enter your website url"
           />
           <button
             className={` py-2.5 mt-6 rounded-lg ${
               !domain || domain.length < 10
-                ? "dark:text-buttonDisable-dark dark:text-opacity-40 dark:bg-buttonDisable-dark dark:bg-opacity-10"
-                : "dark:bg-buttonEnable-dark dark:text-secondaryText-dark"
+                ? "text-theme-buttonDisableText text-theme-opacity-40 bg-theme-buttonDisable bg-theme-opacity-10"
+                : "bg-theme-buttonEnable text-theme-secondaryText"
             } font-normal`}
             onClick={handleDomainVerify}
           >
@@ -191,32 +189,32 @@ const Integration = () => {
       )}
       {!loading && page === 1 && (
         <div className="flex flex-col">
-          <div className="flex border-b dark:border-b-chatDivider-dark font-normal text-sm mt-4 w-max">
+          <div className="flex border-b border-theme-chatDivider font-normal text-sm mt-4 w-max">
             <button
-              className={`py-3 px-5 ${
+              className={`py-3 sm:px-5 px-3 ${
                 activeTab === "dns"
-                  ? "border-b-2 dark:text-secondaryText-dark dark:border-b-secondaryText-dark"
-                  : "dark:text-primaryText-dark"
+                  ? "border-b-2 text-theme-secondaryText border-theme-b-secondaryText"
+                  : "text-theme-primaryText"
               }`}
               onClick={() => setActiveTab("dns")}
             >
               DNS Verification
             </button>
             <button
-              className={`py-3 px-5 ${
+              className={`py-3 sm:px-5 px-3 ${
                 activeTab === "file"
-                  ? "border-b-2 dark:text-secondaryText-dark dark:border-b-secondaryText-dark"
-                  : "dark:text-primaryText-dark"
+                  ? "border-b-2 text-theme-secondaryText border-theme-b-secondaryText"
+                  : "text-theme-primaryText"
               }`}
               onClick={() => setActiveTab("file")}
             >
               TXT File Upload
             </button>
             <button
-              className={`py-3 px-5 ${
+              className={`py-3 sm:px-5 px-3 ${
                 activeTab === "meta"
-                  ? "border-b-2 dark:text-secondaryText-dark dark:border-b-secondaryText-dark"
-                  : "dark:text-primaryText-dark"
+                  ? "border-b-2 text-theme-secondaryText border-theme-b-secondaryText"
+                  : "text-theme-primaryText"
               }`}
               onClick={() => setActiveTab("meta")}
             >
@@ -225,7 +223,7 @@ const Integration = () => {
           </div>{" "}
           <div className="mt-8">
             {activeTab === "dns" && (
-              <div className="flex flex-col space-y-4 dark:text-primaryText-dark font-light text-sm">
+              <div className="flex flex-col space-y-4 text-theme-primaryText font-light text-sm">
                 <p>
                   1. We have identified that your domain manager is{" "}
                   {domainProvider}. Login to your {domainProvider} account.
@@ -247,19 +245,19 @@ const Integration = () => {
                 </p>
                 <div className="flex flex-row space-x-6 text-sm font-light pt-2">
                   <div
-                    className="dark:text-secondaryText-dark cursor-pointer dark:bg-buttonEnable-dark rounded-lg text-center px-12 py-2"
+                    className="text-theme-secondaryText cursor-pointer bg-theme-buttonEnable rounded-lg text-center px-12 py-2"
                     onClick={handleVerify}
                   >
                     Verify
                   </div>
-                  {/* <div className="dark:text-secondaryText-dark border dark:border-secondaryText-dark rounded-lg text-center px-12 py-2 text-xs font-light">
+                  {/* <div className="text-theme-secondaryText border border-theme-secondaryText rounded-lg text-center px-12 py-2 text-xs font-light">
                     Cancel
                   </div> */}
                 </div>
               </div>
             )}
             {activeTab === "file" && (
-              <div className="flex flex-col space-y-4 dark:text-primaryText-dark font-light text-sm">
+              <div className="flex flex-col space-y-4 text-theme-primaryText font-light text-sm">
                 <p>
                   1. Download the TXT file{" "}
                   <span
@@ -291,19 +289,19 @@ const Integration = () => {
                 <p>4. Click Verify below to complete verification.</p>
                 <div className="flex flex-row space-x-6 text-sm font-light pt-2">
                   <div
-                    className="dark:text-secondaryText-dark cursor-pointer dark:bg-buttonEnable-dark rounded-lg text-center px-12 py-2"
+                    className="text-theme-secondaryText cursor-pointer bg-theme-buttonEnable rounded-lg text-center px-12 py-2"
                     onClick={handleVerify}
                   >
                     Verify
                   </div>
-                  {/* <div className="dark:text-secondaryText-dark border dark:border-secondaryText-dark rounded-lg text-center px-12 py-2 text-xs font-light">
+                  {/* <div className="text-theme-secondaryText border border-theme-secondaryText rounded-lg text-center px-12 py-2 text-xs font-light">
                     Cancel
                   </div> */}
                 </div>
               </div>
             )}
             {activeTab === "meta" && (
-              <div className="flex flex-col space-y-4 dark:text-primaryText-dark font-light text-sm">
+              <div className="flex flex-col space-y-4 text-theme-primaryText font-light text-sm">
                 <p>
                   Copy the meta tag below and paste it inside the {"<head>"}{" "}
                   section of your homepage {domain}.
@@ -314,21 +312,19 @@ const Integration = () => {
                 </p>
                 <p className="pt-2">Meta tag value:</p>
 
-                <div className="flex flex-row items-center mt-2 dark:bg-transparent rounded-md  w-full">
-                  <div className="dark:bg-chatDivider-dark px-4 py-4 rounded-lg items-center xs:text-sm text-xs dark:text-secondaryText-dark w-max">
+                <div className="flex flex-row items-center mt-2 bg-transparent rounded-md  w-full">
+                  <div className="bg-theme-chatDivider px-4 py-4 rounded-lg items-center xs:text-sm text-xs text-theme-secondaryText w-max">
                     {metaData}
                   </div>
                   <CopyToClipboard text={metaData} onCopy={handleCopy}>
                     <div className="relative flex items-center">
-                      <button className="flex items-center justify-center px-2 ">
-                        <img
-                          src={CopyIcon}
-                          alt="copy"
-                          className="dark:text-white font-normal text-xs xs:text-sm py-1 rounded-md cursor-pointer"
-                        />
-                      </button>
+                      <img
+                        src={CopyIcon}
+                        alt="copy"
+                        className="ml-2 text-theme-secondaryText font-normal text-xs xs:text-sm py-1 rounded-md w-4 h-6 cursor-pointer"
+                      />
                       {copied && (
-                        <p className="absolute bottom-8 left-2 text-sm font-light dark:text-primaryText-dark">
+                        <p className="absolute bottom-8 left-2 text-sm font-light text-theme-primaryText">
                           copied
                         </p>
                       )}
@@ -337,19 +333,19 @@ const Integration = () => {
                 </div>
                 <div className="flex flex-row space-x-6 text-sm font-light pt-2">
                   <div
-                    className="cursor-pointer dark:text-secondaryText-dark dark:bg-buttonEnable-dark rounded-lg text-center px-12 py-2"
+                    className="cursor-pointer text-theme-secondaryText bg-theme-buttonEnable rounded-lg text-center px-12 py-2"
                     onClick={handleVerify}
                   >
                     Verify
                   </div>
-                  {/* <div className="dark:text-secondaryText-dark border dark:border-secondaryText-dark rounded-lg text-center px-12 py-2 text-xs font-light">
+                  {/* <div className="text-theme-secondaryText border border-theme-secondaryText rounded-lg text-center px-12 py-2 text-xs font-light">
                     Cancel
                   </div> */}
                 </div>
               </div>
             )}
             {successMessage && (
-              <div className="dark:text-green-300 text-sm font-normal mt-8">
+              <div className="text-theme-green-300 text-sm font-normal mt-8">
                 {successMessage}
               </div>
             )}
@@ -357,7 +353,7 @@ const Integration = () => {
         </div>
       )}
       {!loading && page === 2 && (
-        <div className="flex flex-col mt-2 dark:text-primaryText-dark font-light text-sm">
+        <div className="flex flex-col mt-2 text-theme-primaryText font-light text-sm">
           <p>
             This is your unique password and its non-recoverable. If you lose
             this API key, you will have to reset it.
@@ -369,22 +365,22 @@ const Integration = () => {
             Download as JSON
           </p>
           <div
-            className="dark:bg-chatDivider-dark px-4 py-4 rounded-lg items-center xs:text-sm text-xs
-           dark:text-secondaryText-dark w-max mt-6"
+            className="bg-theme-chatDivider px-4 py-4 rounded-lg items-center xs:text-sm text-xs
+           text-theme-secondaryText w-max mt-6"
           >
             {apiKey}
           </div>
           <CopyToClipboard text={apiKey} onCopy={handleCopy}>
-            <div className="w-max cursor-pointer dark:text-secondaryText-dark mt-6 dark:bg-buttonEnable-dark rounded-lg text-center px-12 py-2">
+            <div className="w-max cursor-pointer text-theme-secondaryText mt-6 bg-theme-buttonEnable rounded-lg text-center px-12 py-2">
               Copy
             </div>
           </CopyToClipboard>
         </div>
       )}
       {!loading && page === 3 && (
-        <div className="mt-6 dark:text-secondaryText-dark text-md font-light ">
+        <div className="mt-6 text-theme-secondaryText text-md font-light ">
           Api key is already generated.{" "}
-          <span className="dark:text-blue-400 underline">
+          <span className="text-theme-blue-400 underline">
             Contact the channels support
           </span>
         </div>

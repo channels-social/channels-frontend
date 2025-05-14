@@ -1,13 +1,15 @@
 import axios from "axios";
 import { getAuthToken } from "./cookies";
 import { hostUrl } from "./../utils/globals";
-import { useSelector } from "react-redux";
-import { getCsrfToken } from "../services/csrfToken";
 import StorageManager from "./../components/EmbedChannels/utility/storage_manager";
 
 export const isEmbeddedOrExternal = () => {
   if (typeof window === "undefined") return false;
-  const domain = window.location.hostname;
+
+  const host = StorageManager.getItem("embedData");
+  if (!host) return false;
+  const data = JSON.parse(host);
+  const domain = data.domain;
   return !(
     domain === "channels.social" ||
     // domain === "localhost" ||
@@ -21,7 +23,6 @@ export const postRequestAuthenticated = async (endpoint, data) => {
   const selectedToken = !isEmbeddedOrExternal() ? authToken : externalToken;
   // console.log(selectedToken);
   // console.log(!isEmbeddedOrExternal());
-
   try {
     if (selectedToken) {
       const url = `${hostUrl}/api${endpoint}`;
