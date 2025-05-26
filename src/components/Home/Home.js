@@ -183,20 +183,20 @@ const HomePage = () => {
           </div>
           <div className="sm:ml-8 sm:mt-0 mt-8 relative bg-theme-sidebarColor xs:pt-1 pt-2 lg:w-3/5 md:w-[45%] sm:w-2/3">
             <img
-              src={activeTab === "home" ? HomeImage : CommunityPage}
+              src={activeTab2 === "home" ? HomeImage : CommunityPage}
               alt="home-image"
               className="h-auto object-contain ml-auto w-full"
             />
             <div className="absolute lg:top-2  top-0 sm:right-[25%]  xs:right-[65%] right-[55%] text-theme-primaryBackground">
-              <div className="flex items-center justify-center w-full h-10 md:h-12 ">
-                <div className="flex md:border-2 border border-theme-homeToggle rounded-full ">
+              <div className="flex items-center justify-center w-full h-10 lg:h-12 ">
+                <div className="flex lg:border-2 border border-[#32302c] rounded-full ">
                   <button
                     onClick={() => setActiveTab2("home")}
                     className={`${
                       activeTab2 === "home"
-                        ? "bg-theme-primaryBackground text-theme-secondaryText"
-                        : "text-theme-homeToggle"
-                    } md:px-4 px-2 md:py-1.5 xs:py-1 py-0.5 rounded-full transition-colors duration-300 md:text-sm text-xs xs:font-normal font-light`}
+                        ? "bg-[#202020] text-[#e4e4e4]"
+                        : "text-[#32302c]"
+                    } lg:px-4 px-2 lg:py-1.5 xs:py-1 py-0.5 rounded-full transition-colors duration-300 lg:text-sm text-xs xs:font-normal font-light`}
                   >
                     Home
                   </button>
@@ -204,9 +204,9 @@ const HomePage = () => {
                     onClick={() => setActiveTab2("community")}
                     className={`${
                       activeTab2 === "community"
-                        ? "bg-theme-primaryBackground text-theme-secondaryText"
-                        : "text-theme-homeToggle"
-                    }  md:px-4 px-2 md:py-1.5 xs:py-1 py-0.5 rounded-full transition-colors duration-300 md:text-sm text-xs xs:font-normal font-light`}
+                        ? "bg-[#202020] text-[#e4e4e4]"
+                        : "text-[#32302c]"
+                    }  lg:px-4 px-2 lg:py-1.5 xs:py-1 py-0.5 rounded-full transition-colors duration-300 lg:text-sm text-xs xs:font-normal font-light`}
                   >
                     Community
                   </button>
