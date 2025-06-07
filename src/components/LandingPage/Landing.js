@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import Menu from "../../assets/icons/menu.svg";
 import UserSidebar from "./../Sidebar/UserSidebar";
@@ -26,10 +26,21 @@ const Landing = () => {
   //   );
   //   setSelectedPages({ [channelIndex]: pageIndex });
   // }, [channelName, pageName]);
+  useEffect(() => {
+    const isMobile = window.innerWidth < 640;
+    if (isSidebarOpen && isMobile) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [isSidebarOpen]);
 
   return (
     <div className="flex flex-col w-full">
-      <div className="w-full  bg-theme-primaryBackground sm:hidden flex">
+      <div className="w-full  bg-theme-secondaryBackground sm:hidden flex">
         <img
           src={Menu}
           alt="close"

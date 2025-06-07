@@ -42,7 +42,6 @@ const PageHome = () => {
   const [searchParams] = useSearchParams();
   const inviteCode = searchParams.get("code");
   const navigate = useNavigate();
-
   const toggleBottomSheet = () => {
     setIsBottomSheetOpen(!isBottomSheetOpen);
   };
@@ -50,25 +49,17 @@ const PageHome = () => {
   useEffect(() => {
     dispatch(fetchTopic(topicId));
     dispatch(fetchChannel(channelId));
-    dispatch(fetchTopicSubscription(topicId));
+    // dispatch(fetchTopicSubscription(topicId));
     const timer = setTimeout(() => {
       setLoading(false);
     }, 500);
   }, [topicId, channelId, dispatch]);
 
   useEffect(() => {
-    if (myData?._id) {
+    if (isLoggedIn && myData?._id) {
       connectSocketWithUser(myData._id);
     }
-  }, [myData]);
-
-  const isLoading =
-    topicStatus === "loading" || channel.loading === true || loading;
-
-  const isChannelMember = channel?.members?.includes(myData?._id);
-  const isTopicOwner = topic.user === myData._id;
-  const isInvitedToTopic = topic?.channel?.members?.includes(myData?._id);
-  const isGuest = !isLoggedIn;
+  }, [isLoggedIn, myData?._id]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -77,17 +68,18 @@ const PageHome = () => {
           `${getAppPrefix()}/get-started?redirect=${getAppPrefix()}/user/${username}/channel/${channelId}/c-id/topic/${topicId}`
         );
       }
-    }, 100);
+    }, 200);
 
     return () => clearTimeout(timer);
-  }, [isLoggedIn, navigate]);
+  }, [isLoggedIn]);
+
+  const isChannelMember = channel?.members?.includes(myData?._id);
+  const isTopicOwner = topic.user === myData._id;
 
   const isUnauthorized =
     (!isChannelMember && !isTopicOwner) ||
-    (topic.channel.visibility === "me" && !isTopicOwner) ||
-    (topic.channel.visibility === "invite" &&
-      !isInvitedToTopic &&
-      !isTopicOwner);
+    (channel.visibility === "me" && !isTopicOwner) ||
+    (channel.visibility === "invite" && !isTopicOwner);
 
   if (inviteCode) {
     dispatch(setTopicField({ field: "loadingStatus", value: "idle" }));
@@ -101,7 +93,7 @@ const PageHome = () => {
     );
   }
 
-  if (isLoading) {
+  if (topicStatus === "loading" || channel.loading || loading) {
     return <TopicHomeSkeleton />;
   }
 
@@ -141,6 +133,7 @@ const PageHome = () => {
           channelId={channelId}
           isLoggedIn={isLoggedIn}
           myData={myData}
+          channel={channel}
           channelName={channel.name}
           toggleBottomSheet={toggleBottomSheet}
           isOpen={isBottomSheetOpen}
@@ -153,6 +146,7 @@ const PageHome = () => {
           isOpen={isBottomSheetOpen}
           onClose={closeBottomSheet}
           topic={topic}
+          channel={channel}
         />
       </div>
     </div>

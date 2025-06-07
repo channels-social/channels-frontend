@@ -95,7 +95,7 @@ const PageForm = ({ isOpen, onClose, topic }) => {
           {topic.name.charAt(0).toUpperCase() + topic.name.slice(1)}
         </div> */}
         <div className="flex justify-center mb-3 pr-1 border-b  border-theme-chatDivider">
-          {topic.payment_subscription &&
+          {/* {topic.payment_subscription &&
             (topic.user === myData._id ||
               topic.channel?.members?.includes(myData._id)) && (
               <button
@@ -108,7 +108,7 @@ const PageForm = ({ isOpen, onClose, topic }) => {
               >
                 Chat Summary
               </button>
-            )}
+            )} */}
           <button
             className={`  font-inter text-sm py-3 px-5 w-1/2 ${
               activeTab === "resources"

@@ -2,6 +2,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { postRequestAuthenticated } from "./../../services/rest";
 import { createCategory, createCuration } from "./profileItemsSlice";
+import { deleteCategory } from "./deleteCategorySlice";
 
 export const fetchCategories = createAsyncThunk(
   "pushItems/fetchprofileCategories",
@@ -29,7 +30,6 @@ export const updateCategoriesOrder = createAsyncThunk(
         "/update/profile/categories/order",
         { categories }
       );
-      console.log(response.categories);
       if (response.success) {
         return response.categories;
       } else {
@@ -49,7 +49,6 @@ export const updateItemsOrderCategory = createAsyncThunk(
         "/update/items/order/category",
         { items }
       );
-      console.log(response);
       if (response.success) {
         return response.categories;
       } else {
@@ -103,7 +102,11 @@ export const pushChipToCuration = createAsyncThunk(
         formData
       );
       if (response.success) {
-        return response.chip;
+        const data = {
+          chip: response.chip,
+          curation_id: response.oldCuration,
+        };
+        return data;
       } else {
         return rejectWithValue(response.message);
       }
@@ -219,6 +222,15 @@ const pushItemsSlice = createSlice({
       .addCase(fetchCurations.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.curations = action.payload;
+      })
+      .addCase(deleteCategory.fulfilled, (state, action) => {
+        const categoryId = action.payload;
+        const index = state.categories.findIndex(
+          (item) => item._id === categoryId
+        );
+        if (index !== -1) {
+          state.categories.splice(index, 1);
+        }
       });
   },
 });

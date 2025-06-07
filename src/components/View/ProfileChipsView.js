@@ -222,10 +222,9 @@ const ProfileChipsView = () => {
         <p className="sm:text-3xl  text-xl text-theme-secondaryText font-normal font-familjen-grotesk">
           {curation.name}
         </p>
-        {!owner && (
+        {/* {!owner && (
           <div className="relative">
             {" "}
-            {/* New relative container for positioning */}
             {isSavedMessageVisible && (
               <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg text-theme-secondaryText text-xs rounded-lg px-2 py-1">
                 {savedMessage}
@@ -244,7 +243,7 @@ const ProfileChipsView = () => {
               />
             </div>
           </div>
-        )}
+        )} */}
         {isEditable && (
           <img
             src={AddIcon}
@@ -369,7 +368,7 @@ const ProfileChipsView = () => {
       )}
       {curation?.user?.username && (
         <a
-          href={`https://${domainUrl}/profile/${curation.user.username}`}
+          href={`https://${domainUrl}/user/${curation.user.username}/profile`}
           className="text-theme-secondaryText font-normal text-sm  underline mb-8 w-max"
           style={{ textUnderlineOffset: "2px" }}
         >

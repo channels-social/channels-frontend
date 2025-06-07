@@ -60,7 +60,6 @@ export const createCategory = createAsyncThunk(
         "/create/profile/category",
         category
       );
-      console.log(response);
       if (response.success) {
         return response.category;
       } else {
@@ -542,12 +541,12 @@ export const profileItemsSlice = createSlice({
         }
       })
       .addCase(pushChipToCuration.fulfilled, (state, action) => {
-        const chip = action.payload;
-        const categoryId = chip.profile_category || "";
+        const data = action.payload;
+        const categoryId = data.chip.profile_category || "";
         const index = state.items.findIndex((item) => item._id === categoryId);
         if (index !== -1) {
           const chipIndex = state.items[index].items.findIndex(
-            (item) => item._id === chip._id
+            (item) => item._id === data.chip._id
           );
           if (chipIndex !== -1) {
             state.items[index].items.splice(chipIndex, 1);

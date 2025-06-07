@@ -23,32 +23,7 @@ import Landing from "./components/LandingPage/Landing";
 import Welcome from "./components/LandingPage/Welcome";
 import Profile from "./components/Profile/Profile";
 import ChannelPage from "./components/Channel/ChannelPage";
-import ChannelModal from "./components/Modals/Channel/ChannelModal";
-import ChannelUnsplash from "./components/Modals/Unsplash/ChannelUnsplash";
-import TopicModal from "./components/Modals/Topic/TopicModal";
-import DocumentModal from "./components/Modals/widgets/DocumentModal";
-import PrivacyPolicy from "./components/Footer/Modals/PrivacyPolicy";
-import TermsofService from "./components/Footer/Modals/TermsofService";
 import useInitializeApp from "./services/initializeApp";
-import ChipsModal from "./components/Modals/ChipsModal";
-import ProfileShareModal from "./components/Modals/share/profileShareModal";
-import ChannelShareModal from "./components/Modals/share/channelShareModal";
-import CurationModal from "./components/Modals/CurationModal";
-import CreateCategoryModal from "./components/Modals/CreateCategoryModal";
-import CommentChipModal from "./components/Modals/comments/CommentChipModal";
-import CategoryReorderModal from "./components/Modals/category/CategoryReorderModal";
-import EditChipModal from "./components/Modals/EditChipModal";
-import Unsplash from "./components/Modals/CurationUnplash";
-import LogoutModal from "./components/Modals/LogoutModal";
-import DeleteChipModal from "./components/Modals/deletions/DeleteChipModal";
-import DeleteCurationModal from "./components/Modals/deletions/DeleteCurationModal";
-import DeleteCategoryModal from "./components/Modals/deletions/DeleteCategoryModal";
-import PushtoCategoryModal from "./components/Modals/PushItems/pushtoCategoryModal";
-import PushtoCurationModal from "./components/Modals/PushItems/pushtoCurationModal";
-import ChipShareModal from "./components/Modals/share/ChipShareModal";
-import ChannelCoverModal from "./components/Modals/Channel/ChannelCoverModal";
-import DeleteFaqModal from "./components/Modals/deletions/DeleteFaqModal";
-import DeleteChatModal from "./components/Modals/deletions/chatDeleteModal";
 import ProfileChipsView from "./components/View/ProfileChipsView";
 import AcceptInvite from "./components/widgets/AcceptInvite";
 import HomePage from "./components/Home/Home";
@@ -56,19 +31,10 @@ import { extractSubdomain } from "./utils/extractDomain";
 import { updateGalleryField } from "./redux/slices/gallerySlice";
 import { setIsDomain } from "./redux/slices/authSlice";
 import Gallery from "./components/Profile/Gallery";
-import FeedbackModal from "./components/Modals/FeedbackModal";
 import QueryPage from "./components/query";
 import Page404 from "./components/Page404/Page404";
-import ShareModal from "./components/Modals/share/ShareModal";
 import CurationView from "./components/View/CurationView";
 import { ProtectedOnboardingRoute } from "./components/Onboarding/Protectedonboardroute";
-import TopicReorderModal from "./components/Modals/Topic/TopicReorderModal";
-import EventModal from "./components/Modals/Event/EventModal";
-import RemoveMemberModal from "./components/Modals/deletions/removeMemberModal";
-import EventUnsplashModal from "./components/Modals/Unsplash/EventUnsplashModal";
-import EventCardModal from "./components/Modals/Event/EventCardModal";
-import DeleteEventModal from "./components/Modals/deletions/eventDeletionModal";
-import TopicShareModal from "./components/Modals/share/topicShareModal";
 import EmbedHomePage from "./components/EmbedChannels/views/EmbedHomePage";
 import PrivacyPage from "./components/Footer/Modals/PrivacyPage";
 import ResetPassword from "./utils/ResetPassword";
@@ -89,9 +55,6 @@ import Shipping from "./components/Footer/Modals/Shipping";
 import ContactUs from "./components/Footer/Modals/ContactUs";
 import CancellationPolicy from "./components/Footer/Modals/Cancellation";
 import EventFullPage from "./components/ChannelPages/widgets/EventFullPage";
-
-const clientId =
-  "391369792833-72medeq5g0o5sklosb58k7c98ps72foj.apps.googleusercontent.com";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -161,7 +124,7 @@ const App = () => {
   const isMainApp = window.location.hostname.endsWith("channels.social");
   return (
     <Router>
-      <GoogleOAuthProvider clientId={clientId}>
+      <GoogleOAuthProvider clientId="391369792833-72medeq5g0o5sklosb58k7c98ps72foj.apps.googleusercontent.com">
         <ThemeHandler />
         <Routes>
           {hasSubdomain ? (

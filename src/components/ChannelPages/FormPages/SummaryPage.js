@@ -45,7 +45,6 @@ const SummaryPage = ({ topic }) => {
             topic: topic._id,
           }
         );
-        console.log(response);
         setLoading(false);
 
         if (response.success) {
@@ -70,7 +69,6 @@ const SummaryPage = ({ topic }) => {
           topic: topic._id,
         }
       );
-      console.log(response);
       setCurrentLoading(false);
       if (response.success) {
         setSummary(response.summary);

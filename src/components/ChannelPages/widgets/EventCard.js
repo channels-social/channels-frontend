@@ -18,6 +18,7 @@ import {
 } from "../../../redux/slices/eventSlice";
 import { AddToCalendarButton } from "add-to-calendar-button-react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { getAppPrefix } from "../../EmbedChannels/utility/embedHelper";
 
 const EventCard = ({
   width,
@@ -92,7 +93,7 @@ const EventCard = ({
           console.error("Issue in joining event. Please try again.");
         });
     } else {
-      navigate(`/get-started?redirect=${fullPath}`);
+      navigate(`${getAppPrefix()}/get-started?redirect=${fullPath}`);
     }
   };
 
@@ -367,7 +368,7 @@ const EventCard = ({
           <p className="text-theme-secondaryText text-sm font-normal font-inter mt-1 max-w-72">
             {event.name}
           </p>
-          {event.locationText && (
+          {event.locationText && (!event.type || event.type !== "online") && (
             <div
               className="flex flex-row items-start mt-1 w-full cursor-pointer max-w-64"
               onClick={() => handleLocation(event.location)}

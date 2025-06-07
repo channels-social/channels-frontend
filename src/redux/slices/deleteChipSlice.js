@@ -9,13 +9,11 @@ export const deleteChip = createAsyncThunk(
       const response = await postRequestAuthenticated("/delete/chip", {
         chip_id: chipId,
       });
-      console.log(response);
       if (response.success) {
         const chip = {
           _id: chipId,
           profile_category: profile_category,
         };
-        console.log(chip);
         return chip;
       } else {
         return rejectWithValue(response.message);

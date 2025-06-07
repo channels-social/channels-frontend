@@ -16,6 +16,7 @@ import {
 import { setModalModal } from "../../../redux/slices/modalSlice.js";
 import { useNavigate } from "react-router-dom";
 import { domainUrl } from "./../../../utils/globals";
+import { getAppPrefix } from "../../EmbedChannels/utility/embedHelper.js";
 
 const ChannelsTab = ({ gallery = false }) => {
   const { handleOpenModal } = useModal();
@@ -46,7 +47,6 @@ const ChannelsTab = ({ gallery = false }) => {
     dispatch(createChannelInvite(id))
       .unwrap()
       .then((invite) => {
-        console.log(invite.code);
         dispatch(setChannelField({ field: "code", value: invite.code }));
         setTimeout(() => {
           handleOpenModal("modalShareChannelOpen", id);
@@ -65,6 +65,12 @@ const ChannelsTab = ({ gallery = false }) => {
     // }
   };
 
+  const handleLeaveChannel = (channel) => {
+    dispatch(setModalModal({ field: "channelId", value: channel._id }));
+    dispatch(setModalModal({ field: "isTabChannel", value: true }));
+    handleOpenModal("modalLeaveChannelOpen");
+  };
+
   const handleJoinChannel = (channel) => {
     if (isLoggedIn) {
       if (channel.members.includes(myData._id)) {
@@ -78,10 +84,25 @@ const ChannelsTab = ({ gallery = false }) => {
           .unwrap()
           .then((response) => {
             if (response.visit) {
-              navigate(
-                `/user/${channel.user.username}/channel/${channel._id}/c-id/topic/${channel.topics[0]}`
-              );
+              if (response.channel.topics.length > 0) {
+                navigate(
+                  `${getAppPrefix()}/user/${channel.user.username}/channel/${
+                    channel._id
+                  }/c-id/topic/${response.channel.topics[0]}`
+                );
+              } else {
+                navigate(
+                  `${getAppPrefix()}/user/${channel.user.username}/channel/${
+                    channel._id
+                  }`
+                );
+              }
             }
+            // if (response.visit) {
+            //   navigate(
+            //     `/user/${channel.user.username}/channel/${channel._id}/c-id/topic/${channel.topics[0]}`
+            //   );
+            // }
           })
           .catch((error) => {
             alert(error);
@@ -94,7 +115,9 @@ const ChannelsTab = ({ gallery = false }) => {
         );
       } else {
         navigate(
-          `/get-started?redirect=/user/${channel.user.username}/profile`
+          `/get-started?redirect=${getAppPrefix()}/user/${
+            channel.user.username
+          }/profile`
         );
       }
     }
@@ -151,28 +174,31 @@ const ChannelsTab = ({ gallery = false }) => {
               onClick={() =>
                 handleOwnerShareChannel(channel._id, channel.user.username)
               }
-              className="cursor-pointer px-3 mt-4 font-normal  py-2 bg-theme-secondaryText
+              className="cursor-pointer px-3 mt-4 font-normal  py-2.5 bg-theme-secondaryText
                          text-theme-primaryBackground text-xs rounded-lg "
             >
               Share join link
             </button>
-          ) : channel.requests?.includes(myData?._id) ? (
+          ) : channel.members?.includes(myData?._id) ? (
             <div
-              className={`py-2.5 px-3 cursor-pointer text-center bg-theme-buttonDisable text-theme-buttonDisableText
-             rounded-lg text-sm `}
-              onClick={() => handleJoinChannel(channel)}
+              className={`border border-theme-primaryText py-2 px-3 rounded-lg cursor-pointer text-theme-secondaryText text-sm font-inter`}
+              onClick={() => handleLeaveChannel(channel)}
             >
-              Requested
+              Exit channel
             </div>
           ) : (
             <div
-              className={`flex items-center py-2 px-3 cursor-pointer 
-                bg-theme-secondaryText text-theme-primaryBackground
-               rounded-lg text-sm `}
+              className={`py-2 px-3 cursor-pointer  text-center
+                  ${
+                    channel.requests?.includes(myData?._id)
+                      ? "bg-theme-buttonDisable text-theme-buttonDisableText"
+                      : "bg-theme-secondaryText text-theme-primaryBackground"
+                  }
+                   rounded-lg text-sm font-inter`}
               onClick={() => handleJoinChannel(channel)}
             >
-              {channel.members?.includes(myData?._id)
-                ? "Check updates"
+              {channel.requests?.includes(myData?._id)
+                ? "Requested"
                 : "Join channel"}
             </div>
           )}
@@ -189,7 +215,7 @@ const ChannelsTab = ({ gallery = false }) => {
               onClick={() =>
                 handleShareChannel(channel._id, channel.user.username)
               }
-              className={`px-4 mt-4  py-2 border border-theme-secondaryText 
+              className={`px-4 mt-4  py-2.5 border border-theme-secondaryText 
          text-theme-secondaryText font-normal text-xs rounded-lg`}
             >
               Share

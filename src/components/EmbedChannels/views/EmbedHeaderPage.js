@@ -8,11 +8,13 @@ import {
 } from "react-router-dom";
 import { fetchChannel } from "../../../redux/slices/channelSlice";
 import ProfileIcon from "../../../assets/icons/profile.svg";
+import ColorProfile from "../../../assets/images/color_profile.svg";
 
 import DropDown from "../../../assets/icons/arrow_drop_down.svg";
 import DropDownLight from "../../../assets/lightIcons/arrow_drop_down_light.svg";
 import { getAppPrefix } from "./../utility/embedHelper";
 import { fetchChannels } from "./../../../redux/slices/channelItemsSlice";
+import { fetchMyData } from "./../../../redux/slices/myDataSlice";
 import useModal from "./../../hooks/ModalHook";
 import ThemeToggleButton from "./../../../utils/theme";
 
@@ -26,15 +28,35 @@ const EmbedHeaderPage = () => {
   const [channelsData, setChannelsData] = useState([]);
   const hasFetched = useRef(false);
 
-  const { username, channelId } = useParams();
+  const [username, setUsername] = useState("");
+  const [channelId, setChannelId] = useState("");
   const dispatch = useDispatch();
 
   const channel = useSelector((state) => state.channel);
   const myData = useSelector((state) => state.myData);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
 
-  const channels = channelsData;
   const channelName = channel.name;
+
+  useEffect(() => {
+    if (!myData._id) {
+      dispatch(fetchMyData());
+    }
+  }, [myData._id]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const data = localStorage.getItem("embedFetchedData");
+      if (data) {
+        const dataId = JSON.parse(data);
+        setUsername(dataId.username);
+        setChannelId(dataId.selectedChannel);
+        clearInterval(interval);
+      }
+    }, 200);
+
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (channelId) {
@@ -77,9 +99,18 @@ const EmbedHeaderPage = () => {
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
-  const toggleChannel = (newChannelId) => {
+  const toggleChannel = (channel) => {
+    console.log(channel);
     toggleDropdown();
-    navigate(`${getAppPrefix()}/user/${username}/channel/${newChannelId}`);
+    if (channel.members.includes(myData._id)) {
+      navigate(
+        `${getAppPrefix()}/user/${username}/channel/${channel._id}/c-id/topic/${
+          channel.topics[0]._id
+        }`
+      );
+    } else {
+      navigate(`${getAppPrefix()}/user/${username}/channel/${channel._id}`);
+    }
   };
 
   const handleBrandProfile = () => {
@@ -89,7 +120,9 @@ const EmbedHeaderPage = () => {
 
   const handleMessagePage = () => {
     toggleDropdown();
-    navigate(`${getAppPrefix()}/user/${myData.username}/messages/list`);
+    if (myData.username) {
+      navigate(`${getAppPrefix()}/user/${myData.username}/messages/list`);
+    }
   };
 
   const isTopicPage =
@@ -121,19 +154,18 @@ const EmbedHeaderPage = () => {
     const username = dataId.username;
     toggleDropdown();
     navigate(
-      `${getAppPrefix()}/get-started?redirect=/user/${username}/channel/${channelId}`,
+      `${getAppPrefix()}/get-started?redirect=${getAppPrefix()}/user/${username}/channel/${channelId}`,
       {
         replace: true,
       }
     );
   };
-
   if (isProfilePage) return null;
 
   return (
     <div className="flex flex-row py-3 justify-between items-center px-6 w-full bg-theme-secondaryBackground h-14">
-      <div className="flex-row items-center flex relative ">
-        <p className="flex text-theme-secondaryText xs:text-xl text-lg sm:text-2xl font-normal font-inter tracking-wide">
+      <div className="flex-row items-center flex relative " ref={dropdownRef}>
+        <p className="flex text-theme-secondaryText xs:text-xl text-lg sm:text-2xl font-normal font-inter ">
           {(() => {
             const rawText = isTopicPage
               ? channelName.charAt(0).toUpperCase() + channelName.slice(1)
@@ -148,19 +180,18 @@ const EmbedHeaderPage = () => {
         <img
           src={DropDown}
           alt="arrow-right"
-          className="dark:block hidden w-6 h-6 ml-1 cursor-pointer "
+          className="dark:block hidden w-6 h-6 ml-0.5 cursor-pointer "
           onClick={toggleDropdown}
         />
         <img
           src={DropDownLight}
           alt="arrow-right"
-          className="dark:hidden w-6 h-6 ml-1 cursor-pointer "
+          className="dark:hidden w-6 h-6 ml-0.5 cursor-pointer "
           onClick={toggleDropdown}
         />
 
         {isDropdownOpen && (
           <div
-            ref={dropdownRef}
             className="absolute left-0 top-6 mt-2 w-max rounded-md shadow-lg border 
       border-theme-chatDivider bg-theme-tertiaryBackground ring-1 ring-black ring-opacity-5 z-50"
           >
@@ -180,7 +211,7 @@ const EmbedHeaderPage = () => {
                   <div
                     key={channel._id}
                     className="flex px-3 items-center sm:py-2 py-2 text-center text-theme-primaryText font-light cursor-pointer hover:bg-theme-sidebarHighlight"
-                    onClick={() => toggleChannel(channel._id)}
+                    onClick={() => toggleChannel(channel)}
                   >
                     <p className="mr-1">{channel.name}</p>
                   </div>
@@ -245,9 +276,11 @@ const EmbedHeaderPage = () => {
             />
           ) : myData?.color_logo ? (
             <div
-              className="rounded-full w-full h-full shrink-0 "
-              style={{ backgroundColor: myData.color_logo }}
-            ></div>
+              className="rounded-full w-full h-full shrink-0 flex items-center justify-center"
+              style={{ backgroundColor: myData?.color_logo }}
+            >
+              <img src={ColorProfile} alt="color-profile" className="w-4 h-4" />
+            </div>
           ) : (
             <img
               src={ProfileIcon}

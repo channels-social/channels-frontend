@@ -24,7 +24,6 @@ export const fetchAdminRequests = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await postRequestAuthenticated(`/get/admin/requests`);
-      console.log(response);
       if (response.success) {
         return response.requests;
       } else {
@@ -43,7 +42,6 @@ export const updateAdminRequests = createAsyncThunk(
         `/update/admin/requests`,
         { requests }
       );
-      console.log(response);
       if (response.success) {
         return response.requests;
       } else {

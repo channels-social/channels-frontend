@@ -64,7 +64,6 @@ export const getNewsletterLimit = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await postRequestAuthenticated("/get/newsletter/limit");
-      console.log(response);
       if (response.success) {
         return response.records;
       } else {

@@ -1,7 +1,7 @@
 import { React, useState, useEffect } from "react";
 import * as Dialog from "@radix-ui/react-dialog";
 import Close from "../../../assets/icons/Close.svg";
-import AddIcon from "../../../assets/icons/add-icon.svg";
+import AddIcon from "../../../assets/icons/addIcon.svg";
 import AddIconLight from "../../../assets/lightIcons/add_light.svg";
 import Category from "../../../assets/icons/category.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

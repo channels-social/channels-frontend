@@ -38,7 +38,7 @@ const DeleteCurationModal = () => {
         dispatch(closeModal("modalCurationDeleteOpen"));
         dispatch(clearCurationIdToDelete());
         dispatch(fetchProfileItems(myData._id));
-        navigate(`/user/${myData.username}/profile`);
+        navigate(`/user/${myData.username}/profile?tab=curations`);
       })
       .catch((error) => {
         console.error("Failed to delete curation:", error);

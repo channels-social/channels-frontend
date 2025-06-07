@@ -24,7 +24,7 @@ const GoogleOneTapLogin = ({ handleTapGoogleSuccess }) => {
                 "391369792833-72medeq5g0o5sklosb58k7c98ps72foj.apps.googleusercontent.com",
               callback: handleTapGoogleSuccess,
               auto_select: false,
-              cancel_on_tap_outside: false,
+              cancel_on_tap_outside: true,
             });
 
             setTimeout(() => {
@@ -43,7 +43,7 @@ const GoogleOneTapLogin = ({ handleTapGoogleSuccess }) => {
               "391369792833-72medeq5g0o5sklosb58k7c98ps72foj.apps.googleusercontent.com",
             callback: handleTapGoogleSuccess,
             auto_select: false,
-            cancel_on_tap_outside: false,
+            cancel_on_tap_outside: true,
           });
 
           setTimeout(() => {

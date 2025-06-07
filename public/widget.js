@@ -15,8 +15,8 @@
   }
 
   const apiKey = getApiKeyFromScript();
-  const domain = window.location.hostname;
-  // const domain = "channelsbychips.site";
+  // const domain = window.location.hostname;
+  const domain = "channelsbychips.site";
   // const targetOrigin = "https://localhost:3001";
 
   if (!apiKey) {
@@ -73,7 +73,7 @@
                   source: "channels-widget",
                   payload: embedData,
                 },
-                "https://channels.social"
+                "http://localhost:3001"
               );
             });
           };

@@ -350,7 +350,7 @@ const ChannelModal = () => {
                   onChange={handleChange}
                   name="description"
                   maxLength={maxDesc}
-                  className="w-full text-sm pt-3 font-inter pb-4 pl-4 pr-3 bg-transparent rounded-lg border font-light border-theme-chatDivider 
+                  className="w-full text-sm pt-2 font-inter pb-3 pl-4 pr-3 bg-transparent rounded-lg border font-light border-theme-chatDivider 
                    text-theme-secondaryText focus:border-primary focus:ring-0 focus:outline-none placeholder:text-secondaryText"
                   rows="2"
                   placeholder="Add a description"

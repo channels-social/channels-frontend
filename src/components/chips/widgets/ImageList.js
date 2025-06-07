@@ -3,6 +3,7 @@ import { FaPlay, FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import * as Dialog from "@radix-ui/react-dialog";
 import Close from "../../../assets/icons/Close.svg";
 import { IoExpand } from "react-icons/io5";
+import playIcon from "../../../assets/images/play_button.svg";
 
 const ImageList = ({ imageCards, isAllExclusive }) => {
   const isSingleImage = imageCards.length === 1;
@@ -105,12 +106,17 @@ const ImageList = ({ imageCards, isAllExclusive }) => {
                           src={card.thumbnail}
                           alt="video-thumbnail"
                           className="w-full h-52 object-cover rounded-t-xl"
+                          loading="lazy"
                         />
                         <button
                           className="absolute inset-0 flex items-center justify-center text-theme-secondaryText text-2xl bg-black bg-opacity-50 rounded-t-xl"
                           onClick={() => handleVideoClick(card.id)}
                         >
-                          <FaPlay className="w-10 h-10" />
+                          <img
+                            src={playIcon}
+                            alt="Play"
+                            className=" w-10 h-10 "
+                          />
                         </button>
                       </div>
                     )}
@@ -121,13 +127,16 @@ const ImageList = ({ imageCards, isAllExclusive }) => {
                       src={card.url}
                       alt="carousel"
                       className="w-full h-52 object-cover rounded-t-xl"
+                      loading="lazy"
                     />
                     <button
                       className="absolute top-1 right-1 text-theme-secondaryText text-xl bg-black bg-opacity-50 p-2 rounded-full"
                       onClick={() =>
                         openFullScreen(
                           imageCards.filter((card) => card.type === "image"),
-                          index
+                          imageCards
+                            .filter((card) => card.type === "image")
+                            .findIndex((img) => img.id === card.id)
                         )
                       }
                     >

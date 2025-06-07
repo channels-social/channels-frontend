@@ -25,7 +25,6 @@ const BusinessRequest = () => {
         id: r._id,
         domain: r.domain,
         userId: r.user_id?._id || "",
-        payment_subscription: r.payment_subscription || false,
         autoLogin: r.autoLogin || false,
       }))
     );
@@ -71,7 +70,7 @@ const BusinessRequest = () => {
           <div className=" text-theme-emptyEvent font-normal text-sm">
             {request.username}
           </div>
-          <div>
+          {/* <div>
             <input
               type="checkbox"
               checked={request.payment_subscription}
@@ -80,7 +79,7 @@ const BusinessRequest = () => {
               }
               className="h-4 w-4"
             />
-          </div>
+          </div> */}
           <div className="flex flex-col">
             <input
               type="checkbox"

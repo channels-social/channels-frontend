@@ -74,18 +74,22 @@ const PageDM = () => {
           >
             Messages
           </p>
-          <img
-            src={DropDown}
-            alt="arrow-right"
-            className="dark:block hidden w-6 h-6 ml-1 cursor-pointer "
-            onClick={toggleDropdown}
-          />
-          <img
-            src={DropDownLight}
-            alt="arrow-right"
-            className="dark:hidden w-6 h-6 ml-1 cursor-pointer "
-            onClick={toggleDropdown}
-          />
+          {isEmbeddedOrExternal() && (
+            <img
+              src={DropDown}
+              alt="arrow-right"
+              className="dark:block hidden w-6 h-6 ml-1 cursor-pointer "
+              onClick={toggleDropdown}
+            />
+          )}
+          {isEmbeddedOrExternal() && (
+            <img
+              src={DropDownLight}
+              alt="arrow-right"
+              className="dark:hidden w-6 h-6 ml-1 cursor-pointer "
+              onClick={toggleDropdown}
+            />
+          )}
 
           {isDropdownOpen && (
             <div

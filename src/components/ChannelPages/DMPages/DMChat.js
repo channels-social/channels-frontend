@@ -7,6 +7,7 @@ import ProfileIcon from "../../../assets/icons/profile.svg";
 import Close from "../../../assets/icons/Close.svg";
 import Media from "../../../assets/icons/media.svg";
 import Document from "../../../assets/icons/document.svg";
+import ColorProfile from "../../../assets/images/color_profile.svg";
 import EmojiPicker from "emoji-picker-react";
 import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
@@ -379,9 +380,11 @@ const DMChat = () => {
             />
           ) : receiver?.color_logo ? (
             <div
-              className="rounded-full w-6 h-6 mr-2"
-              style={{ backgroundColor: receiver.color_logo }}
-            ></div>
+              className="rounded-full w-6 h-6 mr-2 shrink-0 flex items-center justify-center"
+              style={{ backgroundColor: receiver?.color_logo }}
+            >
+              <img src={ColorProfile} alt="color-profile" className="w-4 h-4" />
+            </div>
           ) : (
             <img
               src={ProfileIcon}
@@ -408,7 +411,7 @@ const DMChat = () => {
         />
       </div>
 
-      <div className={`absolute ${"bottom-24"}  w-full `}>
+      <div className={`absolute ${"bottom-14"}  w-full `}>
         {dmChat.media.length > 0 && (
           <div
             className="w-full bg-theme-chatDivider flex flex-row  space-x-5 overflow-x-auto custom-scrollbar flex-shrink-0 z-50
@@ -428,7 +431,7 @@ const DMChat = () => {
                       <img
                         src={item.url}
                         alt="pdf-image"
-                        className=" rounded-lg h-24 max-w-32 w-auto "
+                        className=" rounded-lg h-24 max-w-32 w-auto object-cover "
                       />
                     </div>
                   ) : item.type === "video" ? (

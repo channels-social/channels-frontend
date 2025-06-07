@@ -178,29 +178,27 @@ const FaqsTab = ({ username }) => {
   const [isCreateFaq, setIsCreateFaq] = useState(false);
   const [isReorder, setIsReorder] = useState(false);
   const [isEditFaq, setIsEditFaq] = useState(false);
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const Faq = useSelector((state) => state.faqs);
   const dispatch = useDispatch();
   const dropdownRef = useRef(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(null);
-  const { faqs: initialFaqs, status } = useSelector((state) => state.faqs);
-  const [items, setItems] = useState(initialFaqs);
-
-  // useEffect(() => {
-  //   dispatch(fetchFaqs(username));
-  // }, [dispatch, username]);
+  const Faq = useSelector((state) => state.faqs);
+  const {
+    faqs: initialFaqs,
+    status,
+    updatestatus,
+  } = useSelector((state) => state.faqs);
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const [items, setItems] = useState([]);
 
   useEffect(() => {
     if (initialFaqs.length === 0) {
       dispatch(fetchFaqs(username));
     }
-  }, [dispatch, username, initialFaqs.length]);
+  }, [username, initialFaqs.length]);
 
   useEffect(() => {
-    if (items.length !== initialFaqs.length) {
-      setItems(initialFaqs);
-    }
-  }, [initialFaqs, items.length]);
+    setItems(initialFaqs);
+  }, [initialFaqs]);
 
   const handleClickOutside = (event) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -210,12 +208,13 @@ const FaqsTab = ({ username }) => {
 
   const handleDragEnd = (result) => {
     if (!result.destination) return;
-    const newItems = Array.from(items);
-    const [reorderedItem] = newItems.splice(result.source.index, 1);
-    newItems.splice(result.destination.index, 0, reorderedItem);
 
-    setItems(newItems);
-    dispatch(updateReorderItems(newItems));
+    const reorderedItems = Array.from(items);
+    const [movedItem] = reorderedItems.splice(result.source.index, 1);
+    reorderedItems.splice(result.destination.index, 0, movedItem);
+
+    setItems(reorderedItems);
+    dispatch(updateReorderItems(reorderedItems));
   };
 
   const handleChange = (e) => {
@@ -343,11 +342,14 @@ const FaqsTab = ({ username }) => {
             className="rounded-md text-sm  text-theme-primaryBackground bg-theme-secondaryText cursor-pointer  px-4 py-1"
             onClick={handleSaveReorder}
           >
-            Save
+            {updatestatus === "loading" ? "saving.." : "Save"}
           </div>
           <div
             className="space-y-1 cursor-pointer underline text-sm font-light text-theme-emptyEvent"
-            onClick={() => setIsReorder(false)}
+            onClick={() => {
+              setIsReorder(false);
+              setItems(initialFaqs);
+            }}
           >
             Cancel
           </div>
@@ -415,14 +417,20 @@ const FaqsTab = ({ username }) => {
               <div
                 className={`${postButtonClass} 
           text-sm font-normal py-2 px-10 rounded-md cursor-pointer `}
-                onClick={isEditFaq ? handleEditFaq : handleCreateFaq}
+                onClick={(e) => {
+                  e.preventDefault();
+                  isEditFaq ? handleEditFaq() : handleCreateFaq();
+                }}
               >
-                Save
+                {updatestatus === "loading" ? "saving.." : "Save"}
               </div>
               <div
                 className="border rounded-md border-theme-primaryText text-theme-secondaryText cursor-pointer
               text-sm font-normal py-2 px-6"
-                onClick={closeFaq}
+                onClick={(e) => {
+                  e.preventDefault();
+                  closeFaq();
+                }}
               >
                 Discard
               </div>

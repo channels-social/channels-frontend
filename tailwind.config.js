@@ -44,7 +44,7 @@ module.exports = {
         "familjen-grotesk": ['"Familjen Grotesk"', "sans-serif"],
       },
       fontWeight: {
-        extralight: 100,
+        extralight: 300,
         light: 300,
         normal: 400,
         medium: 500,

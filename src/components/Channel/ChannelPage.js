@@ -7,6 +7,8 @@ import Stack from "../../assets/icons/stack.svg";
 import StackLight from "../../assets/lightIcons/curation_light.svg";
 import ChannelLogo from "../../assets/icons/default_channel_logo.svg";
 import { createGeneralTopic } from "./../../redux/slices/channelItemsSlice";
+import Dots from "../../assets/icons/three_dots.svg";
+import DotsLight from "../../assets/lightIcons/faqs_dots_light.svg";
 import {
   clearCreateTopic,
   setCreateTopicField,
@@ -18,6 +20,7 @@ import {
   fetchChannel,
   createChannelInvite,
   joinChannel,
+  leaveChannel,
 } from "../../redux/slices/channelSlice.js";
 import {
   setCreateChannelField,
@@ -33,6 +36,8 @@ import TopicsTab from "./Tabs/TopicsTab";
 import MembersTab from "./Tabs/MembersTab";
 import Compressor from "compressorjs";
 import { getAppPrefix } from "./../EmbedChannels/utility/embedHelper";
+import Delete from "../../assets/icons/Delete.svg";
+import DeleteLight from "../../assets/lightIcons/delete_light.svg";
 
 import {
   React,
@@ -46,11 +51,18 @@ import {
   useParams,
   useModal,
   useLocation,
+  isEmbeddedOrExternal,
 } from "../../globals/imports";
+import {
+  setChannelIdToDelete,
+  setChannelNameToDelete,
+} from "../../redux/slices/deleteChannelSlice.js";
 
 const ChannelPage = () => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const [isEditDropdownOpen, setIsEditDropdownOpen] = useState(null);
+  const dropdownEditRef = useRef(null);
   const navigate = useNavigate();
   const { handleOpenModal } = useModal();
   const dispatch = useDispatch();
@@ -71,34 +83,58 @@ const ChannelPage = () => {
   const [searchParams] = useSearchParams();
   const inviteCode = searchParams.get("code");
   const myData = useSelector((state) => state.myData);
-  const isOwner = myData?._id === channel?.user;
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const isSubdomain = useSelector((state) => state.auth.isSubdomain);
+  const [activeTab, setActiveTab] = useState("topics");
 
   const tabs = [
-    { id: 1, name: "Topics", href: "" },
-    { id: 2, name: "Members", href: "#members" },
+    { id: 1, name: "Topics", href: "topics" },
+    { id: 2, name: "Members", href: "members" },
   ];
 
-  const [activeTab, setActiveTab] = useState("");
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownEditRef.current &&
+        !dropdownEditRef.current.contains(event.target)
+      ) {
+        setIsEditDropdownOpen(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
-    if (window.location.hash) {
-      setActiveTab(window.location.hash);
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+    if (tab === "members") {
+      setActiveTab(tab);
     } else {
-      setActiveTab("");
+      setActiveTab("topics");
     }
-  }, [location]);
+  }, []);
 
-  const handleTabClick = (href) => {
-    window.location.hash = href;
+  const handleTabClick = (event, href) => {
+    event.preventDefault();
+    const scrollY = window.scrollY;
     setActiveTab(href);
+    if (href === "topics") {
+      window.history.pushState(null, "", window.location.pathname);
+    } else {
+      window.history.pushState(null, "", `?tab=${href}`);
+    }
+    window.scrollTo(0, scrollY);
   };
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
-  //
+  const toggleEditDropdown = (id) => {
+    setIsEditDropdownOpen(id);
+  };
 
   useEffect(() => {
     if (channelId) {
@@ -271,13 +307,31 @@ const ChannelPage = () => {
         );
       } else {
         navigate(
-          `${getAppPrefix()}/get-started?redirect=/user/${username}/channel/${
+          `${getAppPrefix()}/get-started?redirect=${getAppPrefix()}/user/${username}/channel/${
             channel._id
           }`
         );
       }
     }
   };
+
+  const handleLeaveChannel = () => {
+    dispatch(setModalModal({ field: "channelId", value: channel._id }));
+    handleOpenModal("modalLeaveChannelOpen");
+    // if (isLoggedIn) {
+    //   dispatch(leaveChannel(channel._id))
+    //     .unwrap()
+    //     .then((response) => {
+    //       if (response.sucess) {
+    //         navigate(`${getAppPrefix()}/user/${myData.username}/profile`);
+    //       }
+    //     })
+    //     .catch((error) => {
+    //       alert(error);
+    //     });
+    // }
+  };
+
   if (loading) {
     return <ChannelSkeleton />;
   }
@@ -293,6 +347,11 @@ const ChannelPage = () => {
     );
   }
 
+  const isOwner = myData?._id.toString() === channel?.user?.toString();
+
+  // console.log(myData);
+  // console.log(isOwner);
+  // console.log(channel.user);
   return (
     <div className="bg-theme-secondaryBackground w-full h-full flex flex-col overflow-y-auto">
       <div className="relative w-full h-44 shrink-0">
@@ -301,15 +360,18 @@ const ChannelPage = () => {
           alt="channel-cover"
           onClick={closeDropdown}
           className="w-full h-full object-cover shrink-0"
+          loading="lazy"
         />
-        <div className="absolute left-3 top-3 text-theme-secondaryText">
-          <img
-            src={ArrowBack}
-            alt="arrow-back"
-            className="text-theme-secondaryText w-5 h-5 cursor-pointer"
-            onClick={() => navigate(-1)}
-          />
-        </div>
+        {!isEmbeddedOrExternal() && (
+          <div className="absolute left-3 top-3 text-theme-secondaryText">
+            <img
+              src={ArrowBack}
+              alt="arrow-back"
+              className="text-theme-secondaryText w-5 h-5 cursor-pointer"
+              onClick={() => navigate(-1)}
+            />
+          </div>
+        )}
         {isEditCover && (
           <div
             className="absolute left-3 top-3 cursor-pointer bg-theme-secondaryText px-3 text-sm font-light py-1.5
@@ -398,6 +460,7 @@ const ChannelPage = () => {
             src={channel.logo}
             alt="logo"
             className="rounded-lg object-cover w-20 h-20 mt-1 flex-shrink-0"
+            loading="lazy"
           />
         ) : (
           <img
@@ -431,6 +494,13 @@ const ChannelPage = () => {
               >
                 Share join link
               </div>
+            ) : channel.members?.includes(myData?._id) ? (
+              <div
+                className={`border border-theme-primaryText py-2 px-3 rounded-lg cursor-pointer text-theme-secondaryText text-sm font-inter`}
+                onClick={() => handleLeaveChannel(channel)}
+              >
+                Exit channel
+              </div>
             ) : (
               <div
                 className={`py-2 px-3 cursor-pointer  text-center
@@ -444,21 +514,96 @@ const ChannelPage = () => {
               >
                 {channel.requests?.includes(myData?._id)
                   ? "Requested"
-                  : channel.members?.includes(myData?._id)
-                  ? "Check updates"
                   : "Join channel"}
               </div>
             )}
             {isOwner ? (
-              <div
-                className="border border-theme-primaryText py-2 px-3 rounded-lg cursor-pointer text-theme-secondaryText text-xs sm:text-sm font-inter"
-                onClick={handleEditChannel}
-              >
-                Edit Channel
+              // <div
+              //   className="border border-theme-primaryText py-2 px-3 rounded-lg cursor-pointer text-theme-secondaryText text-xs sm:text-sm font-inter"
+              //   onClick={handleEditChannel}
+              // >
+              //   Edit Channel
+              // </div>
+              <div className="relative flex items-center">
+                <img
+                  src={Dots}
+                  alt="dots"
+                  className="dark:block hidden w-6 h-6 mr-2 cursor-pointer"
+                  onClick={() => toggleEditDropdown(channel._id)}
+                />
+                <img
+                  src={DotsLight}
+                  alt="dots"
+                  className="dark:hidden w-6 h-6 mr-2 cursor-pointer"
+                  onClick={() => toggleEditDropdown(channel._id)}
+                />
+                {isEditDropdownOpen === channel._id && (
+                  <div
+                    ref={dropdownEditRef}
+                    className="absolute top-6 left-0 mt-1 ml-3 w-24 rounded-md shadow-lg border  border-theme-chatDivider
+                             bg-theme-tertiaryBackground ring-1 ring-black ring-opacity-5 z-50"
+                  >
+                    <div
+                      className="py-1"
+                      role="menu"
+                      aria-orientation="vertical"
+                      aria-labelledby="options-menu"
+                    >
+                      <div className="flex flex-row px-3 items-center">
+                        <img
+                          src={Edit}
+                          alt="edit"
+                          className="dark:block hidden w-4 h-4"
+                        />
+                        <img
+                          src={EditLight}
+                          alt="edit"
+                          className="dark:hidden w-4 h-4"
+                        />
+                        <p
+                          className="block font-light px-2 py-2 text-sm text-theme-secondaryText cursor-pointer"
+                          role="menuitem"
+                          onClick={handleEditChannel}
+                        >
+                          Edit
+                        </p>
+                      </div>
+                      <div
+                        className="flex flex-row px-3 items-center"
+                        onClick={(e) => {
+                          dispatch(setChannelIdToDelete(channel._id));
+                          dispatch(setChannelNameToDelete(channel.name));
+                          handleOpenModal("modalDeleteChannelOpen");
+                        }}
+                      >
+                        <img
+                          src={Delete}
+                          alt="edit"
+                          className="dark:block hidden w-4 h-4"
+                        />
+                        <img
+                          src={DeleteLight}
+                          alt="edit"
+                          className="dark:hidden w-4 h-4"
+                        />
+                        <p
+                          className="block px-2 py-2 font-light text-sm   text-theme-secondaryText cursor-pointer"
+                          role="menuitem"
+                        >
+                          Delete
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div
-                className="border border-theme-primaryText py-2 px-3 rounded-lg cursor-pointer text-theme-secondaryText text-sm font-inter"
+                className={`py-2 px-3 rounded-lg cursor-pointer ${
+                  channel.members?.includes(myData?._id)
+                    ? "bg-theme-secondaryText text-theme-primaryBackground text-sm"
+                    : "border border-theme-primaryText text-theme-secondaryText text-sm font-inter"
+                } `}
                 onClick={() => handleShareChannel(channel._id)}
               >
                 Share Invite
@@ -528,7 +673,7 @@ const ChannelPage = () => {
               return (
                 <button
                   key={tab.id}
-                  onClick={() => handleTabClick(tab.href)}
+                  onClick={(event) => handleTabClick(event, tab.href)}
                   className={`mx-2 xs:px-12 px-8 py-3 text-sm transition-colors duration-300 ${
                     activeTab === tab.href
                       ? "border-b-2 text-theme-secondaryText border-theme-secondaryText"
@@ -551,7 +696,7 @@ const ChannelPage = () => {
         )}
         {(isOwner || channel.members.includes(myData?._id)) && (
           <div className="mt-4 mb-6 h-full">
-            {activeTab === "" ? (
+            {activeTab === "topics" ? (
               <TopicsTab channelId={channelId} isOwner={isOwner} />
             ) : (
               <MembersTab channelId={channelId} isOwner={isOwner} />

@@ -424,7 +424,7 @@ const EditChipModal = () => {
         <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-70 z-50" />
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <Dialog.Content
-            className="bg-theme-secondaryBackground rounded-xl overflow-hidden shadow-xl transform transition-all min-h-[20%] max-h-[80%] overflow-y-auto custom-scrollbar w-[90%] sm:w-max pl-5 py-5"
+            className="bg-theme-secondaryBackground rounded-xl overflow-hidden shadow-xl transform transition-all min-h-[20%] max-h-[80%] overflow-y-auto custom-scrollbar w-[90%] sm:w-max pl-4 py-5"
             onClick={(e) => e.stopPropagation()}
           >
             <Dialog.Title />
@@ -444,7 +444,7 @@ const EditChipModal = () => {
                     onClick={handleClose}
                   />
                 </div>
-                <div className="flex justify-between space-x-4 items-center mb-5 pr-4 overflow-x-auto xs:overflow-x-hidden custom-scrollbar">
+                <div className="flex justify-between xs:space-x-4 space-x-2.5 items-center mb-5 pr-4 overflow-x-auto xs:overflow-x-hidden custom-scrollbar">
                   <div
                     className={`${
                       visibleFields.link

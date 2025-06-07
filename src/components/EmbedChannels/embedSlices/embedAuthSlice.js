@@ -1,14 +1,14 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import StorageManager from "../utility/storage_manager";
+import localStorage from "../utility/storage_manager";
 import { postRequestUnAuthenticated } from "./../../../services/rest";
 
 // Initial State
 const initialState = {
-  user: StorageManager.getItem("user")
-    ? JSON.parse(StorageManager.getItem("user"))
+  user: localStorage.getItem("user")
+    ? JSON.parse(localStorage.getItem("user"))
     : null,
-  token: StorageManager.getItem("auth-token") || null,
-  isLoggedIn: !!StorageManager.getItem("auth-token"),
+  token: localStorage.getItem("auth-token") || null,
+  isLoggedIn: !!localStorage.getItem("auth-token"),
   isOnboarding: false,
 };
 
@@ -30,15 +30,15 @@ const embedAuthSlice = createSlice({
       state.token = null;
       state.isLoggedIn = false;
 
-      StorageManager.removeItem("auth-token");
-      StorageManager.removeItem("user");
+      localStorage.removeItem("auth-token");
+      localStorage.removeItem("user");
     },
     setOnboarding: (state, action) => {
       state.isOnboarding = action.payload;
     },
     initializeEmbedAuth: (state) => {
-      const storedToken = StorageManager.getItem("auth-token");
-      const storedUser = StorageManager.getItem("user");
+      const storedToken = localStorage.getItem("auth-token");
+      const storedUser = localStorage.getItem("user");
 
       if (storedToken && storedUser) {
         state.token = storedToken;
@@ -64,6 +64,7 @@ export const checkAutoLogin = createAsyncThunk(
         "/check/auto/login",
         data
       );
+      // console.log(response);
       if (response.success) {
         const data = {
           token: response.token,

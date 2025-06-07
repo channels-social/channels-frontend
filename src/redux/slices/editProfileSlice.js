@@ -1,25 +1,24 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-    _id:'',
-    name: '',
-    email: '',
-    logo: '',
-    username: '',
-    description: '',
-    links: [],
-    location: '',
-    contact: '',
-    customText: '',
-    customUrl: '',
-    otherLink: '',
-    imageCards: [],
-    subscriptions: [],
-    subscribers: [],
-  };
+  _id: "",
+  name: "",
+  email: "",
+  logo: "",
+  username: "",
+  description: "",
+  links: [],
+  location: "",
+  contact: "",
+  customText: "",
+  customUrl: "",
+  otherLink: "",
+  imageCards: [],
+  subscriptions: [],
+};
 
 const editProfileSlice = createSlice({
-  name: 'editProfile',
+  name: "editProfile",
   initialState,
   reducers: {
     setProfileData: (state, action) => {

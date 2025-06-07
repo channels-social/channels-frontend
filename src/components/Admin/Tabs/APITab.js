@@ -89,7 +89,6 @@ const APITab = () => {
         "/save/admin/api",
         formDataToSend
       );
-      console.log(response);
       setLoading(false);
       if (response.success) {
         setCode("");
@@ -110,7 +109,6 @@ const APITab = () => {
         "/save/admin/upload",
         formDataToSend
       );
-      console.log(response);
       setLoading(false);
       if (response.success) {
         clearFileData();

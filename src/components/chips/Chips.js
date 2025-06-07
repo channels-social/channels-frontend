@@ -5,7 +5,7 @@ import Upvote from "../../assets/icons/upvote.svg";
 import UpvoteLight from "../../assets/lightIcons/upvote_light.svg";
 import UpvotedLight from "../../assets/lightIcons/upvote_filled_light.svg";
 import Upvoted from "../../assets/icons/upvoted.svg";
-
+import ColorProfile from "../../assets/images/color_profile.svg";
 import Send from "../../assets/icons/Send.svg";
 import MetaCard from "./widgets/MetaCard";
 import Comment from "../../assets/icons/Comment.svg";
@@ -23,6 +23,7 @@ import DocumentPreview from "./widgets/DocumentPreview";
 import Linkify from "react-linkify";
 import { setCommentChip } from "./../../redux/slices/commentChipSlice";
 import { useNavigate } from "react-router-dom";
+import { getAppPrefix } from "../EmbedChannels/utility/embedHelper";
 
 const Chips = ({ item }) => {
   const [isSavedMessageVisible, setSavedMessageVisible] = useState(false);
@@ -57,7 +58,11 @@ const Chips = ({ item }) => {
         handleOpenModal("modalCommentOpen");
       }, 0);
     } else {
-      openLoginModal();
+      navigate(
+        `${getAppPrefix()}/get-started?redirect=${getAppPrefix()}/user/${
+          item.user.username
+        }/profile?tab=curations`
+      );
     }
   };
 
@@ -66,7 +71,11 @@ const Chips = ({ item }) => {
       dispatch(upvoteChip(item._id));
       dispatch(setChipEngagement(item._id));
     } else {
-      openLoginModal();
+      navigate(
+        `${getAppPrefix()}/get-started?redirect=${getAppPrefix()}/user/${
+          item.user.username
+        }/profile?tab=curations`
+      );
     }
   };
   const handleSaved = () => {
@@ -118,9 +127,11 @@ const Chips = ({ item }) => {
           />
         ) : item.user?.color_logo ? (
           <div
-            className="rounded-full w-11 h-11 mr-1.5 shrink-0"
+            className="rounded-full w-11 h-11 mxr-1.5 shrink-0  flex items-center justify-center"
             style={{ backgroundColor: item.user?.color_logo }}
-          ></div>
+          >
+            <img src={ColorProfile} alt="color-profile" className="w-8 h-8" />
+          </div>
         ) : (
           <Initicon text={item.user.name} size={42} />
         )}
@@ -185,7 +196,7 @@ const Chips = ({ item }) => {
             alt="Upvote"
             className="dark:hidden mr-0.5 h-5 w-5"
           />
-          <p className="text-theme-secondaryText text-sm font-normal">
+          <p className="text-theme-secondaryText text-sm font-light">
             {item.upvotes.length}
           </p>
         </div>
@@ -194,7 +205,7 @@ const Chips = ({ item }) => {
           onClick={openCommentModal}
         >
           <img src={Comment} alt="Comment" className="mr-0.5" />
-          <p className="text-theme-secondaryText text-sm font-normal">
+          <p className="text-theme-secondaryText text-sm font-light">
             {item.comments ? item?.comments : 0}
           </p>
         </div>
@@ -203,11 +214,11 @@ const Chips = ({ item }) => {
           onClick={openShareModal}
         >
           <img src={Send} alt="Send" className="mr-0.5 h-7 w-7" />
-          <p className="text-theme-secondaryText text-sm font-normal">
-            {item.shared_by}
+          <p className="text-theme-secondaryText text-sm font-light">
+            {item.shared_by ? item.shared_by : ""}
           </p>
         </div>
-        <div className="relative">
+        {/* <div className="relative">
           {isSavedMessageVisible && (
             <div className="absolute -top-5 left-1/2 transform -translate-x-1/2 bg text-theme-secondaryText text-xs rounded-lg px-2 py-1">
               {savedMessage}
@@ -225,7 +236,7 @@ const Chips = ({ item }) => {
               className="h-5 w-5"
             />
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

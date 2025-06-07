@@ -3,8 +3,11 @@ import Smiley from "../../../assets/icons/smiley.svg";
 import ArrowDropDown from "../../../assets/icons/arrow_drop_down.svg";
 import ArrowDropDownLight from "../../../assets/lightIcons/chat_drop_light.svg";
 import EmptyChatIcon from "../../../assets/icons/empty_chat.svg";
+import ColorProfile from "../../../assets/images/color_profile.svg";
 import ReplyIcon from "../../../assets/icons/reply_icon.svg";
+import ChannelCover from "../../../assets/channel_images/channel_cover.svg";
 import EmojiPicker from "emoji-picker-react";
+import playIcon from "../../../assets/images/play_button.svg";
 import {
   fetchDMChats,
   setDMChatField,
@@ -35,6 +38,8 @@ const DMChatData = ({ receiver, sender, onNewMessageSent }) => {
   };
 
   const [hoveredChatId, setHoveredChatId] = useState(null);
+  const [videoLoaded, setVideoLoaded] = useState({});
+
   const [hoveredMedia, setHoveredMedia] = useState({
     chatId: null,
     mediaIndex: null,
@@ -149,10 +154,10 @@ const DMChatData = ({ receiver, sender, onNewMessageSent }) => {
   }, []);
 
   useEffect(() => {
-    if (!myData._id || !receiver) return;
+    if (!myData?._id || !receiver) return;
 
     dispatch(fetchDMChats(receiver));
-  }, [myData._id, receiver, dispatch]);
+  }, [myData?._id, receiver, dispatch]);
 
   //   useEffect(() => {
   //     const handleChatDeleted = (message) => {
@@ -318,12 +323,12 @@ const DMChatData = ({ receiver, sender, onNewMessageSent }) => {
     >
       {Chats.length > 0 &&
         Chats.map((chat) => {
-          const isMyMessage = chat.sender._id === myData._id;
+          const isMyMessage = chat.sender._id === myData?._id;
           return (
             <div
               ref={(el) => chatRefs.current.set(chat._id, el)}
               key={chat._id}
-              className={`flex flex-col relative w-full mb-2 px-0 py-1 ${
+              className={`flex flex-col relative w-full mb-2 px-0 pt-2.5 ${
                 hoveredChatId === chat._id
                   ? "bg-theme-primaryBackground bg-opacity-20"
                   : highlightedChatId === chat._id
@@ -336,7 +341,7 @@ const DMChatData = ({ receiver, sender, onNewMessageSent }) => {
               {hoveredChatId === chat._id && (
                 <span
                   className={`absolute ${
-                    isMyMessage ? "left-6" : "right-4"
+                    isMyMessage ? "left-4 xs:left-6" : "xs:right-4 right-2"
                   } flex items-center space-x-2 z-10`}
                 >
                   <img
@@ -352,12 +357,12 @@ const DMChatData = ({ receiver, sender, onNewMessageSent }) => {
                     <img
                       src={ArrowDropDown}
                       alt="arrow-dop-down"
-                      className="dark:block hidden w-8 h-8 "
+                      className="dark:block hidden w-6 h-6 "
                     />
                     <img
                       src={ArrowDropDownLight}
                       alt="arrow-dop-down"
-                      className="dark:hidden w-4 h-4 "
+                      className="dark:hidden w-3 h-3 "
                     />
                     {showMenu && (
                       <div
@@ -375,7 +380,7 @@ const DMChatData = ({ receiver, sender, onNewMessageSent }) => {
                           aria-labelledby="options-menu"
                         >
                           <div
-                            className="relative flex flex-row px-4 items-center"
+                            className="relative flex flex-row px-4 items-center "
                             onClick={() =>
                               handleReplyClick(chat?._id, chat.sender?.username)
                             }
@@ -385,7 +390,7 @@ const DMChatData = ({ receiver, sender, onNewMessageSent }) => {
                             </p>
                           </div>
                         </div>
-                        {chat.sender._id === myData._id && (
+                        {chat.sender._id === myData?._id && (
                           <div
                             className="py-1"
                             role="menu"
@@ -432,12 +437,19 @@ const DMChatData = ({ receiver, sender, onNewMessageSent }) => {
                       src={chat.replyTo.user?.logo}
                       alt="profile-icon"
                       className="rounded-full w-4 h-4 object-cover"
+                      loading="lazy"
                     />
                   ) : chat.replyTo.user?.color_logo ? (
                     <div
-                      className="rounded-full w-4 h-4 shrink-0"
+                      className="rounded-full w-4 h-4 shrink-0 flex items-center justify-center"
                       style={{ backgroundColor: chat.replyTo.user?.color_logo }}
-                    ></div>
+                    >
+                      <img
+                        src={ColorProfile}
+                        alt="color-profile"
+                        className="w-5 h-5"
+                      />
+                    </div>
                   ) : (
                     <img
                       src={Profile}
@@ -473,12 +485,13 @@ const DMChatData = ({ receiver, sender, onNewMessageSent }) => {
                 <div
                   className={`flex ${
                     isMyMessage ? "flex-row-reverse" : ""
-                  } w-max sm:max-w-[60%] max-w-[80%] items-center`}
+                  } w-max md:max-w-[60%] max-w-[90%] items-start`}
                 >
                   <img
                     src={chat.user?.logo || Profile}
                     alt="logo"
                     className="rounded-full w-8 h-8 object-cover mx-2"
+                    loading="lazy"
                   />
                   <div
                     className={`flex flex-col w-full ${
@@ -487,19 +500,18 @@ const DMChatData = ({ receiver, sender, onNewMessageSent }) => {
                         : "items-start text-left"
                     }`}
                   >
-                    <p className="text-theme-emptyEvent font-normal text-sm flex items-center relative ">
+                    <p className="text-theme-emptyEvent font-normal text-xs flex items-center relative ">
                       <span
-                        className="cursor-pointer"
-                        // onClick={() =>
-                        //   navigate(
-                        //     `/embed/channels/user/${myData.username}/profile`
-                        //   )
-                        // }
+                        className={`${
+                          isMyMessage
+                            ? "text-[#FF8C4E] font-medium"
+                            : "text-theme-emptyEvent"
+                        }  cursor-pointer`}
                       >
-                        {chat.user?.username}{" "}
-                        <span className="font-light ml-1 text-xs">
-                          {formatChatDate(chat.createdAt)}
-                        </span>
+                        {isMyMessage ? "You" : chat.user?.username}
+                      </span>
+                      <span className="font-light ml-1 text-xs">
+                        {formatChatDate(chat.createdAt)}
                       </span>
                     </p>
 
@@ -512,44 +524,80 @@ const DMChatData = ({ receiver, sender, onNewMessageSent }) => {
                       </p>
                     </Linkify>
 
-                    <div className="flex flex-row overflow-x-auto w-[100%] custom-scrollbar">
-                      {chat.media.map((media, index) => (
-                        <div
-                          className="relative"
-                          key={media._id}
-                          onMouseEnter={() =>
-                            handleMouseEnterMedia(chat._id, index)
-                          }
-                          onMouseLeave={handleMouseLeaveMedia}
-                        >
-                          {media.type === "image" ? (
-                            <div className="relative h-36 mr-3">
-                              <img
-                                key={index}
-                                src={media.url}
-                                alt={media.name}
-                                className="h-36 mt-1 rounded-md object-cover w-auto max-w-60"
-                              />
-                            </div>
-                          ) : media.type === "video" ? (
-                            <video
-                              controls
-                              className="h-36 object-cover mr-3 mt-1 rounded-md w-auto max-w-52"
-                            >
-                              <source src={media.url} type="video/mp4" />
-                              Your browser does not support the video tag.
-                            </video>
-                          ) : null}
-                        </div>
-                      ))}
+                    <div
+                      className={`flex flex-row overflow-x-auto w-[100%] custom-scrollbar ${
+                        isMyMessage ? "justify-end" : "justify-start"
+                      }`}
+                    >
+                      {chat.media.map((media, index) => {
+                        const videoKey = `${chat._id}-${index}`;
+                        return (
+                          <div
+                            className="relative "
+                            key={media._id}
+                            onMouseEnter={() =>
+                              handleMouseEnterMedia(chat._id, index)
+                            }
+                            onMouseLeave={handleMouseLeaveMedia}
+                          >
+                            {media.type === "image" ? (
+                              <div className="relative h-36 mr-3">
+                                <img
+                                  key={index}
+                                  src={media.url}
+                                  alt={media.name}
+                                  className="h-36 mt-1 rounded-md object-cover min-w-36 w-auto max-w-60"
+                                  loading="lazy"
+                                />
+                              </div>
+                            ) : media.type === "video" ? (
+                              !videoLoaded[videoKey] ? (
+                                <div
+                                  className="relative h-36 w-auto max-w-52 mr-3 mt-1 rounded-md bg-gray-700 cursor-pointer flex items-center justify-center"
+                                  onClick={() =>
+                                    setVideoLoaded((prev) => ({
+                                      ...prev,
+                                      [videoKey]: true,
+                                    }))
+                                  }
+                                >
+                                  <img
+                                    src={media.thumbnail || ChannelCover}
+                                    alt="Click to load"
+                                    className="h-36 rounded-md object-cover w-auto max-w-60"
+                                  />
+                                  <img
+                                    src={playIcon}
+                                    alt="Play"
+                                    className="absolute w-12 h-12 opacity-90"
+                                  />
+                                </div>
+                              ) : (
+                                <video
+                                  controls
+                                  className="h-36 object-cover mr-3 mt-1 rounded-md w-auto max-w-52"
+                                >
+                                  <source src={media.url} type="video/mp4" />
+                                  Your browser does not support the video tag.
+                                </video>
+                              )
+                            ) : null}
+                          </div>
+                        );
+                      })}
                     </div>
 
-                    <div className="flex flex-row overflow-x-auto w-4/5 custom-scrollbar overflow-y-hidden">
+                    <div
+                      className={`flex flex-row overflow-x-auto w-[100%] custom-scrollbar ${
+                        isMyMessage ? "justify-end" : "justify-start"
+                      }`}
+                    >
                       {chat.media.map(
                         (media, index) =>
                           media.type === "document" && (
                             <div
-                              className="w-max rounded-lg bg-theme-tertiaryBackground mt-1.5 relative mr-3"
+                              className="w-max rounded-lg bg-theme-tertiaryBackground mt-1.5 relative mr-3 cursor-pointer"
+                              onClick={() => handleClick(media)}
                               onMouseEnter={() =>
                                 handleMouseEnterDocument(chat._id, index)
                               }
@@ -559,8 +607,7 @@ const DMChatData = ({ receiver, sender, onNewMessageSent }) => {
                                 <img
                                   src={documentImage}
                                   alt="Document Icon"
-                                  className="h-14 w-15 object-fill cursor-pointer pr-3"
-                                  onClick={() => handleClick(media)}
+                                  className="h-14 w-15 object-fill  pr-3"
                                 />
                                 <div className="flex flex-col my-1 w-full-minus-68">
                                   <p className="text-theme-secondaryText text-xs overflow-hidden text-ellipsis whitespace-nowrap font-normal">

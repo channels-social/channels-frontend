@@ -58,6 +58,7 @@ const PageChat = ({
   channelId,
   isLoggedIn,
   myData,
+  channel,
   channelName,
   toggleBottomSheet,
   isOpen,
@@ -90,7 +91,7 @@ const PageChat = ({
   const [isChecked, setIsChecked] = useState(false);
 
   useEffect(() => {
-    if (!topic.channel.members?.includes(myData._id)) {
+    if (!channel.members?.includes(myData._id)) {
       dispatch(visitTopic(topicId));
     }
   }, [topicId]);
@@ -463,7 +464,6 @@ const PageChat = ({
       dispatch(saveWhatsAppNumber(whatsAppNumber))
         .unwrap()
         .then(() => {
-          console.log("done");
           setOtpPage(false);
           setSuccessPage(true);
           setWhatsAppNumber("");
@@ -534,10 +534,10 @@ const PageChat = ({
           </div>
         </div>
       )}
-      {notificationDropdown && (
+      {/* {notificationDropdown && (
         <div
-          className="z-40 w-full items-center bg-theme-secondaryText border-b
-         border-theme-chatDivider p-3 flex flex-row justify-between"
+          className="z-40 w-full items-center bg-theme-chatDivider border-b
+         border-theme-chatDivider px-3 py-2.5 flex flex-row justify-between"
         >
           <label className="flex items-center space-x-2 cursor-pointer">
             <input
@@ -550,7 +550,7 @@ const PageChat = ({
               onChange={handleCheckboxChange}
               checked={isChecked}
             />
-            <span className="xs:text-sm text-xs text-theme-primaryBackground">
+            <span className="xs:text-sm text-xs text-theme-description">
               Enable WhatsApp notifications for this conversation
             </span>
           </label>
@@ -558,12 +558,12 @@ const PageChat = ({
           <img
             src={Close}
             alt="close"
-            className="w-4 h-4 cursor-pointer"
+            className="w-3.5 h-3.5 cursor-pointer"
             onClick={handleCloseDropdown}
           />
         </div>
-      )}
-      {isChecked && (
+      )} */}
+      {/* {isChecked && (
         <div
           className="absolute z-[99] bottom-0 bg-theme-tertiaryBackground border-b w-full
          border-theme-chatDivider p-4 flex flex-col rounded-t-lg h-2/5"
@@ -671,7 +671,7 @@ const PageChat = ({
             <p className="mt-6 text-theme-error text-sm font-normal">{error}</p>
           )}
         </div>
-      )}
+      )} */}
       {isBrandTalk && (
         <div className=" bg-theme-primaryBackground w-full h-full overflow-y-auto  ">
           <PageChatData2
@@ -714,7 +714,8 @@ const PageChat = ({
                       <img
                         src={item.url}
                         alt="pdf-image"
-                        className=" rounded-lg h-24 max-w-32 w-auto "
+                        className=" rounded-lg h-24  max-w-32 w-auto object-cover "
+                        loading="lazy"
                       />
                     </div>
                   ) : item.type === "video" ? (
@@ -730,6 +731,7 @@ const PageChat = ({
                       src={PdfImage}
                       alt="pdf-image"
                       className="rounded-lg h-24 max-w-32 w-auto"
+                      loading="lazy"
                     />
                   )}
                   <p className="text-theme-secondaryText mt-1 font-normal text-xs truncate max-w-24">
@@ -898,7 +900,7 @@ const PageChat = ({
                   className={`${
                     isBrandTalk
                       ? " bg-theme-secondaryText text-theme-primaryBackground"
-                      : "bg-theme-chatDivider text-theme-buttonDisableText"
+                      : "bg-theme-buttonDisable text-theme-buttonDisableText"
                   } 
                   ml-4 text-theme-primaryText rounded-full px-3 py-1.5 text-center flex flex-row cursor-pointer`}
                   onClick={handleBrandTalk}
@@ -924,7 +926,7 @@ const PageChat = ({
                 className={`xl:hidden text-center flex  ${
                   isOpen
                     ? " bg-theme-secondaryText text-theme-primaryBackground"
-                    : "bg-theme-chatDivider text-theme-buttonDisableText"
+                    : "bg-theme-buttonDisable text-theme-buttonDisableText"
                 } 
                   ml-4  rounded-full px-3 py-1.5 flex-row cursor-pointer`}
                 onClick={toggleBottomSheet}

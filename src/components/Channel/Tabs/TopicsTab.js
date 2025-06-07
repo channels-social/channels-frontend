@@ -2,27 +2,64 @@ import AddIcon from "../../../assets/icons/addIcon.svg";
 import AddIconLight from "../../../assets/lightIcons/create_new_light.svg";
 import EditIcon from "../../../assets/icons/Edit.svg";
 import EditIconLight from "../../../assets/lightIcons/edit_light.svg";
+import { setModalModal } from "../../../redux/slices/modalSlice.js";
+
 import {
   clearCreateTopic,
   setCreateTopicField,
   setCreateTopicItems,
 } from "../../../redux/slices/createTopicSlice";
 import ArrowForward from "../../../assets/icons/arrow_forward.svg";
+import Dots from "../../../assets/icons/three_dots.svg";
+import DotsLight from "../../../assets/lightIcons/faqs_dots_light.svg";
+import Edit from "../../../assets/icons/Edit.svg";
+import EditLight from "../../../assets/lightIcons/edit_light.svg";
+import Delete from "../../../assets/icons/Delete.svg";
+import DeleteLight from "../../../assets/lightIcons/delete_light.svg";
 
 import {
   React,
+  useState,
+  useRef,
   useDispatch,
+  useEffect,
   useSelector,
   useModal,
   useNavigate,
 } from "../../../globals/imports";
+import {
+  setTopicIdToDelete,
+  setTopicNameToDelete,
+  setTopicChannelToDelete,
+} from "../../../redux/slices/deleteTopicSlice.js";
 
 const TopicsTab = ({ channelId, isOwner }) => {
   const { handleOpenModal } = useModal();
+  const [isEditDropdownOpen, setIsEditDropdownOpen] = useState(null);
+  const dropdownEditRef = useRef(null);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const reorderTopics = useSelector((state) => state.reorderTopic.topics);
   const status = useSelector((state) => state.reorderTopic.status);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownEditRef.current &&
+        !dropdownEditRef.current.contains(event.target)
+      ) {
+        setIsEditDropdownOpen(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const toggleEditDropdown = (id) => {
+    setIsEditDropdownOpen(id);
+  };
 
   const handleTopicModal = (channelId) => {
     dispatch(clearCreateTopic());
@@ -97,6 +134,7 @@ const TopicsTab = ({ channelId, isOwner }) => {
         ) : (
           reorderTopics.map((topic, index) => (
             <div
+              key={topic._id}
               className="bg-theme-tertiaryBackground rounded-lg px-4 py-4 flex cursor-pointer flex-row justify-between items-center my-3 "
               onClick={() => handleTopic(topic._id)}
             >
@@ -105,23 +143,89 @@ const TopicsTab = ({ channelId, isOwner }) => {
               </p>
               <div className="flex flex-row space-x-6 items-center">
                 {isOwner && (
-                  <div
-                    className="pl-4 pr-2  cursor-pointer"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleEditModal(topic);
-                    }}
-                  >
+                  <div className="relative flex items-center">
                     <img
-                      src={EditIcon}
-                      alt="edit"
-                      className="dark:block hidden w-4 h-4"
+                      src={Dots}
+                      alt="dots"
+                      className="dark:block hidden w-6 h-6 mr-2 cursor-pointer "
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleEditDropdown(topic._id);
+                      }}
                     />
                     <img
-                      src={EditIconLight}
-                      alt="edit"
-                      className="dark:hidden w-4 h-4"
+                      src={DotsLight}
+                      alt="dots"
+                      className="dark:hidden w-6 h-6 mr-2 cursor-pointer "
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleEditDropdown(topic._id);
+                      }}
                     />
+                    {isEditDropdownOpen === topic._id && (
+                      <div
+                        ref={dropdownEditRef}
+                        className="absolute top-6 -left-4 mt-1 ml-3 w-24 rounded-md shadow-lg border  border-theme-chatDivider
+                                               bg-theme-tertiaryBackground ring-1 ring-black ring-opacity-5 z-20"
+                      >
+                        <div
+                          className="py-1"
+                          role="menu"
+                          aria-orientation="vertical"
+                          aria-labelledby="options-menu"
+                        >
+                          <div className="flex flex-row px-3 items-center">
+                            <img
+                              src={Edit}
+                              alt="edit"
+                              className="dark:block hidden w-4 h-4"
+                            />
+                            <img
+                              src={EditLight}
+                              alt="edit"
+                              className="dark:hidden w-4 h-4"
+                            />
+                            <p
+                              className="block font-light px-2 py-2 text-sm text-theme-secondaryText cursor-pointer"
+                              role="menuitem"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleEditModal(topic);
+                              }}
+                            >
+                              Edit
+                            </p>
+                          </div>
+                          <div
+                            className="flex flex-row px-3 items-center"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              dispatch(setTopicIdToDelete(topic._id));
+                              dispatch(setTopicNameToDelete(topic.name));
+                              dispatch(setTopicChannelToDelete(topic.channel));
+                              handleOpenModal("modalDeleteTopicOpen");
+                            }}
+                          >
+                            <img
+                              src={Delete}
+                              alt="edit"
+                              className="dark:block hidden w-4 h-4"
+                            />
+                            <img
+                              src={DeleteLight}
+                              alt="edit"
+                              className="dark:hidden w-4 h-4"
+                            />
+                            <p
+                              className="block px-2 py-2 font-light text-sm   text-theme-secondaryText cursor-pointer"
+                              role="menuitem"
+                            >
+                              Delete
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
                 <img

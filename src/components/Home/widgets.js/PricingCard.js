@@ -4,19 +4,8 @@ import { axios } from "axios";
 import Modal from "./PricingModal";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-const PricingCard = ({
-  title,
-  price,
-  priceSuffix,
-  description,
-  features,
-  buttonText,
-  badge,
-  originalPrice,
-  originalAnnualPrice,
-  annualPrice,
-  type,
-}) => {
+import { handlePayment } from "../../../utils/paymentPage";
+const PricingCard = ({ plan, type }) => {
   const [openInfoIndex, setOpenInfoIndex] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
@@ -26,125 +15,153 @@ const PricingCard = ({
   const handleInfoOpen = (index) => setOpenInfoIndex(index);
   const handleInfoClose = () => setOpenInfoIndex(null);
 
-  const handleStartClick = () => {
-    if (buttonText === "Get started for free") {
+  const extractFeatures = () => {
+    const f = plan.features;
+    const features = [];
+    if (plan._id === "enterprise") {
+      features.push({ name: `Pay as you go`, available: true });
+      features.push({ name: `Unlimited Channels`, available: true });
+      features.push({ name: `Unlimited Users`, available: true });
+      features.push({ name: `Unlimited Newsletters`, available: true });
+    }
+    if (f.maxChannels && plan._id !== "enterprise")
+      features.push({
+        name: `${
+          f.maxChannels === 1
+            ? `${f.maxChannels} Channel`
+            : `Upto ${f.maxChannels} Channels`
+        }`,
+        available: true,
+      });
+    if (f.userLimit && plan._id !== "enterprise")
+      features.push({ name: `Total ${f.userLimit} users`, available: true });
+    if (f.paidEvents !== undefined)
+      features.push({ name: "Paid Events", available: f.paidEvents });
+    if (f.autoLogin !== undefined)
+      features.push({ name: "Auto Login", available: f.autoLogin });
+    if (f.newslettersPerMonth > 0 && plan._id !== "enterprise")
+      features.push({
+        name: `${f.newslettersPerMonth} Monthly Newsletters`,
+        available: true,
+      });
+    if (f.integrationSupport !== undefined)
+      features.push({
+        name: "Integration Support",
+        available: f.integrationSupport,
+      });
+    if (f.communityManager !== undefined)
+      features.push({
+        name: "Community Manager",
+        available: f.communityManager,
+      });
+    if (f.inAppNotifications !== undefined)
+      features.push({
+        name: "In-App Notifications",
+        available: f.inAppNotifications,
+      });
+
+    if (f.analytics) {
+      const analyticsList = Object.entries(f.analytics)
+        .filter(([_, value]) => value.enabled)
+        .map(([_, value]) => value.label);
+
+      if (analyticsList.length) {
+        features.push({
+          name: f.analyticTitle,
+          available: true,
+          info: analyticsList,
+        });
+      } else {
+        features.push({ name: "Analytics", available: false });
+      }
+    }
+    return features;
+  };
+
+  const featureList = extractFeatures();
+
+  const handleStartClick = (price) => {
+    if (plan.buttonText === "Get started for free") {
       if (!isLoggedIn) {
         navigate("/get-started");
       } else {
         navigate(`/user/${myData.username}/profile`);
       }
-    } else if (buttonText !== "Talk to sales") {
+    } else if (plan.buttonText !== "Talk to sales") {
       setIsModalOpen(true);
-      // openRazorpayTestCheckout();
+      // handlePayment(price, myData);
     }
-  };
-
-  const getAmountInPaise = () => {
-    const amountStr = type === "monthly" ? price : annualPrice;
-    if (!amountStr) return 0;
-
-    const clean = amountStr.replace(/[₹,]/g, "").trim();
-    const number = parseInt(clean, 10);
-
-    return isNaN(number) ? 0 : number * 100;
-  };
-
-  const loadRazorpayScript = () => {
-    return new Promise((resolve) => {
-      const script = document.createElement("script");
-      script.src = "https://checkout.razorpay.com/v1/checkout.js";
-      script.onload = () => resolve(true);
-      script.onerror = () => resolve(false);
-      document.body.appendChild(script);
-    });
-  };
-
-  const openRazorpayTestCheckout = async () => {
-    const amount = getAmountInPaise();
-    if (!amount || amount <= 0) {
-      alert("Invalid amount. Cannot proceed to payment.");
-      return;
-    }
-    const res = await loadRazorpayScript();
-    if (!res) {
-      alert("Failed to load Razorpay script. Are you online?");
-      return;
-    }
-
-    const options = {
-      key: "rzp_test_QOoM6OtgVZgTuW",
-      amount: 2500,
-      currency: "INR",
-      name: "Channels.social",
-      description: `${title} Plan Subscription`,
-      image: "https://chips-social.s3.ap-south-1.amazonaws.com/logo.png",
-      handler: function (response) {
-        alert("✅ Payment successful: " + response.razorpay_payment_id);
-      },
-      prefill: {
-        name: "Test User",
-        email: "test@example.com",
-        contact: "9999999999",
-      },
-      theme: {
-        color: "#3f83f8",
-      },
-    };
-
-    const rzp = new window.Razorpay(options);
-    rzp.open();
   };
 
   return (
     <div className="bg-theme-pricingBackground rounded-lg p-6 flex flex-col relative space-y-4">
       <div className="flex flex-row justify-between items-center">
-        <div className="text-white text-lg font-light">{title}</div>
+        <div className="text-white text-lg font-light">{plan.name}</div>
 
-        {badge && (
+        {plan.badge && (
           <div className=" bg-[#CAD83C] text-black text-xs px-2 py-1 rounded-full">
-            {badge}
+            {plan.badge}
           </div>
         )}
       </div>
-      <div className="text-white text-2xl font-light flex items-center space-x-2">
-        <span className="font-normal">
-          {type === "monthly" ? price : annualPrice}
-        </span>
-        <span className="flex flex-col justify-start">
-          {type === "monthy" && originalPrice && (
-            <span className="text-xs text-theme-emptyEvent line-through">
-              {originalPrice}
-            </span>
-          )}
-          {type === "annually" && originalAnnualPrice && (
-            <span className="text-xs text-theme-emptyEvent line-through">
-              {originalAnnualPrice}
-            </span>
-          )}
-          {priceSuffix && (
-            <span className="text-xs font-extralight -pt-0.5">
-              {type === "monthly" ? priceSuffix : "/year"}
-            </span>
-          )}
-        </span>
-      </div>
-      {description && (
-        <p className="text-xs text-white font-extralight">{description}</p>
+      {plan._id !== "enterprise" && (
+        <div className="text-white text-2xl font-light flex items-center space-x-2">
+          <span className="font-normal">
+            {type === "monthly"
+              ? "₹" + plan.pricing.monthly.price
+              : "₹" + plan.pricing.annually.price}
+          </span>
+          <span className="flex flex-col justify-start">
+            {plan._id !== "free" &&
+              type === "monthly" &&
+              plan.pricing.monthly.intialFee && (
+                <span className="text-xs text-theme-emptyEvent line-through">
+                  {"₹" + plan.pricing.monthly.intialFee}
+                </span>
+              )}
+            {plan._id !== "free" &&
+              type === "annually" &&
+              plan.pricing.annually.intialFee && (
+                <span className="text-xs text-theme-emptyEvent line-through">
+                  {"₹" + plan.pricing.annually.intialFee}
+                </span>
+              )}
+            {plan._id !== "free" && (
+              <span className="text-xs font-extralight -pt-0.5">
+                {type === "monthly" ? "/month" : "/year"}
+              </span>
+            )}
+          </span>
+        </div>
+      )}
+      {plan._id === "enterprise" && (
+        <div className="text-white text-2xl font-light flex items-center space-x-2">
+          Custom Pricing
+        </div>
+      )}
+      {plan.description && (
+        <p className="text-xs text-white font-extralight">{plan.description}</p>
       )}
 
-      {buttonText !== "Talk to sales" && (
+      {plan.buttonText !== "Talk to sales" && (
         <button
           className={`${
-            buttonText === "Get started for free"
+            plan.buttonText === "Get started for free"
               ? "bg-theme-buttonEnable text-white "
               : "border border-white text-white"
           } text-sm py-2 rounded-lg  font-light`}
-          onClick={handleStartClick}
+          onClick={() =>
+            handleStartClick(
+              type === "monthly"
+                ? plan.pricing.monthly.price
+                : plan.pricing.annually.price
+            )
+          }
         >
-          {buttonText}
+          {plan.buttonText}
         </button>
       )}
-      {buttonText === "Talk to sales" && (
+      {plan.buttonText === "Talk to sales" && (
         <a
           href="https://calendly.com/channels_social/talk-to-us"
           target="_blank"
@@ -152,16 +169,12 @@ const PricingCard = ({
           className={`${"border border-white text-white"} text-center text-sm py-2 rounded-lg  font-light`}
           onClick={handleStartClick}
         >
-          {buttonText}
+          {plan.buttonText}
         </a>
       )}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        plan={title}
-      />
-      {buttonText !== "Get started for free" &&
-        buttonText !== "Talk to sales" && (
+
+      {plan.buttonText !== "Get started for free" &&
+        plan.buttonText !== "Talk to sales" && (
           <a
             href="https://calendly.com/channels_social/talk-to-us"
             target="_blank"
@@ -173,21 +186,20 @@ const PricingCard = ({
         )}
       <ul className="text-white font-light text-sm space-y-2 pt-2">
         <p className="text-[#898989] text-sm font-light">
-          {buttonText === "Get started for free"
+          {plan.buttonText === "Get started for free"
             ? "Features:"
-            : buttonText === "Talk to sales"
+            : plan.buttonText === "Talk to sales"
             ? ""
             : "Core Features:"}
         </p>
-        {features.map(
+
+        {featureList.map(
           (feature, index) =>
             feature.available && (
               <li key={index} className="flex items-center space-x-2">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className={`h-4 w-4 ${
-                    feature.available ? "text-white" : "text-[#898989]"
-                  }`}
+                  className={`h-4 w-4 text-white`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -196,11 +208,7 @@ const PricingCard = ({
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d={
-                      feature.available
-                        ? "M5 13l4 4L19 7" // Tick
-                        : "M6 18L18 6M6 6l12 12" // Cross
-                    }
+                    d="M5 13l4 4L19 7"
                   />
                 </svg>
                 <span>{feature.name}</span>

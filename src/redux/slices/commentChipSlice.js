@@ -13,7 +13,6 @@ export const fetchChipComments = createAsyncThunk(
         "/fetch/chip/comments",
         { chipId: chipId }
       );
-      console.log(response);
       if (response.success) {
         return response.comments;
       } else {
@@ -50,7 +49,6 @@ export const toggleCommentUpvote = createAsyncThunk(
         "/toggle/comment/upvote",
         { id }
       );
-      console.log(response);
       if (response.success) {
         return response.comment;
       } else {
@@ -87,7 +85,6 @@ export const createChipCommentReply = createAsyncThunk(
         "/create/chip/comment/reply",
         data
       );
-      console.log(response);
       if (response.success) {
         return response.reply;
       } else {

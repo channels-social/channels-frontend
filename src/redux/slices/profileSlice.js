@@ -26,50 +26,6 @@ export const fetchProfile = createAsyncThunk(
   }
 );
 
-export const toggleSubscription = createAsyncThunk(
-  "profile/toggleSubscription",
-  async (profileData, { dispatch, getState, rejectWithValue }) => {
-    const state = getState();
-    const myData = state.myData;
-    const isSubscribed = profileData.subscribers.includes(myData._id);
-    dispatch(
-      updateProfileField({
-        name: "subscribers",
-        value: isSubscribed
-          ? profileData.subscribers.filter((id) => id !== myData._id)
-          : [...profileData.subscribers, myData._id],
-      })
-    );
-    try {
-      const response = await postRequestAuthenticated("/toggle/subscription", {
-        receiverId: profileData._id,
-      });
-      // console.log(response);
-      if (response.success) {
-        // dispatch(
-        //   updateProfileField({
-        //     name: "subscribers",
-        //     value: response.subscribers,
-        //   })
-        // );
-        dispatch(
-          updateMyField({
-            name: "subscriptions",
-            value: response.subscriptions,
-          })
-        );
-      } else {
-        return rejectWithValue(response.message);
-      }
-    } catch (error) {
-      return rejectWithValue("Error toggling subscription");
-    } finally {
-      dispatch(setProfileEngagement(profileData._id));
-      dispatch(setProfileSubscription(profileData._id));
-    }
-  }
-);
-
 const initialState = {
   _id: "",
   name: "",
@@ -85,7 +41,6 @@ const initialState = {
   otherLink: "",
   imageCards: [],
   subscriptions: [],
-  subscribers: [],
   status: "idle",
   error: null,
   activeTab: "profileDetails",

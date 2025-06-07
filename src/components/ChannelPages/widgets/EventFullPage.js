@@ -22,6 +22,7 @@ import {
   useModal,
   useLocation,
 } from "../../../globals/imports";
+import { getAppPrefix } from "../../EmbedChannels/utility/embedHelper";
 
 const EventFullPage = () => {
   const dispatch = useDispatch();
@@ -66,7 +67,7 @@ const EventFullPage = () => {
           console.error("Issue in joining event. Please try again.");
         });
     } else {
-      navigate(`/get-started?redirect=${fullPath}`);
+      navigate(`${getAppPrefix()}/get-started?redirect=${fullPath}`);
     }
   };
 

@@ -5,6 +5,7 @@ import {
   declineChannelRequest,
   fetchChannelRequests,
 } from "../../../redux/slices/businessSlice";
+import ColorProfile from "../../../assets/images/color_profile.svg";
 import {
   React,
   useState,
@@ -86,9 +87,15 @@ const RequestTab = ({ apiKey }) => {
                         />
                       ) : request.color_logo ? (
                         <div
-                          className="rounded-md w-12 h-12 shrink-0"
-                          style={{ backgroundColor: request.color_logo }}
-                        ></div>
+                          className="rounded-full w-12 h-12 shrink-0 flex items-center justify-center"
+                          style={{ backgroundColor: request?.color_logo }}
+                        >
+                          <img
+                            src={ColorProfile}
+                            alt="color-profile"
+                            className="w-8 h-8"
+                          />
+                        </div>
                       ) : (
                         <img
                           src={ProfileIcon}

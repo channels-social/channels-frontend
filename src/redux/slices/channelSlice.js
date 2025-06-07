@@ -99,6 +99,23 @@ export const joinChannel = createAsyncThunk(
     }
   }
 );
+export const leaveChannel = createAsyncThunk(
+  "channel/leave-channel",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await postRequestAuthenticated("/leave/channel", {
+        channelId: id,
+      });
+      if (response.success) {
+        return response.channel;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 export const joinChannelInvite = createAsyncThunk(
   "channel/join-channel-invite",
   async (data, { rejectWithValue }) => {
@@ -107,7 +124,6 @@ export const joinChannelInvite = createAsyncThunk(
         "/join/channel/invite",
         data
       );
-      console.log(response);
       if (response.success) {
         return response.channel;
       } else {
@@ -232,7 +248,30 @@ export const channelSlice = createSlice({
       })
       .addCase(joinChannel.rejected, (state, action) => {
         state.channelstatus = "idle";
-        state.channelNameError = action.payload || action.error.message;
+      })
+      .addCase(leaveChannel.pending, (state) => {
+        state.channelstatus = "loading";
+      })
+      .addCase(leaveChannel.fulfilled, (state, action) => {
+        state.channelstatus = "idle";
+        const channel = action.payload;
+        if (state._id === channel._id) {
+          let memberIndex = state.members.findIndex(
+            (member) => member === channel.user_id
+          );
+          if (memberIndex !== -1) {
+            state.members.splice(memberIndex, 1);
+          }
+          let requestIndex = state.requests.findIndex(
+            (member) => member === channel.user_id
+          );
+          if (requestIndex !== -1) {
+            state.requests.splice(requestIndex, 1);
+          }
+        }
+      })
+      .addCase(leaveChannel.rejected, (state, action) => {
+        state.channelstatus = "idle";
       })
       .addCase(removeMember.fulfilled, (state, action) => {
         state.status = "idle";

@@ -39,7 +39,8 @@ const CurationsTab = ({ isOwner, items, gallery = false }) => {
     }
   };
 
-  const toggleDropdown = () => {
+  const toggleDropdown = (e) => {
+    e.preventDefault();
     setIsDropdownOpen(!isDropdownOpen);
   };
 

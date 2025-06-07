@@ -75,7 +75,6 @@ export const updateFaq = createAsyncThunk(
   async (faqData, { rejectWithValue }) => {
     try {
       const response = await postRequestAuthenticated("/update/faq", faqData);
-      console.log(response);
       if (response.success) {
         return response.faq;
       } else {
@@ -94,6 +93,7 @@ export const FaqsSlice = createSlice({
     question: "",
     answer: "",
     status: "idle",
+    updatestatus: "idle",
     error: null,
     reorderItems: [],
     faq_id: "",
@@ -122,15 +122,15 @@ export const FaqsSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(createFaq.pending, (state) => {
-        state.status = "loading";
+        state.updatestatus = "loading";
       })
       .addCase(createFaq.fulfilled, (state, action) => {
-        state.status = "idle";
+        state.updatestatus = "idle";
         const faq = action.payload;
         state.faqs = faq.faqs;
       })
       .addCase(createFaq.rejected, (state, action) => {
-        state.status = "idle";
+        state.updatestatus = "idle";
         state.error = action.payload || action.error.message;
       })
       .addCase(fetchFaqs.pending, (state) => {
@@ -145,10 +145,10 @@ export const FaqsSlice = createSlice({
         state.error = action.payload || action.error.message;
       })
       .addCase(deleteFaq.pending, (state) => {
-        state.status = "loading";
+        state.updatestatus = "loading";
       })
       .addCase(deleteFaq.fulfilled, (state, action) => {
-        state.status = "idle";
+        state.updatestatus = "idle";
         const faqId = action.payload;
         let index = state.faqs.findIndex((item) => item._id === faqId);
         if (index !== -1) {
@@ -156,14 +156,14 @@ export const FaqsSlice = createSlice({
         }
       })
       .addCase(deleteFaq.rejected, (state, action) => {
-        state.status = "idle";
+        state.updatestatus = "idle";
         state.error = action.payload || action.error.message;
       })
       .addCase(updateFaq.pending, (state) => {
-        state.status = "loading";
+        state.updatestatus = "loading";
       })
       .addCase(updateFaq.fulfilled, (state, action) => {
-        state.status = "idle";
+        state.updatestatus = "idle";
         const faq = action.payload;
         let index = state.faqs.findIndex((item) => item._id === faq._id);
         if (index !== -1) {
@@ -171,11 +171,11 @@ export const FaqsSlice = createSlice({
         }
       })
       .addCase(updateFaq.rejected, (state, action) => {
-        state.status = "idle";
+        state.updatestatus = "idle";
         state.error = action.payload || action.error.message;
       })
       .addCase(updateFaqsOrder.fulfilled, (state, action) => {
-        state.status = "idle";
+        state.updatestatus = "idle";
         const faq = action.payload;
         state.faqs = faq.faqs;
       });

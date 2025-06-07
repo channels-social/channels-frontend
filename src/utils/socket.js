@@ -5,6 +5,7 @@ const socket = io(`${hostUrl}`, {
   path: "/ws",
   transports: ["websocket"],
   autoConnect: false,
+  withCredentials: true,
 });
 
 export const connectSocketWithUser = (userId) => {

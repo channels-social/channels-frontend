@@ -55,8 +55,9 @@ const Integration = () => {
         setError(error);
       }
     };
-
-    checkInitialKey();
+    if (isLoggedIn) {
+      checkInitialKey();
+    }
   }, []);
 
   const handleDomainVerify = async () => {
@@ -67,6 +68,7 @@ const Integration = () => {
         "/check/domain/verification",
         { domain: domain }
       );
+      console.log(response);
       setLoading(false);
       if (response.success) {
         setVerificationToken(response.token);
@@ -189,6 +191,9 @@ const Integration = () => {
       )}
       {!loading && page === 1 && (
         <div className="flex flex-col">
+          <p className="text-theme-primaryText text-md font-normal my-2">
+            Choose any one method for domain verification from above:
+          </p>
           <div className="flex border-b border-theme-chatDivider font-normal text-sm mt-4 w-max">
             <button
               className={`py-3 sm:px-5 px-3 ${
@@ -226,7 +231,8 @@ const Integration = () => {
               <div className="flex flex-col space-y-4 text-theme-primaryText font-light text-sm">
                 <p>
                   1. We have identified that your domain manager is{" "}
-                  {domainProvider}. Login to your {domainProvider} account.
+                  {domainProvider || "not available"}. Login to your{" "}
+                  {domainProvider || "Provider"} account.
                 </p>
                 <p>
                   2. Now, add a new TXT record, and paste the below TXT value{" "}
@@ -243,9 +249,9 @@ const Integration = () => {
                   4. Finally, come back to this page and click on the below
                   button to complete the domain verification process.
                 </p>
-                <div className="flex flex-row space-x-6 text-sm font-light pt-2">
+                <div className="flex flex-row space-x-6 text-sm font-light pt-2 ">
                   <div
-                    className="text-theme-secondaryText cursor-pointer bg-theme-buttonEnable rounded-lg text-center px-12 py-2"
+                    className="text-theme-secondaryText cursor-pointer bg-theme-buttonEnable rounded-lg text-center px-12 py-2 mb-4"
                     onClick={handleVerify}
                   >
                     Verify
@@ -289,7 +295,7 @@ const Integration = () => {
                 <p>4. Click Verify below to complete verification.</p>
                 <div className="flex flex-row space-x-6 text-sm font-light pt-2">
                   <div
-                    className="text-theme-secondaryText cursor-pointer bg-theme-buttonEnable rounded-lg text-center px-12 py-2"
+                    className="text-theme-secondaryText cursor-pointer bg-theme-buttonEnable rounded-lg text-center px-12 py-2 mb-4"
                     onClick={handleVerify}
                   >
                     Verify
@@ -333,7 +339,7 @@ const Integration = () => {
                 </div>
                 <div className="flex flex-row space-x-6 text-sm font-light pt-2">
                   <div
-                    className="cursor-pointer text-theme-secondaryText bg-theme-buttonEnable rounded-lg text-center px-12 py-2"
+                    className="cursor-pointer text-theme-secondaryText bg-theme-buttonEnable rounded-lg text-center px-12 py-2 mb-4"
                     onClick={handleVerify}
                   >
                     Verify
@@ -355,9 +361,10 @@ const Integration = () => {
       {!loading && page === 2 && (
         <div className="flex flex-col mt-2 text-theme-primaryText font-light text-sm">
           <p>
-            This is your unique password and its non-recoverable. If you lose
-            this API key, you will have to reset it.
+            This is your unique API key. It will be used to embed channels into
+            your website.
           </p>
+
           <p
             className="text-blue-400 cursor-pointer mt-2"
             onClick={() => downloadJson(apiKey)}
@@ -370,18 +377,22 @@ const Integration = () => {
           >
             {apiKey}
           </div>
-          <CopyToClipboard text={apiKey} onCopy={handleCopy}>
-            <div className="w-max cursor-pointer text-theme-secondaryText mt-6 bg-theme-buttonEnable rounded-lg text-center px-12 py-2">
-              Copy
-            </div>
-          </CopyToClipboard>
+          <div
+            onClick={() => navigate(`/admin/${myData.username}/home`)}
+            className="w-max cursor-pointer text-theme-secondaryText mt-6 bg-theme-buttonEnable rounded-lg text-center px-12 py-2"
+          >
+            Navigate to Dashboard
+          </div>
         </div>
       )}
       {!loading && page === 3 && (
         <div className="mt-6 text-theme-secondaryText text-md font-light ">
           Api key is already generated.{" "}
-          <span className="text-theme-blue-400 underline">
-            Contact the channels support
+          <span
+            className="text-theme-blue-400 underline cursor-pointer"
+            onClick={() => navigate(`/admin/${myData.username}/home`)}
+          >
+            Navigate to Dashboard
           </span>
         </div>
       )}

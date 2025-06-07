@@ -37,6 +37,9 @@ import EmbedLogoutModal from "./../components/Modals/EmbedLogoutModal";
 import DeleteDMModal from "./../components/Modals/deletions/dmDeleteModal";
 import EventShareModal from "./../components/Modals/share/eventShareModal";
 import PollModal from "./../components/Modals/Poll/PollModal";
+import DeleteChannelModal from "../components/Modals/deletions/channelDeleteModal";
+import DeleteTopicModal from "../components/Modals/deletions/topicDeleteModal";
+import LeaveChannelModal from "../components/Modals/deletions/leaveChannelModal";
 
 const Modals = () => (
   <>
@@ -78,6 +81,9 @@ const Modals = () => (
     <DeleteDMModal />
     <EventShareModal />
     <PollModal />
+    <DeleteChannelModal />
+    <DeleteTopicModal />
+    <LeaveChannelModal />
   </>
 );
 

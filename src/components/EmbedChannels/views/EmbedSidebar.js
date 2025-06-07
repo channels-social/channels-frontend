@@ -17,6 +17,7 @@ import Close from "../../../assets/icons/Close.svg";
 import SidebarSkeleton from "./../../skeleton/SidebarSkeleton";
 import { domainUrl } from "./../../../utils/globals";
 import StorageManager from "./../utility/storage_manager";
+import { getAppPrefix } from "../utility/embedHelper";
 
 const EmbedSidebar = ({ closeSidebar, loading }) => {
   const location = useLocation();
@@ -81,7 +82,7 @@ const EmbedSidebar = ({ closeSidebar, loading }) => {
     const username = dataId.username;
     closeSidebar();
     navigate(
-      `/embed/channels/get-started?redirect=/user/${username}/channel/${channelId}`,
+      `/embed/channels/get-started?redirect=${getAppPrefix()}/user/${username}/channel/${channelId}`,
       {
         replace: true,
       }

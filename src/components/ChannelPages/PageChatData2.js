@@ -5,6 +5,7 @@ import ReplyIcon from "../../assets/icons/reply_icon.svg";
 import EmojiPicker from "emoji-picker-react";
 import StorageManager from "../EmbedChannels/utility/storage_manager";
 import ArrowDropDownLight from "../../assets/lightIcons/chat_drop_light.svg";
+import ColorProfile from "../../assets/images/color_profile.svg";
 
 import {
   fetchBrandChats,
@@ -430,9 +431,15 @@ const PageChatData2 = ({
                     />
                   ) : chat.replyTo.user.color_logo ? (
                     <div
-                      className="rounded-full w-4 h-4 shrink-0"
+                      className="rounded-full w-4 h-4  shrink-0 flex items-center justify-center"
                       style={{ backgroundColor: chat.replyTo.user?.color_logo }}
-                    ></div>
+                    >
+                      <img
+                        src={ColorProfile}
+                        alt="color-profile"
+                        className="w-2 h-2"
+                      />
+                    </div>
                   ) : (
                     <img
                       src={Profile}
@@ -483,9 +490,15 @@ const PageChatData2 = ({
                     />
                   ) : chat.sender?.color_logo ? (
                     <div
-                      className="rounded-full w-8 h-8 mx-2 shrink-0 mt-0.5"
+                      className="rounded-full w-8 h-8 mx-2 shrink-0 mt-0.5 flex items-center justify-center"
                       style={{ backgroundColor: chat.sender?.color_logo }}
-                    ></div>
+                    >
+                      <img
+                        src={ColorProfile}
+                        alt="color-profile"
+                        className="w-5 h-5"
+                      />
+                    </div>
                   ) : (
                     <img
                       src={Profile}
@@ -520,7 +533,7 @@ const PageChatData2 = ({
 
                     <Linkify componentDecorator={componentDecorator}>
                       <p
-                        className={`text-theme-secondaryText text-sm font-light my-1 
+                        className={`text-theme-secondaryText text-sm font-light my-1 text-left
       whitespace-pre-wrap break-words break-all w-full max-w-full`}
                       >
                         {chat.content}

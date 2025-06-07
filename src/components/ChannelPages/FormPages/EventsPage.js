@@ -9,18 +9,21 @@ import { setEventField } from "../../../redux/slices/eventSlice";
 import AddIcon from "../../../assets/icons/addIcon.svg";
 import AddIconLight from "../../../assets/lightIcons/add_light.svg";
 import useModal from "./../../hooks/ModalHook";
+import { useParams } from "react-router-dom";
+import { fetchEventChats } from "../../../redux/slices/chatSlice";
 
-const EventsPage = ({ topicId }) => {
+const EventsPage = () => {
   const today = new Date();
   const [selectedTab, setSelectedTab] = useState("Calendar");
   const [currentDate, setCurrentDate] = useState(
     new Date(today.getFullYear(), today.getMonth(), today.getDate())
   );
+  const { username, topicId } = useParams();
   const dispatch = useDispatch();
   const [selectedDate, setSelectedDate] = useState(today);
   const [monthDropdownOpen, setMonthDropdownOpen] = useState(false);
   const [yearDropdownOpen, setYearDropdownOpen] = useState(false);
-  const Chats = useSelector((state) => state.chat.chats);
+  const Chats = useSelector((state) => state.chat.eventChats);
   const [openDropdownId, setOpenDropdownId] = useState(null);
   const dropdownContainerRef = useRef(null);
   const months = Array.from({ length: 12 }, (v, i) =>
@@ -31,6 +34,10 @@ const EventsPage = ({ topicId }) => {
     new Array(6),
     (val, index) => index + today.getFullYear() - 1
   );
+
+  useEffect(() => {
+    dispatch(fetchEventChats(topicId));
+  }, []);
 
   const getDaysArray = (year, month) => {
     const monthIndex = month;
@@ -228,7 +235,6 @@ const EventsPage = ({ topicId }) => {
                 <div className="absolute z-10 max-h-90 overflow-y-auto custom-scrollbar bg-theme-tertiaryBackground border border-theme-chatBackground rounded-lg shadow-lg">
                   {months.map((month) => (
                     <div
-                      key={month}
                       className="p-2 text-left text-sm text-theme-secondaryText hover:bg-chatBackground"
                       onClick={() => handleMonthChange(month)}
                     >
@@ -265,7 +271,6 @@ const EventsPage = ({ topicId }) => {
                 <div className="absolute z-10 max-h-90 overflow-y-auto custom-scrollbar bg-theme-tertiaryBackground border border-theme-chatBackground rounded-lg shadow-lg">
                   {years.map((year) => (
                     <div
-                      key={year}
                       className="p-2 text-left text-sm text-theme-secondaryText hover:bg-chatBackground"
                       onClick={() => handleYearChange(year.toString())}
                     >
@@ -278,10 +283,7 @@ const EventsPage = ({ topicId }) => {
           </div>
           <div className="grid grid-cols-7 ml-2 space-x-1">
             {["M", "T", "W", "T", "F", "S", "S"].map((day) => (
-              <div
-                key={day}
-                className="text-theme-primaryText  font-light text-[10px]"
-              >
+              <div className="text-theme-primaryText  font-light text-[10px]">
                 {day}
               </div>
             ))}
@@ -301,7 +303,6 @@ const EventsPage = ({ topicId }) => {
               (day, index) =>
                 day && (
                   <div
-                    key={index}
                     className={`text-center rounded-full h-6 w-6 text-sm font-light cursor-pointer ${
                       selectedDate.toDateString() === day.toDateString()
                         ? "bg-theme-secondaryText text-theme-primaryBackground p-0.5"
@@ -347,8 +348,8 @@ const EventsPage = ({ topicId }) => {
       {selectedTab === "All upcoming events" && (
         <div className="mt-4">
           {upcomingEvents.length > 0 ? (
-            upcomingEvents.map((chat) => (
-              <div key={chat._id} className="w-full my-3">
+            upcomingEvents.map((chat, index) => (
+              <div key={`${chat._id}-${index}`} className="w-full my-3">
                 <EventCard
                   width="w-full"
                   imageHeight="h-32"

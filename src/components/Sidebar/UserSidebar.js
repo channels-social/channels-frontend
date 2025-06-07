@@ -42,7 +42,7 @@ const UserSidebar = ({ closeSidebar }) => {
   const { channels, loading, error, communityChannel } = useSelector(
     (state) => state.channelItems
   );
-  const { channelId } = useParams();
+  const { channelId, username } = useParams();
 
   const handleChannelModal = () => {
     handleOpenModal("modalChannelOpen");
@@ -174,9 +174,9 @@ const UserSidebar = ({ closeSidebar }) => {
 
         <nav className="mt-6">
           <Link
-            to={`/user/${myData.username}/welcome`}
+            to={`/user/${username}/welcome`}
             className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6 ${
-              location.pathname === `/user/${myData.username}/welcome`
+              location.pathname === `/user/${username}/welcome`
                 ? "text-theme-secondaryText bg-theme-sidebarHighlight rounded-lg mx-3"
                 : "text-theme-primaryText"
             }`}
@@ -269,6 +269,7 @@ const UserSidebar = ({ closeSidebar }) => {
                   {channel.topics.map(
                     (topic, topicIndex) =>
                       (channel.visibility === "anyone" ||
+                        channel.members?.includes(myData._id) ||
                         channel.user._id === myData._id) && (
                         <div key={topic._id}>
                           <Link

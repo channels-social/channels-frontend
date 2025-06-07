@@ -5,6 +5,7 @@ import ProfileIcon from "../../assets/icons/profile.svg";
 import ProfileForm from "./FormProfile/ProfileForm";
 import ProfileCarousel from "./Widgets/ProfileCarousel";
 import UnsplashModal from "./../Modals/UnsplashModal";
+import ColorProfile from "../../assets/images/color_profile.svg";
 import {
   fetchProfile,
   selectProfileStatus,
@@ -52,6 +53,7 @@ const Profile = () => {
   const [isDomainExist, setIsDomainExist] = useState(true);
   const dispatch = useDispatch();
   const myData = useSelector((state) => state.myData);
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const { handleOpenModal } = useModal();
   const navigate = useNavigate();
   const { username } = useParams();
@@ -71,32 +73,35 @@ const Profile = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const [activeTab, setActiveTab] = useState("");
+  const [activeTab, setActiveTab] = useState("channels");
 
   const tabs = [
-    { id: 1, name: "Channels", href: "" },
-    { id: 2, name: "Curations", href: "#curations" },
-    { id: 3, name: "FAQs", href: "#faqs" },
+    { id: 1, name: "Channels", href: "channels" },
+    { id: 2, name: "Curations", href: "curations" },
+    { id: 3, name: "FAQs", href: "faqs" },
   ];
 
-  useEffect(() => {
-    window.scrollTo(0, scrollPosition);
-  }, [activeTab]);
-
   const handleTabClick = (event, href) => {
-    setScrollPosition(window.scrollY);
+    event.preventDefault();
+    const scrollY = window.scrollY;
     setActiveTab(href);
-    window.history.pushState(null, "", `#${href}`);
+    if (href === "channels") {
+      window.history.pushState(null, "", window.location.pathname);
+    } else {
+      window.history.pushState(null, "", `?tab=${href}`);
+    }
+    window.scrollTo(0, scrollY);
   };
 
   useEffect(() => {
-    const hash = window.location.hash.replace("#", "");
-    if (hash) {
-      setActiveTab(hash);
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+    if (tab === "curations" || tab === "faqs") {
+      setActiveTab(tab);
     } else {
-      setActiveTab("");
+      setActiveTab("channels"); // default
     }
-  }, []); //
+  }, []);
 
   const toggleReadMore = () => {
     setIsExpanded(!isExpanded);
@@ -151,30 +156,10 @@ const Profile = () => {
   const openBottomSheet = () => setIsBottomSheetOpen(true);
   const closeBottomSheet = () => setIsBottomSheetOpen(false);
 
-  // const handleCurationOpenModal = () => {
-  //   setIsDropdownOpen(false);
-  //   handleOpenModal("modalCurationOpen");
-  // };
-  // const handleChipOpen = () => {
-  //   setIsDropdownOpen(false);
-  //   handleOpenModal("modalChipOpen");
-  // };
-
   const openShareModal = (link) => {
     handleOpenModal("modalShareProfileOpen", link);
     dispatch(setProfileEngagement(profileData._id));
   };
-
-  // const handleSubscription = () => {
-  //   if (isLoggedIn) {
-  //     dispatch(toggleSubscription(profileData));
-  //   } else {
-  //     handleOpenModal("modalLoginOpen");
-  //   }
-  // };
-  // const handleSubscribersModal = () => {
-  //   handleOpenModal("modalMySubscribersOpen", profileData._id);
-  // };
 
   const handleEditCards = () => {
     dispatch(updateProfileField({ name: "activeTab", value: "displayCards" }));
@@ -226,6 +211,22 @@ const Profile = () => {
   //   navigate(`/${myData?.username}/newsletter`);
   // };
 
+  const handleMessageClick = () => {
+    if (isLoggedIn && myData?.username) {
+      navigate(
+        `${getAppPrefix()}/user/${myData.username}/messages/list/${
+          profileData.username
+        }`
+      );
+    } else {
+      navigate(
+        `${getAppPrefix()}/get-started?redirect=${getAppPrefix()}/user/${
+          profileData.username
+        }/profile`
+      );
+    }
+  };
+
   if (isLoading) {
     return <ProfileSkeleton />;
   }
@@ -242,7 +243,6 @@ const Profile = () => {
     userId !== "";
 
   const hasImages = profileData.imageCards.length !== 0;
-  // const isSubscribed = profileData.subscribers?.includes(myData?._id);
 
   return (
     <div
@@ -323,9 +323,15 @@ const Profile = () => {
                     />
                   ) : profileData.color_logo ? (
                     <div
-                      className="rounded-full w-24 h-24 border border-theme-white shrink-0"
-                      style={{ backgroundColor: profileData.color_logo }}
-                    ></div>
+                      className="rounded-full w-24 h-24 border border-theme-white shrink-0  flex items-center justify-center"
+                      style={{ backgroundColor: profileData?.color_logo }}
+                    >
+                      <img
+                        src={ColorProfile}
+                        alt="color-profile"
+                        className="w-5 h-5"
+                      />
+                    </div>
                   ) : (
                     <img
                       src={ProfileIcon}
@@ -346,12 +352,7 @@ const Profile = () => {
                     <p className="mt-1 text-xs font-light text-theme-emptyEvent font-inter">
                       {profileData.username}.{domainUrl}
                     </p>
-                    {/* <p
-                      className="mt-1 text-xs  font-normal text-viewAll font-inter cursor-pointer"
-                      onClick={handleSubscribersModal}
-                    >
-                      {profileData.subscribers.length} Subscribers
-                    </p> */}
+
                     {
                       <Linkify componentDecorator={componentDecorator}>
                         <p
@@ -450,13 +451,7 @@ const Profile = () => {
                         <div
                           className="cursor-pointer px-4 mt-4 font-normal py-2.5 border bg-theme-secondaryText
                             text-sm rounded-lg border-none text-theme-primaryBackground"
-                          onClick={() =>
-                            navigate(
-                              `${getAppPrefix()}/user/${
-                                myData.username
-                              }/messages/list/${profileData.username}`
-                            )
-                          }
+                          onClick={handleMessageClick}
                         >
                           Message
                         </div>
@@ -597,15 +592,15 @@ const Profile = () => {
             {!isEmbeddedOrExternal() && (
               <div
                 className={`
-                w-88px
+                xs:w-88px w-72
               mx-auto border border-theme-chatDivider `}
                 style={{ height: "0.1px" }}
               ></div>
             )}
             <div className="mt-6 mb-8">
-              {activeTab === "" ? (
+              {activeTab === "channels" ? (
                 <ChannelsTab gallery={false} />
-              ) : activeTab === "#curations" ? (
+              ) : activeTab === "curations" ? (
                 <CurationsTab isOwner={isOwner} items={items} gallery={false} />
               ) : (
                 <FaqsTab username={username} />

@@ -7,12 +7,20 @@ import {
   setCreateTopicItems,
 } from "../../redux/slices/createTopicSlice";
 import { fetchChannels } from "./../../redux/slices/channelItemsSlice";
+import ColorProfile from "../../assets/images/color_profile.svg";
+
 import {
   createTopicInvite,
   setTopicField,
 } from "../../redux/slices/topicSlice";
 import { setModalModal } from "../../redux/slices/modalSlice";
 import { getAppPrefix } from "./../EmbedChannels/utility/embedHelper";
+import Dots from "../../assets/icons/three_dots.svg";
+import DotsLight from "../../assets/lightIcons/faqs_dots_light.svg";
+import Edit from "../../assets/icons/Edit.svg";
+import EditLight from "../../assets/lightIcons/edit_light.svg";
+import Delete from "../../assets/icons/Delete.svg";
+import DeleteLight from "../../assets/lightIcons/delete_light.svg";
 
 import {
   React,
@@ -25,6 +33,11 @@ import {
   useModal,
   isEmbeddedOrExternal,
 } from "../../globals/imports";
+import {
+  setTopicIdToDelete,
+  setTopicNameToDelete,
+  setTopicChannelToDelete,
+} from "../../redux/slices/deleteTopicSlice.js";
 
 const PageHeader = ({
   channelName,
@@ -41,12 +54,17 @@ const PageHeader = ({
   const { handleOpenModal } = useModal();
   const dropdownRef = useRef(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isEditDropdownOpen, setIsEditDropdownOpen] = useState(false);
+  const dropdownEditRef = useRef(null);
   const reorderTopics = useSelector((state) => state.reorderTopic);
   const channels = useSelector((state) => state.channelItems.channels);
   const myData = useSelector((state) => state.myData);
   const [channelsData, setChannelsData] = useState([]);
   const hasFetched = useRef(false);
   const navigate = useNavigate();
+  const [isDark, setIsDark] = useState(
+    () => localStorage.getItem("theme") !== "light"
+  );
 
   const handleEditModal = () => {
     const transformedData = {
@@ -61,11 +79,25 @@ const PageHeader = ({
 
   useEffect(() => {
     const handleClickOutside = (event) => {
+      if (
+        dropdownEditRef.current &&
+        !dropdownEditRef.current.contains(event.target)
+      ) {
+        setIsEditDropdownOpen(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
       }
     };
-
     if (isDropdownOpen) {
       document.addEventListener("mousedown", handleClickOutside);
     } else {
@@ -104,6 +136,9 @@ const PageHeader = ({
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
+  };
+  const toggleEditDropdown = () => {
+    setIsEditDropdownOpen(!isEditDropdownOpen);
   };
 
   const handleOwnerShareTopic = (id) => {
@@ -144,6 +179,13 @@ const PageHeader = ({
     navigate(`${getAppPrefix()}/user/${myData.username}/messages/list`);
   };
 
+  const handleDeleteTopic = (topic) => {
+    dispatch(setTopicIdToDelete(topic._id));
+    dispatch(setTopicNameToDelete(topic.name));
+    dispatch(setTopicChannelToDelete(topic.channel));
+    handleOpenModal("modalDeleteTopicOpen");
+  };
+
   const isOwner = topic.user === myData._id;
 
   return (
@@ -170,19 +212,95 @@ const PageHeader = ({
               {topic.name.charAt(0).toUpperCase() + topic.name.slice(1)}
             </p>
 
-            <img
-              src={DropDown}
-              alt="arrow-right"
-              className="hidden dark:inline-block w-6 h-6 ml-1 cursor-pointer sm:hidden"
-              onClick={toggleDropdown}
-            />
+            {isEmbeddedOrExternal() && (
+              <img
+                src={DropDown}
+                alt="arrow-right"
+                className="hidden dark:sm:hidden dark:inline-block  w-6 h-6 ml-1 cursor-pointer"
+              />
+            )}
 
-            <img
-              src={DropDownLight}
-              alt="arrow-right"
-              className="inline-block dark:hidden w-6 h-6 ml-1 cursor-pointer sm:hidden"
-              onClick={toggleDropdown}
-            />
+            {isEmbeddedOrExternal() && (
+              <img
+                src={DropDownLight}
+                alt="arrow-right"
+                className="dark:hidden sm:hidden block w-6 h-6 ml-1 cursor-pointer"
+              />
+            )}
+
+            {isOwner && (
+              <div className="relative flex items-center ml-2">
+                <img
+                  src={Dots}
+                  alt="dots"
+                  className="dark:block hidden w-6 h-6 mr-2 cursor-pointer z-20"
+                  onClick={toggleEditDropdown}
+                />
+                <img
+                  src={DotsLight}
+                  alt="dots"
+                  className="dark:hidden w-6 h-6 mr-2 cursor-pointer z-20"
+                  onClick={toggleEditDropdown}
+                />
+                {isEditDropdownOpen && (
+                  <div
+                    ref={dropdownEditRef}
+                    className="absolute top-6 -left-4 mt-1 ml-3 w-24 rounded-md shadow-lg border  border-theme-chatDivider
+                                                           bg-theme-tertiaryBackground ring-1 ring-black ring-opacity-5 z-50"
+                  >
+                    <div
+                      className="py-1"
+                      role="menu"
+                      aria-orientation="vertical"
+                      aria-labelledby="options-menu"
+                    >
+                      <div className="flex flex-row px-3 items-center">
+                        <img
+                          src={Edit}
+                          alt="edit"
+                          className="dark:block hidden w-4 h-4"
+                        />
+                        <img
+                          src={EditLight}
+                          alt="edit"
+                          className="dark:hidden w-4 h-4"
+                        />
+                        <p
+                          className="block font-light px-2 py-2 text-sm text-theme-secondaryText cursor-pointer"
+                          role="menuitem"
+                          onClick={() => {
+                            handleEditModal(topic);
+                          }}
+                        >
+                          Edit
+                        </p>
+                      </div>
+                      <div
+                        className="flex flex-row px-3 items-center"
+                        onClick={() => handleDeleteTopic(topic)}
+                      >
+                        <img
+                          src={Delete}
+                          alt="edit"
+                          className="dark:block hidden w-4 h-4"
+                        />
+                        <img
+                          src={DeleteLight}
+                          alt="edit"
+                          className="dark:hidden w-4 h-4"
+                        />
+                        <p
+                          className="block px-2 py-2 font-light text-sm   text-theme-secondaryText cursor-pointer"
+                          role="menuitem"
+                        >
+                          Delete
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
 
             {isDropdownOpen && (
               <div
@@ -250,9 +368,15 @@ const PageHeader = ({
               />
             ) : myData?.color_logo ? (
               <div
-                className="rounded-full w-full h-full shrink-0"
-                style={{ backgroundColor: myData.color_logo }}
-              ></div>
+                className="rounded-full w-full h-full  shrink-0 flex items-center justify-center"
+                style={{ backgroundColor: myData?.color_logo }}
+              >
+                <img
+                  src={ColorProfile}
+                  alt="color-profile"
+                  className="w-4 h-4"
+                />
+              </div>
             ) : (
               <img
                 src={ProfileIcon}

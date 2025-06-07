@@ -19,13 +19,19 @@ const EmbedLogoutModal = () => {
     googleLogout();
     dispatch(clearMyData());
     handleClose();
-    const data = StorageManager.getItem("embedFetchedData");
-    const dataId = JSON.parse(data);
-    const channelId = dataId.selectedChannel;
-    const username = dataId.username;
-    navigate(`/embed/channels/user/${username}/channel/${channelId}`, {
-      replace: true,
-    });
+    const data = localStorage.getItem("embedFetchedData");
+    if (data) {
+      const dataId = JSON.parse(data);
+      const channelId = dataId.selectedChannel;
+      const username = dataId.username;
+      navigate(`/embed/channels/user/${username}/channel/${channelId}`, {
+        replace: true,
+      });
+    } else {
+      navigate(`/embed/channels/get-started`, {
+        replace: true,
+      });
+    }
   };
   const handleClose = () => {
     dispatch(closeModal("modalEmbedLogoutOpen"));

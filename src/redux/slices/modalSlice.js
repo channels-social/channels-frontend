@@ -30,12 +30,13 @@ const initialState = {
   modalEventCardOpen: false,
   modalShareChipOpen: false,
   modalShareChannelOpen: false,
+  modalDeleteChannelOpen: false,
   modalShareTopicOpen: false,
+  modalDeleteTopicOpen: false,
   modalShareEventOpen: false,
   modalShareProfileOpen: false,
   modalTokenExpiryOpen: false,
   modalUnsubscriptionOpen: false,
-  modalMySubscribersOpen: false,
   modalCreateCategoryOpen: false,
   modalCategoryDeleteOpen: false,
   modalPushtoCategoryOpen: false,
@@ -51,7 +52,10 @@ const initialState = {
   isLoginMode: false,
   profileId: "",
   channelId: "",
+  isTabChannel: false,
+  channelName: "",
   topicId: "",
+  topicName: "",
   event: {},
   eventId: "",
 };
@@ -86,9 +90,7 @@ const modalSlice = createSlice({
       if (modalName === "modalUnsubscriptionOpen") {
         state.shareUsername = link;
       }
-      if (modalName === "modalMySubscribersOpen") {
-        state.profileId = link;
-      }
+
       if (modalName === "modalShareChannelOpen") {
         state.channelId = link;
       }
@@ -124,9 +126,7 @@ const modalSlice = createSlice({
       if (modalName === "modalTopicReorderOpen") {
         state.channelId = "";
       }
-      if (modalName === "modalMySubscribersOpen") {
-        state.profileId = "";
-      }
+
       if (modalName === "modalShareChannelOpen") {
         state.channelId = "";
       }

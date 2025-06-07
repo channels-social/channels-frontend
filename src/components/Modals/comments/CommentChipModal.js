@@ -47,12 +47,11 @@ const CommentChipModal = () => {
     setComment((prevComment) => prevComment + event.emoji);
     inputRef.current.focus();
   };
-
   useEffect(() => {
-    if (item._id) {
+    if (isOpen && item && item._id) {
       dispatch(fetchChipComments(item._id));
     }
-  }, [dispatch, item._id]);
+  }, [isOpen, item._id]);
 
   useEffect(() => {
     if (scrollRef.current && isScroll) {
@@ -119,19 +118,19 @@ const CommentChipModal = () => {
               ></div>
               <div
                 className={`${
-                  comments.length === 0 ? "min-h-[25%]" : "min-h-[50%]"
+                  comments?.length === 0 ? "min-h-[25%]" : "min-h-[50%]"
                 }  space-y-3 overflow-y-auto custom-scrollbar`}
                 ref={scrollRef}
               >
                 {status === "loading" ? (
                   <p
                     className={`text-sm text-theme-primaryText ${
-                      comments.length === 0 ? "mt-4" : "mt-8"
+                      comments?.length === 0 ? "mt-4" : "mt-8"
                     } text-center font-light`}
                   >
                     Loading...
                   </p>
-                ) : comments.length === 0 ? (
+                ) : comments?.length === 0 ? (
                   <p
                     className={`text-sm text-theme-primaryText ${
                       comments.length === 0 ? "mt-4" : "mt-8"
@@ -140,7 +139,7 @@ const CommentChipModal = () => {
                     Start a conversation.
                   </p>
                 ) : (
-                  comments.map((item, index) => (
+                  comments?.map((item, index) => (
                     <CommentItem
                       key={item._id}
                       item={item}

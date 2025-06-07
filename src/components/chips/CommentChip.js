@@ -161,7 +161,7 @@ const CommentChip = ({ item }) => {
             alt="Upvote"
             className="mr-0.5 h-5 w-5"
           />
-          <p className="text-theme-secondaryText text-sm font-normal">
+          <p className="text-theme-secondaryText text-sm font-light">
             {item.upvotes.length}
           </p>
         </div>
@@ -171,13 +171,12 @@ const CommentChip = ({ item }) => {
           onClick={openShareModal}
         >
           <img src={Send} alt="Send" className="mr-0.5 h-7 w-7" />
-          <p className="text-theme-secondaryText text-sm font-normal">
-            {item.shared_by}
+          <p className="text-theme-secondaryText text-sm font-light">
+            {item.shared_by ? item.shared_by : ""}
           </p>
         </div>
-        <div className="relative">
+        {/* <div className="relative">
           {" "}
-          {/* New relative container for positioning */}
           {isSavedMessageVisible && (
             <div className="absolute -top-7 left-1/2 transform -translate-x-1/2 bg text-theme-secondaryText text-xs rounded-lg px-2 py-1">
               {savedMessage}
@@ -195,7 +194,7 @@ const CommentChip = ({ item }) => {
               className="h-5 w-5"
             />
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

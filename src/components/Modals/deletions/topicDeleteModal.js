@@ -4,39 +4,47 @@ import Close from "../../../assets/icons/Close.svg";
 import { useDispatch, useSelector } from "react-redux";
 import { closeModal } from "../../../redux/slices/modalSlice";
 import {
-  deleteTopicChat,
-  clearChatIdToDelete,
-} from "../../../redux/slices/chatSlice";
-import socket from "../../../utils/socket";
+  deleteTopic,
+  clearTopicIdToDelete,
+} from "../../../redux/slices/deleteTopicSlice";
+import { useNavigate } from "react-router-dom";
+import { getAppPrefix } from "../../EmbedChannels/utility/embedHelper";
 
-const DeleteChatModal = () => {
+const DeleteTopicModal = () => {
   const dispatch = useDispatch();
-  const isOpen = useSelector((state) => state.modals.modalChatDeleteOpen);
-  const chatIdToDelete = useSelector((state) => state.chat.chatReplyId);
-  const topicIdToDelete = useSelector((state) => state.chat.topicReplyId);
+  const isOpen = useSelector((state) => state.modals.modalDeleteTopicOpen);
+  const myData = useSelector((state) => state.myData);
+  const topicIdToDelete = useSelector((state) => state.topicDeletion.topicId);
+  const topicNameToDelete = useSelector(
+    (state) => state.topicDeletion.topicName
+  );
+  const topicChannelToDelete = useSelector(
+    (state) => state.topicDeletion.channelId
+  );
+  const navigate = useNavigate();
 
   if (!isOpen) return null;
 
   const handleClose = () => {
-    dispatch(closeModal("modalChatDeleteOpen"));
-    dispatch(clearChatIdToDelete());
+    dispatch(closeModal("modalDeleteTopicOpen"));
+    dispatch(clearTopicIdToDelete());
   };
 
   const handleDelete = () => {
-    dispatch(deleteTopicChat(chatIdToDelete))
+    dispatch(deleteTopic(topicIdToDelete))
       .unwrap()
       .then(() => {
-        const messageData = {
-          chatId: chatIdToDelete,
-          topicId: topicIdToDelete,
-        };
-        console.log(messageData);
-        socket.emit("delete_message", messageData);
-        dispatch(closeModal("modalChatDeleteOpen"));
-        dispatch(clearChatIdToDelete());
+        dispatch(closeModal("modalDeleteTopicOpen"));
+        dispatch(clearTopicIdToDelete());
+        navigate(
+          `${getAppPrefix()}/user/${
+            myData.username
+          }/channel/${topicChannelToDelete}`,
+          { replace: true }
+        );
       })
       .catch((error) => {
-        console.error("Failed to delete chat:", error);
+        console.error("Failed to delete topic:", error);
       });
   };
 
@@ -50,7 +58,7 @@ const DeleteChatModal = () => {
             <div className="flex flex-col p-5">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-theme-secondaryText text-lg font-normal fonr-inter">
-                  Delete Chat
+                  Delete Topic
                 </h2>
                 <img
                   src={Close}
@@ -60,7 +68,9 @@ const DeleteChatModal = () => {
                 />
               </div>
               <div className="mt-2 text-theme-secondaryText font-normal font-inter">
-                Do you really want to delete the chat?
+                Do you really want to delete the topic{" "}
+                <span className="font-semibold">{topicNameToDelete}</span>? This
+                will delete all chats and all its contents.
               </div>
               <div className="flex flex-row mt-5 space-x-8">
                 <button
@@ -70,7 +80,7 @@ const DeleteChatModal = () => {
                   Cancel
                 </button>
                 <button
-                  className="w-full py-2.5 rounded-full text-theme-primaryBackground bg-theme-secondaryText  font-normal"
+                  className="w-full py-2.5 rounded-full text-theme-primaryBackground bg-theme-secondaryText font-normal"
                   onClick={handleDelete}
                 >
                   Confirm
@@ -84,4 +94,4 @@ const DeleteChatModal = () => {
   );
 };
 
-export default DeleteChatModal;
+export default DeleteTopicModal;

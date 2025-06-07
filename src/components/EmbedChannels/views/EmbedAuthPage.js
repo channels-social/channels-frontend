@@ -10,6 +10,7 @@ import StorageManager from "./../utility/storage_manager";
 import { domainUrl } from "./../../../utils/globals";
 import DateTimeCard from "./../../chips/widgets/DateTime";
 import { useLocation, useNavigate } from "react-router-dom";
+import { fetchMyData } from "../../../redux/slices/myDataSlice";
 
 const EmbedAuthPage = ({ initialEmail = "" }) => {
   const [isLogin, setIsLogin] = useState(false);
@@ -28,6 +29,21 @@ const EmbedAuthPage = ({ initialEmail = "" }) => {
   const [redirectDomain, setRedirectDomain] = useState("");
   const navigate = useNavigate();
 
+  // const [channelId, setChannelId] = useState("");
+
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     const data = localStorage.getItem("embedFetchedData");
+  //     if (data) {
+  //       const dataId = JSON.parse(data);
+  //       setChannelId(dataId.selectedChannel);
+  //       clearInterval(interval);
+  //     }
+  //   }, 200);
+
+  //   return () => clearInterval(interval);
+  // }, []);
+
   const clearData = () => {
     setFullName("");
     setEmail("");
@@ -40,7 +56,15 @@ const EmbedAuthPage = ({ initialEmail = "" }) => {
     const searchParams = new URLSearchParams(location.search);
     const redirectParam = searchParams.get("redirect");
     if (redirectParam) {
-      setRedirectUrl(redirectParam);
+      let normalizedRedirect = redirectParam;
+      normalizedRedirect = normalizedRedirect.replace(
+        /(?:\/embed\/channels)+/g,
+        ""
+      );
+      normalizedRedirect = `/embed/channels${
+        normalizedRedirect.startsWith("/") ? "" : "/"
+      }${normalizedRedirect}`;
+      setRedirectUrl(normalizedRedirect);
       const match = redirectParam.match(/\/channel\/([^/]+)/);
       if (match && match[1]) {
         setChannelId(match[1]);
@@ -104,8 +128,8 @@ const EmbedAuthPage = ({ initialEmail = "" }) => {
                 whatsapp_number: user.whatsapp_number,
                 _id: user._id,
               };
-              StorageManager.setItem("user", JSON.stringify(partialUser));
-              StorageManager.setItem("auth-token", response.data.token);
+              localStorage.setItem("user", JSON.stringify(partialUser));
+              localStorage.setItem("auth-token", response.data.token);
               dispatch(
                 setEmbedCredentials({
                   user: response.data.user,
@@ -113,14 +137,22 @@ const EmbedAuthPage = ({ initialEmail = "" }) => {
                 })
               );
               clearData();
+              dispatch(fetchMyData());
               if (redirectUrl !== "") {
                 navigate(`${redirectUrl}`, {
                   replace: true,
                 });
               } else {
-                navigate(`/embed/channels`, {
-                  replace: true,
-                });
+                const data = localStorage.getItem("embedFetchedData");
+                if (data) {
+                  const dataId = JSON.parse(data);
+                  navigate(
+                    `/embed/channels/user/${dataId.username}/channel/${dataId.selectedChannel}`,
+                    {
+                      replace: true,
+                    }
+                  );
+                }
               }
             } else {
               setNewError(response.data.message);
@@ -131,7 +163,6 @@ const EmbedAuthPage = ({ initialEmail = "" }) => {
       }
     } else if (otp.length === 6) {
       setNewError("Enter Correct Otp");
-      console.log("some error");
     }
   };
 
@@ -140,7 +171,6 @@ const EmbedAuthPage = ({ initialEmail = "" }) => {
     const embedData = JSON.parse(data);
     const originalDomain = embedData.domain;
 
-    console.log(originalDomain);
     setNewError("");
     const authUrl = `https://channels.social/embed/google-auth/login?domain=${window.location.origin}&hostDomain=${originalDomain}&channel=${channelId}`;
     const popup = window.open(
@@ -152,7 +182,6 @@ const EmbedAuthPage = ({ initialEmail = "" }) => {
       const allowedOrigin = "https://channels.social";
 
       if (event.origin !== allowedOrigin) return;
-      console.log(event.data);
 
       const { success, user, token } = event.data;
       if (success) {
@@ -165,25 +194,30 @@ const EmbedAuthPage = ({ initialEmail = "" }) => {
           whatsapp_number: user.whatsapp_number,
         };
 
-        StorageManager.setItem("auth-token", token);
-        console.log(token);
-        StorageManager.setItem("user", JSON.stringify(partialUser));
+        localStorage.setItem("auth-token", token);
+        localStorage.setItem("user", JSON.stringify(partialUser));
         dispatch(
           setEmbedCredentials({
             user,
             token,
           })
         );
-        console.log(redirectUrl);
-        // /user/yashu2312/channel/67875bb770b2eb72ee58eb79
+        dispatch(fetchMyData());
         if (redirectUrl !== "") {
           navigate(`${redirectUrl}`, {
             replace: true,
           });
         } else {
-          navigate(`/embed/channels`, {
-            replace: true,
-          });
+          const data = localStorage.getItem("embedFetchedData");
+          if (data) {
+            const dataId = JSON.parse(data);
+            navigate(
+              `/embed/channels/user/${dataId.username}/channel/${dataId.selectedChannel}`,
+              {
+                replace: true,
+              }
+            );
+          }
         }
       }
       window.removeEventListener("message", handleMessage);

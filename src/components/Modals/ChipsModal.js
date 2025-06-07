@@ -105,8 +105,8 @@ const ChipsModal = () => {
 
   const handleMediaUpload = (event) => {
     const files = Array.from(event.target.files);
-    const maxFileSize = 20 * 1024 * 1024;
-    const maxVideoSize = 16 * 1024 * 1024;
+    const maxFileSize = 16 * 1024 * 1024;
+    const maxVideoSize = 30 * 1024 * 1024;
 
     if (files.length <= 5) {
       const newFiles = [];
@@ -114,7 +114,7 @@ const ChipsModal = () => {
         return new Promise((resolve, reject) => {
           if (file.size > maxFileSize && file.type.startsWith("image")) {
             alert(
-              `The file "${file.name}" exceeds the 20 MB size limit and will not be uploaded.`
+              `The file "${file.name}" exceeds the 16 MB size limit and will not be uploaded.`
             );
             return resolve();
           } else if (
@@ -122,45 +122,20 @@ const ChipsModal = () => {
             file.type.startsWith("video")
           ) {
             alert(
-              `The file "${file.name}" exceeds the 16 MB size limit and will not be uploaded.`
+              `The file "${file.name}" exceeds the 30 MB size limit and will not be uploaded.`
             );
             return resolve();
           }
-
-          if (file.size >= 7 * 1024 * 1024 && file.type.startsWith("image")) {
-            new Compressor(file, {
-              quality: 0.5,
-              maxWidth: 1920,
-              maxHeight: 1080,
-              success(result) {
-                const newFile = {
-                  id: uuidv4(),
-                  url: URL.createObjectURL(result),
-                  type: "image",
-                  exclusive: false,
-                  source: "upload",
-                };
-                dispatch(addImageUrl(newFile));
-                newFiles.push(result);
-                resolve();
-              },
-              error(err) {
-                alert("Image compression failed: " + err);
-                resolve();
-              },
-            });
-          } else {
-            const newFile = {
-              id: uuidv4(),
-              url: URL.createObjectURL(file),
-              type: file.type.startsWith("video") ? "video" : "image",
-              exclusive: false,
-              source: "upload",
-            };
-            dispatch(addImageUrl(newFile));
-            newFiles.push(file);
-            resolve();
-          }
+          const newFile = {
+            id: uuidv4(),
+            url: URL.createObjectURL(file),
+            type: file.type.startsWith("video") ? "video" : "image",
+            exclusive: false,
+            source: "upload",
+          };
+          dispatch(addImageUrl(newFile));
+          newFiles.push(file);
+          resolve();
         });
       });
 
@@ -324,21 +299,20 @@ const ChipsModal = () => {
       const currentHeight = textarea.offsetHeight;
       const newHeight = textarea.scrollHeight;
       if (currentHeight !== newHeight) {
-        textarea.style.height = "auto"; // Reset height to auto
-        textarea.style.height = `${newHeight}px`; // Set height to match scroll height
+        textarea.style.height = "auto";
+        textarea.style.height = `${newHeight}px`;
       }
       textarea.scrollTop = scrollTop;
     }
   };
+
   useEffect(() => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.addEventListener("input", handleTextareaChange);
-      return () => {
-        textarea.removeEventListener("input", handleTextareaChange);
-      };
+    if (chipData.text) {
+      setTimeout(() => {
+        handleTextareaChange();
+      }, 0);
     }
-  }, []);
+  }, [chipData.text]);
 
   const isDescEmpty = chipData.text.trim() === "";
   const isEmptyData = isDescEmpty;
@@ -438,7 +412,7 @@ const ChipsModal = () => {
                     onClick={handleClose}
                   />
                 </div>
-                <div className="flex justify-between space-x-4 items-center mb-5 pr-4 overflow-x-auto xs:overflow-x-hidden custom-scrollbar">
+                <div className="flex justify-between xs:space-x-4 space-x-2.5 items-center mb-5 pr-4 overflow-x-auto xs:overflow-x-hidden custom-scrollbar">
                   <div
                     className={`${
                       visibleFields.link
@@ -556,6 +530,7 @@ const ChipsModal = () => {
                     resize-none"
                     placeholder="What is this chip about"
                     rows={1}
+                    onInput={handleTextareaChange}
                     value={chipData.text}
                     onChange={handleChange}
                     name="text"

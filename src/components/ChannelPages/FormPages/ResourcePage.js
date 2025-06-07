@@ -4,18 +4,24 @@ import Search from "../../../assets/icons/search.svg";
 import { useSelector, useDispatch } from "react-redux";
 import ArrowDropDown from "../../../assets/icons/arrow_drop_down.svg";
 import { useParams } from "react-router-dom";
-import { removeFromResource } from "../../../redux/slices/chatSlice";
+import {
+  fetchResourceChats,
+  removeFromResource,
+} from "../../../redux/slices/chatSlice";
 import documentImage from "../../../assets/images/Attachment.svg";
+import { FaPlay } from "react-icons/fa";
+
 import useModal from "./../../hooks/ModalHook";
 
 const ResourcePage = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const { username } = useParams();
+  const { username, topicId } = useParams();
   const { handleOpenModal } = useModal();
+  const [activeVideoId, setActiveVideoId] = useState(null);
 
   const [resourceChats, setResourceChats] = useState([]);
   const myData = useSelector((state) => state.myData);
-  const Chats = useSelector((state) => state.chat.chats);
+  const Chats = useSelector((state) => state.chat.resourceChats);
   const dispatch = useDispatch();
   const [hoveredMedia, setHoveredMedia] = useState({
     mediaId: null,
@@ -49,6 +55,10 @@ const ResourcePage = () => {
   const handleClear = () => {
     setSearchQuery("");
   };
+
+  useEffect(() => {
+    dispatch(fetchResourceChats(topicId));
+  }, [topicId]);
 
   // const handleRefilterChats = () => {
   //   const resourceChat = resourceChats.filter((chat) =>
@@ -198,14 +208,16 @@ const ResourcePage = () => {
           No Resources found...
         </div>
       ) : (
-        resourceChats.map((chat) => (
-          <div className="flex flex-col mt-2 h-full  overflow-y-auto custom-scrollbar">
+        resourceChats.map((chat, index) => (
+          <div
+            className="flex flex-col mt-2 h-full  overflow-y-auto custom-scrollbar"
+            // key={`${chat._id}-${index}`}
+          >
             {chat.media.map(
               (media, index) =>
                 media.resource === true && (
                   <div className="flex flex-row space-x-2 mt-2 overflow-x-auto w-full custom-scrollbar">
                     <div
-                      key={`${chat._id}-${media._id}`}
                       className="relative flex flex-col"
                       onMouseEnter={() =>
                         handleMouseEnterMedia(media._id, index)
@@ -222,17 +234,36 @@ const ResourcePage = () => {
                             src={media.url}
                             alt={media.name}
                             className="h-36 rounded-md object-cover w-auto max-w-52 flex-shrink-0"
+                            loading="lazy"
                           />
-                          <div></div>
                         </div>
                       ) : media.type === "video" ? (
-                        <video
-                          controls
-                          className="h-36 object-cover  rounded-t-xl w-auto max-w-52"
-                        >
-                          <source src={media.url} type="video/mp4" />
-                          Your browser does not support the video tag.
-                        </video>
+                        <div className="relative h-36 max-w-52">
+                          {activeVideoId === media._id ? (
+                            <video
+                              controls
+                              className="h-36 object-cover rounded-md w-full"
+                            >
+                              <source src={media.url} type="video/mp4" />
+                              Your browser does not support the video tag.
+                            </video>
+                          ) : (
+                            <div className="relative w-full h-full">
+                              <img
+                                src={media.thumbnail || media.url}
+                                alt="video thumbnail"
+                                className="w-full h-full object-cover rounded-md"
+                                loading="lazy"
+                              />
+                              <button
+                                className="absolute inset-0 flex items-center justify-center text-theme-secondaryText text-2xl bg-black bg-opacity-50 rounded-md"
+                                onClick={() => setActiveVideoId(media._id)}
+                              >
+                                <FaPlay className="w-10 h-10" />
+                              </button>
+                            </div>
+                          )}
+                        </div>
                       ) : media.type === "document" ? (
                         <div className="w-full rounded-lg bg-theme-secondaryBackground relative mt-2 ">
                           <div className="flex flex-row items-center justify-start w-full">

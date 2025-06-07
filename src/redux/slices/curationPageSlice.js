@@ -12,6 +12,7 @@ import {
 } from "./profileItemsSlice";
 import { deleteChip } from "./deleteChipSlice";
 import { createChipComment, createChipCommentReply } from "./commentChipSlice";
+import { pushChipToCuration } from "./pushItemsSlice";
 
 export const fetchCuration = createAsyncThunk(
   "curation/fetchCuration",
@@ -141,7 +142,7 @@ const curationPageSlice = createSlice({
       })
       .addCase(fetchChips.rejected, (state, action) => {
         state.chipstatus = "failed";
-        state.chiperror = action.payload;
+        state.chipError = action.payload;
       })
       .addCase(createChip.fulfilled, (state, action) => {
         if (state.curation._id === action.payload.curation) {
@@ -155,6 +156,21 @@ const curationPageSlice = createSlice({
           );
           if (index !== -1) {
             state.chips[index] = action.payload;
+          }
+        }
+      })
+      .addCase(pushChipToCuration.fulfilled, (state, action) => {
+        const data = action.payload;
+        const curation_id = data.curation_id;
+        const isCurr =
+          state.curation._id === curation_id &&
+          data.chip.curation !== state.curation._id;
+        if (isCurr) {
+          const index = state.chips.findIndex(
+            (item) => item._id === data.chip._id
+          );
+          if (index !== -1) {
+            state.chips.splice(index, 1);
           }
         }
       })

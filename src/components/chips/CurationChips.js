@@ -29,6 +29,7 @@ import DocumentPreview from "./widgets/DocumentPreview";
 import { setCommentChip } from "./../../redux/slices/commentChipSlice";
 import { useNavigate } from "react-router-dom";
 import { updateItemField } from "./../../redux/slices/pushItemsSlice";
+import { getAppPrefix } from "../EmbedChannels/utility/embedHelper";
 const CurationChips = ({ item, owner }) => {
   // const fileUrl = "../../assets/yashu.pdf";
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -38,6 +39,8 @@ const CurationChips = ({ item, owner }) => {
   const navigate = useNavigate();
   const [isExpanded, setIsExpanded] = useState(false);
   const maxLength = 250;
+  const dispatch = useDispatch();
+  const myData = useSelector((state) => state.myData);
 
   const toggleReadMore = () => {
     setIsExpanded(!isExpanded);
@@ -64,19 +67,24 @@ const CurationChips = ({ item, owner }) => {
         handleOpenModal("modalCommentOpen");
       }, 0);
     } else {
-      openLoginModal();
+      navigate(
+        `${getAppPrefix()}/get-started?redirect=${getAppPrefix()}/user/${
+          item.user.username
+        }/profile?tab=curations`
+      );
     }
   };
-
-  const dispatch = useDispatch();
-  const myData = useSelector((state) => state.myData);
 
   const handleUpvote = () => {
     if (isLoggedIn) {
       dispatch(upvoteChip(item._id));
       dispatch(setChipEngagement(item._id));
     } else {
-      openLoginModal();
+      navigate(
+        `${getAppPrefix()}/get-started?redirect=${getAppPrefix()}/user/${
+          item.user.username
+        }/profile?tab=curations`
+      );
     }
   };
   const handleSaved = () => {
@@ -319,7 +327,7 @@ const CurationChips = ({ item, owner }) => {
             alt="Upvote"
             className="dark:hidden mr-0.5 h-5 w-5"
           />
-          <p className="text-theme-secondaryText text-sm font-normal">
+          <p className="text-theme-secondaryText text-sm font-light">
             {item.upvotes.length}
           </p>
         </div>
@@ -328,7 +336,7 @@ const CurationChips = ({ item, owner }) => {
           onClick={openCommentModal}
         >
           <img src={Comment} alt="Comment" className="mr-0.5" />
-          <p className="text-theme-secondaryText text-sm font-normal">
+          <p className="text-theme-secondaryText text-sm font-light">
             {item.comments ? item?.comments : 0}
           </p>
         </div>
@@ -337,13 +345,12 @@ const CurationChips = ({ item, owner }) => {
           onClick={openShareModal}
         >
           <img src={Send} alt="Send" className="mr-0.5 h-7 w-7" />
-          <p className="text-theme-secondaryText text-sm font-normal">
-            {item.shared_by}
+          <p className="text-theme-secondaryText text-sm font-light">
+            {item.shared_by ? item.shared_by : ""}
           </p>
         </div>
-        <div className="relative">
+        {/* <div className="relative">
           {" "}
-          {/* New relative container for positioning */}
           {isSavedMessageVisible && (
             <div className="absolute -top-7 left-1/2 transform -translate-x-1/2 bg text-theme-secondaryText text-xs rounded-lg px-2 py-1">
               {savedMessage}
@@ -361,7 +368,7 @@ const CurationChips = ({ item, owner }) => {
               className="h-5 w-5"
             />
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

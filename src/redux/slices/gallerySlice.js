@@ -26,49 +26,6 @@ export const fetchGallery = createAsyncThunk(
   }
 );
 
-export const toggleGallerySubscription = createAsyncThunk(
-  "gallery/toggleSubscription",
-  async (galleryData, { dispatch, getState, rejectWithValue }) => {
-    const state = getState();
-    const myData = state.myData;
-    const isSubscribed = galleryData.subscribers.includes(myData._id);
-    dispatch(
-      updateGalleryField({
-        name: "subscribers",
-        value: isSubscribed
-          ? galleryData.subscribers.filter((id) => id !== myData._id)
-          : [...galleryData.subscribers, myData._id],
-      })
-    );
-    try {
-      const response = await postRequestAuthenticated("/toggle/subscription", {
-        receiverId: galleryData._id,
-      });
-      console.log(response);
-      if (response.success) {
-        // dispatch(
-        //   updateProfileField({
-        //     name: "subscribers",
-        //     value: response.subscribers,
-        //   })
-        // );
-        dispatch(
-          updateMyField({
-            name: "subscriptions",
-            value: response.subscriptions,
-          })
-        );
-      } else {
-        return rejectWithValue(response.message);
-      }
-    } catch (error) {
-      return rejectWithValue("Error toggling subscription");
-    } finally {
-      dispatch(setProfileEngagement(galleryData._id));
-    }
-  }
-);
-
 const initialState = {
   _id: "",
   name: "",
@@ -84,7 +41,6 @@ const initialState = {
   otherLink: "",
   imageCards: [],
   subscriptions: [],
-  subscribers: [],
   status: "idle",
   error: null,
   activeTab: "profileDetails",

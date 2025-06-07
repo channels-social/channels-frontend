@@ -33,10 +33,18 @@ const DocumentModal = () => {
     setIsLoading(false);
     setLoadError(false);
   };
+  // const onDocumentLoadError = () => {
+  //   setIsLoading(false);
+  //   setLoadError(true);
+  // };
   const onDocumentLoadError = () => {
     setIsLoading(false);
     setLoadError(true);
+    // Auto-download and close modal
+    window.open(fileUrl, "_blank");
+    dispatch(closeModal("modalDocumentOpen"));
   };
+
   const retryLoad = () => {
     setIsLoading(true);
     setLoadError(false);
@@ -54,17 +62,7 @@ const DocumentModal = () => {
             {isLoading && !loadError && (
               <p className="text-theme-secondaryText mt-4 ml-2">Loading....</p>
             )}
-            {loadError ? (
-              <div className="text-theme-secondaryText text-center mt-4">
-                <p className="text-theme-secondaryText">Failed to load PDF.</p>
-                <button
-                  onClick={retryLoad}
-                  className="p-2 mt-3 bg-theme-secondaryText text-theme-primaryBackground rounded-md"
-                >
-                  Retry
-                </button>
-              </div>
-            ) : (
+            {!loadError && (
               <Document
                 file={fileUrl}
                 onLoadSuccess={onDocumentLoadSuccess}
@@ -73,6 +71,7 @@ const DocumentModal = () => {
                 <Page pageNumber={pageNumber} />
               </Document>
             )}
+
             {numPages > 1 && !isLoading && !loadError && (
               <div className="flex items-center justify-between mt-4">
                 <button

@@ -4,24 +4,6 @@ import {
   postRequestAuthenticated,
 } from "./../../services/rest";
 
-export const setProfileSearched = createAsyncThunk(
-  "profileEngagement/searched",
-  async (user_id, { rejectWithValue }) => {
-    try {
-      const response = await postRequestUnAuthenticated(
-        `/set/profile/searched`,
-        { user_id }
-      );
-      if (response.success) {
-        return user_id;
-      } else {
-        return rejectWithValue(response.message);
-      }
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
 export const setProfileEngagement = createAsyncThunk(
   "profileEngagement/engagement",
   async (user_id, { rejectWithValue }) => {
@@ -67,18 +49,7 @@ export const profileEngagementSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
-      .addCase(setProfileSearched.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(setProfileSearched.fulfilled, (state, action) => {
-        state.loading = false;
-        state.error = null;
-      })
-      .addCase(setProfileSearched.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload || action.error.message;
-      })
+
       .addCase(setProfileEngagement.pending, (state) => {
         state.loading = true;
         state.error = null;

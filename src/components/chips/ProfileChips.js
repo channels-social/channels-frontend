@@ -90,7 +90,7 @@ const ProfileChips = ({ item }) => {
     if (isLoggedIn) {
       setIsDropdownOpen(false);
       dispatch(setChipIdToDelete(item._id));
-      dispatch(setProfileCategorytoDelete(item.profile_category));
+      dispatch(setProfileCategorytoDelete(item.profile_category || ""));
       handleOpenModal("modalChipDeleteOpen");
     } else {
       openLoginModal();
@@ -147,7 +147,7 @@ const ProfileChips = ({ item }) => {
   );
 
   return (
-    <div className="container  pl-4 pb-4 w-full pt-4 rounded-lg space-y-2.5 border border-borderColor border-theme-chatDivider bg-theme-tertiaryBackground">
+    <div className="container  pl-4 pb-3 w-full pt-4 rounded-lg space-y-2.5 border border-borderColor border-theme-chatDivider bg-theme-tertiaryBackground">
       <div className="flex items-center justify-end mr-4 relative">
         <div className="flex space-x-1 cursor-pointer" onClick={toggleDropdown}>
           <div className="w-1 h-1 bg-theme-primaryText rounded-full"></div>
@@ -292,7 +292,7 @@ const ProfileChips = ({ item }) => {
             alt="Upvote"
             className="dark:hidden mr-0.5 h-5 w-5"
           />
-          <p className="text-theme-secondaryText text-sm font-normal">
+          <p className="text-theme-secondaryText text-sm font-light">
             {item.upvotes.length}
           </p>
         </div>
@@ -301,7 +301,7 @@ const ProfileChips = ({ item }) => {
           onClick={openCommentModal}
         >
           <img src={Comment} alt="Comment-item" className="mr-0.5" />
-          <p className="text-theme-secondaryText text-sm font-normal">
+          <p className="text-theme-secondaryText text-sm font-light">
             {item.comments ? item?.comments : 0}
           </p>
         </div>
@@ -310,8 +310,8 @@ const ProfileChips = ({ item }) => {
           onClick={openShareModal}
         >
           <img src={Send} alt="Send" className="mr-0.5" />
-          <p className="text-theme-secondaryText text-sm font-normal">
-            {item.shared_by}
+          <p className="text-theme-secondaryText text-sm font-light">
+            {item.shared_by ? item.shared_by : ""}
           </p>
         </div>
       </div>

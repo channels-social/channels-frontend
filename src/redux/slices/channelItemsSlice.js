@@ -6,7 +6,8 @@ import {
 } from "./../../services/rest";
 import { createTopic, updateTopic } from "./createTopicSlice";
 import { updateTopicsOrder, removeMember } from "./reorderTopicSlice";
-import { joinChannel } from "./channelSlice";
+import { deleteTopic } from "./deleteTopicSlice";
+import { joinChannel, leaveChannel } from "./channelSlice";
 
 export const createChannel = createAsyncThunk(
   "channel/create-channel",
@@ -94,24 +95,24 @@ export const fetchChannels = createAsyncThunk(
     }
   }
 );
-export const fetchEmbedChannels = createAsyncThunk(
-  "channel/fetch-embed-channels",
-  async (data, { rejectWithValue }) => {
-    try {
-      const response = await postRequestAuthenticated(
-        "/fetch/embed/channels",
-        data
-      );
-      if (response.success) {
-        return response.channels;
-      } else {
-        return rejectWithValue(response.message);
-      }
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
+// export const fetchEmbedChannels = createAsyncThunk(
+//   "channel/fetch-embed-channels",
+//   async (data, { rejectWithValue }) => {
+//     try {
+//       const response = await postRequestAuthenticated(
+//         "/fetch/embed/channels",
+//         data
+//       );
+//       if (response.success) {
+//         return response.channels;
+//       } else {
+//         return rejectWithValue(response.message);
+//       }
+//     } catch (error) {
+//       return rejectWithValue(error.message);
+//     }
+//   }
+// );
 export const fetchUserChannels = createAsyncThunk(
   "channel/fetch-user-channels",
   async (username, { rejectWithValue }) => {
@@ -155,7 +156,7 @@ const channelItemsSlice = createSlice({
     userChannels: [],
     selectedChannel: null,
     channelstatus: "idle",
-    topicstatus: false,
+    topicstatus: "idle",
     selectedPage: null,
     loading: false,
     error: null,
@@ -239,6 +240,43 @@ const channelItemsSlice = createSlice({
           }
         }
       })
+      .addCase(leaveChannel.fulfilled, (state, action) => {
+        state.channelstatus = "idle";
+        const channel = action.payload;
+        const channelId = channel._id;
+        let index = state.channels.findIndex((item) => item._id === channelId);
+        let index2 = state.userChannels.findIndex(
+          (item) => item._id === channelId
+        );
+        if (index === -1) {
+          let memberIndex = state.channels[index].members.findIndex(
+            (member) => member === channel.user_id
+          );
+          if (memberIndex !== -1) {
+            state.channels[index].members.splice(memberIndex, 1);
+          }
+          let requestIndex = state.channels[index].requests.findIndex(
+            (member) => member === channel.user_id
+          );
+          if (requestIndex !== -1) {
+            state.channels[index].requests.splice(requestIndex, 1);
+          }
+        }
+        if (index2 !== -1) {
+          let memberIndex2 = state.userChannels[index2].members.findIndex(
+            (member) => member === channel.user_id
+          );
+          if (memberIndex2 !== -1) {
+            state.userChannels[index2].members.splice(memberIndex2, 1);
+          }
+          let requestIndex2 = state.userChannels[index2].requests.findIndex(
+            (member) => member === channel.user_id
+          );
+          if (requestIndex2 !== -1) {
+            state.userChannels[index2].requests.splice(requestIndex2, 1);
+          }
+        }
+      })
       .addCase(fetchMyChannels.pending, (state) => {
         state.loading = true;
       })
@@ -257,17 +295,17 @@ const channelItemsSlice = createSlice({
         state.loading = false;
         state.channelNameError = action.payload || action.error.message;
       })
-      .addCase(fetchEmbedChannels.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(fetchEmbedChannels.fulfilled, (state, action) => {
-        state.loading = false;
-        state.channels = action.payload;
-      })
-      .addCase(fetchEmbedChannels.rejected, (state, action) => {
-        state.loading = false;
-        state.channelNameError = action.payload || action.error.message;
-      })
+      // .addCase(fetchEmbedChannels.pending, (state) => {
+      //   state.loading = true;
+      // })
+      // .addCase(fetchEmbedChannels.fulfilled, (state, action) => {
+      //   state.loading = false;
+      //   state.channels = action.payload;
+      // })
+      // .addCase(fetchEmbedChannels.rejected, (state, action) => {
+      //   state.loading = false;
+      //   state.channelNameError = action.payload || action.error.message;
+      // })
       .addCase(fetchUserChannels.pending, (state) => {
         state.loading = true;
       })
@@ -310,7 +348,7 @@ const channelItemsSlice = createSlice({
           (item) => item._id === topic.channel
         );
         if (index !== -1) {
-          state.channels[index].topics.unshift(topic);
+          state.channels[index].topics.push(topic);
         }
       })
       .addCase(updateTopic.fulfilled, (state, action) => {
@@ -325,6 +363,20 @@ const channelItemsSlice = createSlice({
             (item) => item._id === topic._id
           );
           state.channels[index].topics[topicIndex].name = topic.name;
+        }
+      })
+      .addCase(deleteTopic.fulfilled, (state, action) => {
+        state.topicstatus = "idle";
+        const topic = action.payload;
+        let index = state.channels.findIndex(
+          (item) => item._id === topic.channel
+        );
+        let topicIndex;
+        if (index !== -1) {
+          topicIndex = state.channels[index].topics.findIndex(
+            (item) => item._id === topic._id
+          );
+          state.channels[index].topics.splice(topicIndex, 1);
         }
       })
       .addCase(removeMember.fulfilled, (state, action) => {

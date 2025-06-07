@@ -15,6 +15,7 @@ import {
   clearChipIdToDelete,
 } from "../../../redux/slices/deleteChipSlice";
 import { useNavigate, useLocation } from "react-router-dom";
+import { getAppPrefix } from "../../EmbedChannels/utility/embedHelper";
 
 const EventCardModal = () => {
   const dispatch = useDispatch();
@@ -43,7 +44,7 @@ const EventCardModal = () => {
           console.error("Issue in joining event. Please try again.");
         });
     } else {
-      navigate(`/get-started?redirect=${fullPath}`);
+      navigate(`${getAppPrefix()}/get-started?redirect=${fullPath}`);
     }
   };
 

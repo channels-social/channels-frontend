@@ -36,35 +36,12 @@ const ChipState = () => {
     }
   }, [username, dispatch, chipId]);
 
-  const handleSubscribe = async () => {
-    if (isLoggedIn) {
-      try {
-        const response = await postRequestAuthenticated(
-          "/toggle/subscription",
-          { receiverId: profileData._id }
-        );
-        if (response.success) {
-          dispatch(setProfileData({ subscribers: response.subscribers }));
-          dispatch(setMyData({ subscriptions: response.subscriptions }));
-        } else {
-          console.error(response.message);
-        }
-      } catch (error) {
-        console.error("Error fetching profile", error);
-      } finally {
-      }
-    } else {
-      handleOpenModal("modalLoginOpen");
-    }
-  };
   const handleButtonClick = () => {
     const url = `https://${username}.${domainUrl}`;
     window.open(url, "_blank");
   };
 
   const owner = username === myData?.username;
-  // const isSubscribed = profileData.subscribers?.includes(myData?._id);
-  // console.log(chipItemData.chip);
   return (
     <div className="w-[98%] flex flex-col sm:flex-row bg-primaryBackground min-h-screen ">
       <div className="sm:w-1/2 w-full sm:relative">
@@ -137,7 +114,6 @@ const ChipState = () => {
             <p className="mt-1 text-xs  font-normal text-viewAll font-inter">
               {profileData.username}.{domainUrl}
             </p>
-            {/* <p className="mt-1 text-xs  font-normal text-viewAll font-inter">{profileData.subscribers.length} Subscribers</p> */}
             <p className="mt-2 text-xs font-light text-textColor">
               {profileData.description}
             </p>

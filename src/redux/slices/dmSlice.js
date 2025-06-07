@@ -35,7 +35,6 @@ export const fetchDMChats = createAsyncThunk(
       const response = await postRequestAuthenticated("/fetch/dm/chats", {
         receiverUsername: receiver,
       });
-      console.log(response);
       if (response.success) {
         return response.chats;
       } else {
@@ -55,7 +54,6 @@ export const createDMChat = createAsyncThunk(
         "/create/dm/chat",
         data
       );
-      console.log(response);
       if (response.success) {
         return response.chat;
       } else {
@@ -93,7 +91,6 @@ export const toggleDMReaction = createAsyncThunk(
         "/toggle/dm/reaction",
         data
       );
-      console.log(response);
       if (response.success) {
         const data = {
           chatId: response.chatId,

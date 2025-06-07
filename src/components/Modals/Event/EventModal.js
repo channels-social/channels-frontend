@@ -531,7 +531,7 @@ const EventModal = () => {
                         focus:outline-none placeholder:text-theme-emptyEvent resize-none"
                     placeholder="https://meet.google.com/tnt-sccs.."
                     name="meet_url"
-                    onChange={handleInputChange}
+                    onChange={handleChange}
                     value={event.meet_url}
                     autoComplete="off"
                   />

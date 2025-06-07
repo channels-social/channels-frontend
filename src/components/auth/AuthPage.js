@@ -215,9 +215,6 @@ const AuthPage = ({ isSubdomain }) => {
           email: userData.email,
         },
         {
-          headers: {
-            "X-CSRF-Token": csrfToken,
-          },
           withCredentials: true,
         }
       );
@@ -460,12 +457,10 @@ const AuthPage = ({ isSubdomain }) => {
         try {
           await axios
             .post(`${hostUrl}/api/login`, userData, {
-              headers: {
-                "X-CSRF-Token": csrfToken,
-              },
               withCredentials: true,
             })
             .then((response) => {
+              console.log(response);
               if (response.data.success === true) {
                 dispatch(
                   setCredentials({

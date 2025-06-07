@@ -18,14 +18,12 @@ import chipItemReducer from "./../slices/chipItemSlice";
 import curationEngagementReducer from "./../slices/curationEngagementSlice";
 import chipEngagementReducer from "./../slices/chipEngagementSlice";
 import profileEngagementReducer from "./../slices/profileEngagementSlice";
-import searchItemsReducer from "./../slices/searchSlice";
-import homeItemsReducer from "./../slices/homeSlice";
-import categoryCurationReducer from "./../slices/categoryCurations";
-import homeCardReducer from "./../slices/homeCardSlice";
 import uiReducer from "./../slices/uiSlice";
 import commentReducer from "./../slices/commentChipSlice";
 import newsletterReducer from "./../slices/newsletterSlice";
 import deleteCategoryReducer from "./../slices/deleteCategorySlice";
+import deleteChannelReducer from "./../slices/deleteChannelSlice";
+import deleteTopicReducer from "./../slices/deleteTopicSlice";
 import pushItemsReducer from "./../slices/pushItemsSlice";
 import themeReducer from "./../slices/themeSlice";
 import createChannelReducer from "./../slices/createChannelSlice";
@@ -62,14 +60,12 @@ export const appReducer = {
   curationEngagement: curationEngagementReducer,
   chipEngagement: chipEngagementReducer,
   profileEngagement: profileEngagementReducer,
-  searchItems: searchItemsReducer,
-  homeItems: homeItemsReducer,
-  categoryCurations: categoryCurationReducer,
-  homeCard: homeCardReducer,
   ui: uiReducer,
   commentChip: commentReducer,
   newsletter: newsletterReducer,
   categoryDeletion: deleteCategoryReducer,
+  channelDeletion: deleteChannelReducer,
+  topicDeletion: deleteTopicReducer,
   pushItems: pushItemsReducer,
   theme: themeReducer,
   createChannel: createChannelReducer,

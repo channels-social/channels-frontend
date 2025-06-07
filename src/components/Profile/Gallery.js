@@ -3,6 +3,8 @@ import UnsplashModal from "./../Modals/UnsplashModal";
 import ArrowForward from "../../assets/icons/arrow_forward_dark.svg";
 import ArrowBack from "../../assets/icons/arrow_back.svg";
 import ProfileIcon from "../../assets/icons/profile.svg";
+import ColorProfile from "../../assets/images/color_profile.svg";
+
 import {
   fetchGallery,
   selectGalleryStatus,
@@ -36,14 +38,9 @@ import {
   useLocation,
   postRequestUnAuthenticated,
 } from "../../globals/imports";
+import { getAppPrefix } from "./../EmbedChannels/utility/embedHelper";
 
 const Gallery = () => {
-  const tabs = [
-    { id: 1, name: "Channels", href: "" },
-    { id: 2, name: "Curations", href: "#curations" },
-    { id: 3, name: "FAQs", href: "#faqs" },
-  ];
-
   const [isUnsplashModalOpen, setIsUnsplashModalOpen] = useState(false);
   const [isBottomSheetOpen, setIsBottomSheetOpen] = useState(false);
 
@@ -58,6 +55,7 @@ const Gallery = () => {
   const galleryStatus = useSelector(selectGalleryStatus);
   const [isLoading, setIsLoading] = useState(true);
   const [isDomainExist, setIsDomainExist] = useState(true);
+  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const { handleOpenModal } = useModal();
   const location = useLocation();
   const [isExpanded, setIsExpanded] = useState(false);
@@ -65,27 +63,36 @@ const Gallery = () => {
   const hasImages = galleryData.imageCards.length !== 0;
   const isOwner = galleryData?.username === myData?.username;
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [activeTab, setActiveTab] = useState("channels");
 
-  const [activeTab, setActiveTab] = useState("");
+  const tabs = [
+    { id: 1, name: "Channels", href: "channels" },
+    { id: 2, name: "Curations", href: "curations" },
+    { id: 3, name: "FAQs", href: "faqs" },
+  ];
+
+  const handleTabClick = (event, href) => {
+    event.preventDefault();
+    const scrollY = window.scrollY;
+    setActiveTab(href);
+    if (href === "channels") {
+      window.history.pushState(null, "", window.location.pathname);
+    } else {
+      window.history.pushState(null, "", `?tab=${href}`);
+    }
+    window.scrollTo(0, scrollY);
+  };
 
   useEffect(() => {
-    const hash = window.location.hash.replace("#", "");
-    if (hash) {
-      setActiveTab(hash);
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab");
+    if (tab === "curations" || tab === "faqs") {
+      setActiveTab(tab);
     } else {
-      setActiveTab("");
+      setActiveTab("channels"); // default
     }
   }, []);
 
-  useEffect(() => {
-    window.scrollTo(0, scrollPosition);
-  }, [activeTab]);
-
-  const handleTabClick = (event, href) => {
-    setScrollPosition(window.scrollY);
-    setActiveTab(href);
-    window.history.pushState(null, "", `#${href}`);
-  };
   const getSubdomain = () => {
     const host = window.location.hostname;
     const domain = domainUrl;
@@ -152,23 +159,6 @@ const Gallery = () => {
 
   const { items } = useSelector((state) => state.profileItems);
 
-  // const handleSubscribe = async () => {
-  //   if (isLoggedIn) {
-  //     dispatch(toggleGallerySubscription(galleryData));
-  //   } else {
-  //     openLoginModal();
-  //   }
-  // };
-
-  // const handleCurationOpenModal = () => {
-  //   if (isLoggedIn) {
-  //     setIsDropdownOpen(false);
-  //     handleOpenModal("modalCurationOpen");
-  //   } else {
-  //     openLoginModal();
-  //   }
-  // };
-
   // const toggleDropdown2 = () => {
   //   setIsDropdownOpen2(!isDropdownOpen2);
   // };
@@ -192,6 +182,20 @@ const Gallery = () => {
     dispatch(setProfileEngagement(galleryData._id));
   };
 
+  const handleMessageClick = () => {
+    if (isLoggedIn && myData.username) {
+      navigate(
+        `${getAppPrefix()}/user/${myData.username}/messages/list/${
+          galleryData.username
+        }`
+      );
+    } else {
+      window.location.replace(
+        `https://${domainUrl}/get-started?redirectDomain=${galleryData.username}&redirect=/user/${galleryData.username}/profile`
+      );
+    }
+  };
+
   const componentDecorator = (href, text, key) => (
     <a
       href={href}
@@ -203,45 +207,6 @@ const Gallery = () => {
       {text}
     </a>
   );
-
-  // const handleCategoryOpenModal = () => {
-  //   setIsDropdownOpen(false);
-  //   handleOpenModal("modalCreateCategoryOpen");
-  // };
-
-  // const handleCategoryReorderModal = () => {
-  //   setIsDropdownOpen2(false);
-  //   handleOpenModal("modalCategoryReorderOpen");
-  // };
-
-  // const handleSubscribersModal = () => {
-  //   handleOpenModal("modalMySubscribersOpen", galleryData._id);
-  // };
-
-  // const handleReorderItems = () => {
-  //   setIsDropdownOpen2(false);
-  //   setReorderItems(true);
-  // };
-
-  // const handleSaveChanges = () => {
-  //   const items = pushItems.reorderItems;
-  //   dispatch(updateItemsOrderCategory(items))
-  //     .unwrap()
-  //     .then(() => {
-  //       setReorderItems(false);
-  //       dispatch(clearReorderItems());
-  //     })
-  //     .catch((error) => {
-  //       alert(error);
-  //     });
-  // };
-  // const handleResetChanges = () => {
-  //   setReorderItems(false);
-  // };
-
-  // const handleNewsletterPage = () => {
-  //   navigate(`/${myData?.username}/newsletter`);
-  // };
 
   if (isLoading) {
     return <ProfileSkeleton />;
@@ -331,9 +296,15 @@ const Gallery = () => {
                     />
                   ) : galleryData.color_logo ? (
                     <div
-                      className="rounded-full w-24 h-24 border border-theme-white shrink-0"
-                      style={{ backgroundColor: galleryData.color_logo }}
-                    ></div>
+                      className="rounded-full w-24 h-24 border border-theme-white shrink-0  flex items-center justify-center"
+                      style={{ backgroundColor: galleryData?.color_logo }}
+                    >
+                      <img
+                        src={ColorProfile}
+                        alt="color-profile"
+                        className="w-5 h-5"
+                      />
+                    </div>
                   ) : (
                     <img
                       src={ProfileIcon}
@@ -355,12 +326,7 @@ const Gallery = () => {
                     <p className="mt-1 text-xs font-light text-theme-emptyEvent font-inter">
                       {galleryData.username}.{domainUrl}
                     </p>
-                    {/* <p
-                      className="mt-1 text-xs  font-normal text-viewAll font-inter cursor-pointer"
-                      onClick={handleSubscribersModal}
-                    >
-                      {galleryData.subscribers.length} Subscribers
-                    </p> */}
+
                     {
                       <Linkify componentDecorator={componentDecorator}>
                         <p
@@ -455,11 +421,7 @@ const Gallery = () => {
                         <div
                           className="cursor-pointer px-4 mt-4 font-normal py-2.5 border bg-theme-secondaryText
                             text-sm rounded-lg border-none text-theme-primaryBackground"
-                          onClick={() =>
-                            navigate(
-                              `/user/${myData.username}/messages/list/${galleryData.username}`
-                            )
-                          }
+                          onClick={handleMessageClick}
                         >
                           Message
                         </div>
@@ -627,13 +589,15 @@ const Gallery = () => {
               )}
             </div>
             <div
-              className="w-88px mx-auto border border-theme-chatDivider "
+              className={`
+                xs:w-88px w-72
+              mx-auto border border-theme-chatDivider `}
               style={{ height: "0.1px" }}
             ></div>
             <div className="mt-6 mb-8">
-              {activeTab === "" ? (
+              {activeTab === "channels" ? (
                 <ChannelsTab gallery={true} />
-              ) : activeTab === "#curations" ? (
+              ) : activeTab === "curations" ? (
                 <CurationsTab isOwner={isOwner} items={items} gallery={true} />
               ) : (
                 <FaqsTab username={galleryData.username} />

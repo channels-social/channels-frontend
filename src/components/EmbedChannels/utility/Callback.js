@@ -5,7 +5,6 @@ import { hostUrl } from "./../../../utils/globals";
 
 const GoogleAuthCallback = () => {
   const [searchParams] = useSearchParams();
-  console.log("work3");
   useEffect(() => {
     const fullHash = window.location.hash;
     console.log("🌐 Callback hash:", fullHash);
@@ -25,11 +24,6 @@ const GoogleAuthCallback = () => {
     } catch (err) {
       console.error("❌ Failed to decode state:", err);
     }
-
-    console.log("🔑 accessToken:", accessToken);
-    console.log("🌍 redirectDomain:", redirectDomain);
-    console.log("🌐 hostDomain:", hostDomain);
-    console.log("🌐 channel:", channel);
 
     if (accessToken && redirectDomain) {
       fetchUserDetails(accessToken, redirectDomain, hostDomain, channel);
@@ -55,7 +49,6 @@ const GoogleAuthCallback = () => {
           },
         }
       );
-      console.log(response);
 
       const userData = response.data;
 

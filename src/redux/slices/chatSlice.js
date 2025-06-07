@@ -22,6 +22,7 @@ export const fetchTopicChats = createAsyncThunk(
         limit,
         skip,
       });
+      // console.log(response);
       if (response.success) {
         return {
           chats: response.chats,
@@ -44,7 +45,43 @@ export const fetchBrandChats = createAsyncThunk(
       const response = await postRequestAuthenticated("/fetch/brand/chats", {
         domain: domain,
       });
-      console.log(response);
+      if (response.success) {
+        return response.chats;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+export const fetchResourceChats = createAsyncThunk(
+  "channelChat/fetchResourceChats",
+  async (topicId, { rejectWithValue }) => {
+    try {
+      const response = await postRequestUnAuthenticated(
+        "/fetch/resource/chats",
+        {
+          topicId: topicId,
+        }
+      );
+      if (response.success) {
+        return response.chats;
+      } else {
+        return rejectWithValue(response.message);
+      }
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+export const fetchEventChats = createAsyncThunk(
+  "channelChat/fetchEventChats",
+  async (topicId, { rejectWithValue }) => {
+    try {
+      const response = await postRequestUnAuthenticated("/fetch/event/chats", {
+        topicId: topicId,
+      });
       if (response.success) {
         return response.chats;
       } else {
@@ -63,7 +100,6 @@ export const createTopicChat = createAsyncThunk(
         "/create/channel/chat",
         data
       );
-      console.log(response);
       if (response.success) {
         return response.chat;
       } else {
@@ -82,7 +118,6 @@ export const createBrandChat = createAsyncThunk(
         "/create/brand/chat",
         data
       );
-      console.log(response);
       if (response.success) {
         return response.chat;
       } else {
@@ -237,6 +272,8 @@ export const chatSlice = createSlice({
   name: "chatSlice ",
   initialState: {
     chats: [],
+    resourceChats: [],
+    eventChats: [],
     brandChats: [],
     chatStatus: "idle",
     chatError: null,
@@ -257,6 +294,8 @@ export const chatSlice = createSlice({
     loading: false,
     loadingMore: false,
     brandLoading: false,
+    eventLoading: false,
+    resourceLoading: false,
   },
   reducers: {
     setChatField: (state, action) => {
@@ -268,6 +307,12 @@ export const chatSlice = createSlice({
     },
     addMessage: (state, action) => {
       state.chats.push(action.payload);
+    },
+    deleteMessage: (state, action) => {
+      let index = state.chats.findIndex((item) => item._id === action.payload);
+      if (index !== -1) {
+        state.chats.splice(index, 1);
+      }
     },
     addMediaItem: (state, action) => {
       state.media.push(action.payload);
@@ -306,12 +351,20 @@ export const chatSlice = createSlice({
       })
       .addCase(fetchTopicChats.fulfilled, (state, action) => {
         const { chats, skip } = action.payload;
+        const reversedChats = [...chats].reverse();
 
         if (skip === 0) {
-          state.chats = chats;
+          state.chats = reversedChats;
           state.loading = false;
         } else {
-          state.chats = [...state.chats, ...chats];
+          const existingMap = new Map(
+            state.chats.map((chat) => [chat._id, chat])
+          );
+          for (const chat of reversedChats) {
+            if (!existingMap.has(chat._id)) {
+              state.chats.unshift(chat);
+            }
+          }
           state.loadingMore = false;
         }
       })
@@ -329,6 +382,28 @@ export const chatSlice = createSlice({
       })
       .addCase(fetchBrandChats.rejected, (state, action) => {
         state.brandLoading = false;
+        state.chatError = action.payload || action.error.message;
+      })
+      .addCase(fetchResourceChats.pending, (state) => {
+        state.resourceLoading = true;
+      })
+      .addCase(fetchResourceChats.fulfilled, (state, action) => {
+        state.resourceLoading = false;
+        state.resourceChats = action.payload;
+      })
+      .addCase(fetchResourceChats.rejected, (state, action) => {
+        state.resourceLoading = false;
+        state.chatError = action.payload || action.error.message;
+      })
+      .addCase(fetchEventChats.pending, (state) => {
+        state.eventLoading = true;
+      })
+      .addCase(fetchEventChats.fulfilled, (state, action) => {
+        state.eventLoading = false;
+        state.eventChats = action.payload;
+      })
+      .addCase(fetchEventChats.rejected, (state, action) => {
+        state.eventLoading = false;
         state.chatError = action.payload || action.error.message;
       })
       .addCase(pushToResource.pending, (state) => {
@@ -455,6 +530,7 @@ export const {
   clearChatIdToDelete,
   addMessage,
   clearMedia,
+  deleteMessage,
   setEventField,
 } = chatSlice.actions;
 

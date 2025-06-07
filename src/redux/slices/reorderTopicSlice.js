@@ -4,7 +4,8 @@ import {
   postRequestAuthenticated,
   postRequestUnAuthenticated,
 } from "./../../services/rest";
-import { createTopic } from "./createTopicSlice";
+import { createTopic, updateTopic } from "./createTopicSlice";
+import { deleteTopic } from "./deleteTopicSlice";
 
 export const fetchTopics = createAsyncThunk(
   "reorderTopics/fetchChannelTopics",
@@ -171,6 +172,22 @@ export const reorderTopicSlice = createSlice({
       .addCase(createTopic.fulfilled, (state, action) => {
         state.status = "idle";
         state.topics.push(action.payload);
+      })
+      .addCase(updateTopic.fulfilled, (state, action) => {
+        state.topicstatus = "idle";
+        const topic = action.payload;
+        let topicIndex = state.topics.findIndex(
+          (item) => item._id === topic._id
+        );
+        state.topics[topicIndex] = topic;
+      })
+      .addCase(deleteTopic.fulfilled, (state, action) => {
+        state.topicstatus = "idle";
+        const topic = action.payload;
+        let topicIndex = state.topics.findIndex(
+          (item) => item._id === topic._id
+        );
+        state.topics.splice(topicIndex, 1);
       })
       .addCase(updateTopicsOrder.pending, (state) => {
         state.status = "loading";
