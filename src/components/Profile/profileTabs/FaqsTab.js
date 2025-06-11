@@ -174,7 +174,7 @@ const FaqItem = ({
   );
 };
 
-const FaqsTab = ({ username }) => {
+const FaqsTab = ({ username, isOwner }) => {
   const [isCreateFaq, setIsCreateFaq] = useState(false);
   const [isReorder, setIsReorder] = useState(false);
   const [isEditFaq, setIsEditFaq] = useState(false);
@@ -293,13 +293,13 @@ const FaqsTab = ({ username }) => {
       ? "text-theme-buttonDisableText bg-theme-buttonDisable "
       : " bg-theme-secondaryText text-theme-primaryBackground";
 
-  if (status === "loading") {
-    return (
-      <div className="text-theme-primaryText text-md font-normal mt-12 items-center flex justify-center">
-        Loading...
-      </div>
-    );
-  }
+  // if (status === "loading") {
+  //   return (
+  //     <div className="text-theme-primaryText text-md font-normal mt-12 items-center flex justify-center">
+  //       Loading...
+  //     </div>
+  //   );
+  // }
   return (
     <div className="flex flex-col" onClick={handleClickOutside}>
       {items.length > 0 &&
@@ -359,10 +359,14 @@ const FaqsTab = ({ username }) => {
         <div className="text-theme-secondaryText text-xl font-medium font-familjen-grotesk ">
           FAQs
         </div>
-        {items.length === 0 && isLoggedIn ? (
-          <div className="rounded-lg bg-theme-tertiaryBackground p-4 flex flex-row mt-2">
-            <img src={FAQCover} alt="faq_cover" className="h-28 w-auto" />
-            <div className="flex flex-col ml-3 justify-between">
+        {items.length === 0 && isLoggedIn && isOwner ? (
+          <div className="rounded-lg bg-theme-tertiaryBackground p-4 flex xs:flex-row flex-col mt-2 xs:space-y-0 space-y-3">
+            <img
+              src={FAQCover}
+              alt="faq_cover"
+              className="sm:h-28 h-40 w-auto object-cover rounded-lg"
+            />
+            <div className="flex flex-col xs:ml-3 ml-0 justify-between">
               <p className="text-theme-secondaryText text-xs font-light font-inter">
                 Everyone could use a little more clarity!
                 <br />
@@ -373,7 +377,7 @@ const FaqsTab = ({ username }) => {
                 understand and connect with your vision effortlessly.
               </p>
               <div
-                className="mt-2 border border-theme-primaryText text-theme-secondaryText  w-max rounded-md
+                className="mt-2 border border-theme-primaryText text-theme-secondaryText  text-center xs:w-max w-full rounded-md
            px-2 py-1.5 text-xs font-light cursor-pointer"
                 onClick={toggleCreateFaq}
               >

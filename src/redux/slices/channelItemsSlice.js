@@ -52,7 +52,6 @@ export const createGeneralTopic = createAsyncThunk(
       const response = await postRequestAuthenticated("/create/general/topic", {
         channelId,
       });
-      console.log(response);
       if (response.success) {
         return response.topic;
       } else {

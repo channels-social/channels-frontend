@@ -80,7 +80,7 @@ const PricingCard = ({ plan, type }) => {
 
   const featureList = extractFeatures();
 
-  const handleStartClick = (price) => {
+  const handleStartClick = (price, planId, type) => {
     if (plan.buttonText === "Get started for free") {
       if (!isLoggedIn) {
         navigate("/get-started");
@@ -89,7 +89,13 @@ const PricingCard = ({ plan, type }) => {
       }
     } else if (plan.buttonText !== "Talk to sales") {
       setIsModalOpen(true);
-      // handlePayment(price, myData);
+      // const data = {
+      //   amount: price,
+      //   currency: "INR",
+      //   planId: planId,
+      //   billingCycle: type,
+      // };
+      // handlePayment(myData,data);
     }
   };
 
@@ -154,7 +160,9 @@ const PricingCard = ({ plan, type }) => {
             handleStartClick(
               type === "monthly"
                 ? plan.pricing.monthly.price
-                : plan.pricing.annually.price
+                : plan.pricing.annually.price,
+              plan._id,
+              type
             )
           }
         >
@@ -167,7 +175,6 @@ const PricingCard = ({ plan, type }) => {
           target="_blank"
           rel="noopener noreferrer"
           className={`${"border border-white text-white"} text-center text-sm py-2 rounded-lg  font-light`}
-          onClick={handleStartClick}
         >
           {plan.buttonText}
         </a>

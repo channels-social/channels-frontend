@@ -249,20 +249,22 @@ const Profile = () => {
       className={`w-full pt-4 px-4 h-screen bg-theme-secondaryBackground overflow-y-auto custom-scrollbar relative`}
       onClick={handleClickOutside}
     >
-      <div className="sm:hidden flex absolute left-3 top-3 text-theme-secondaryText">
-        <img
-          src={ArrowBack}
-          alt="arrow-back"
-          className="dark:block hidden text-theme-secondaryText w-5 h-5 cursor-pointer"
-          onClick={() => navigate(-1)}
-        />
-        <img
-          src={ArrowBackLight}
-          alt="arrow-back"
-          className="dark:hidden text-theme-secondaryText w-5 h-5 cursor-pointer"
-          onClick={() => navigate(-1)}
-        />
-      </div>
+      {isEmbeddedOrExternal() && (
+        <div className="sm:hidden flex absolute left-6 top-6 text-theme-secondaryText">
+          <img
+            src={ArrowBack}
+            alt="arrow-back"
+            className="dark:block hidden text-theme-secondaryText w-5 h-5 cursor-pointer"
+            onClick={() => navigate(-1)}
+          />
+          <img
+            src={ArrowBackLight}
+            alt="arrow-back"
+            className="dark:hidden text-theme-secondaryText w-5 h-5 cursor-pointer"
+            onClick={() => navigate(-1)}
+          />
+        </div>
+      )}
       {isInvite && (
         <div
           className="absolute z-60 top-0 -left-1 w-full flex flex-col bg-theme-primaryBackground  px-4 pt-2 pb-3 border-b
@@ -329,7 +331,7 @@ const Profile = () => {
                       <img
                         src={ColorProfile}
                         alt="color-profile"
-                        className="w-5 h-5"
+                        className="w-12 h-12"
                       />
                     </div>
                   ) : (
@@ -603,7 +605,7 @@ const Profile = () => {
               ) : activeTab === "curations" ? (
                 <CurationsTab isOwner={isOwner} items={items} gallery={false} />
               ) : (
-                <FaqsTab username={username} />
+                <FaqsTab username={username} isOwner={isOwner} />
               )}
             </div>
 

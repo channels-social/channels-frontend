@@ -2,10 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import ProfileIcon from "../../../assets/icons/chipEmptyIcon.svg";
 import { useParams, useNavigate, Outlet } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  fetchInboxMessages,
-  setDMChatField,
-} from "./../../../redux/slices/dmSlice";
+
 import { getAppPrefix } from "./../../EmbedChannels/utility/embedHelper";
 import DropDown from "../../../assets/icons/arrow_drop_down.svg";
 import DropDownLight from "../../../assets/lightIcons/arrow_drop_down_light.svg";
@@ -53,10 +50,6 @@ const PageDM = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isDropdownOpen]);
-
-  useEffect(() => {
-    dispatch(fetchInboxMessages());
-  }, []);
 
   return (
     <div

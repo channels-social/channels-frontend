@@ -7,7 +7,6 @@ import ChannelCover from "../../assets/channel_images/channel_cover.svg";
 import ColorProfile from "../../assets/images/color_profile.svg";
 import playIcon from "../../assets/images/play_button.svg";
 import { format } from "date-fns";
-
 import {
   fetchTopicChats,
   setChatField,
@@ -97,12 +96,44 @@ const PageChatData = ({ topicId, isLoggedIn, myData, onNewMessageSent }) => {
   const [videoLoaded, setVideoLoaded] = useState({});
   const firstLoadDone = useRef(false);
 
-  const scrollToChat = (chatId) => {
-    const chatElement = chatRefs.current.get(chatId);
-    if (chatElement) {
-      chatElement.scrollIntoView({ behavior: "smooth", block: "center" });
+  const scrollToChat = async (chatId) => {
+    const existingChat = chatRefs.current.get(chatId);
+    if (existingChat) {
+      existingChat.scrollIntoView({ behavior: "smooth", block: "center" });
       setHighlightedChatId(chatId);
       setTimeout(() => setHighlightedChatId(null), 2500);
+      return;
+    }
+    let found = false;
+    let localSkip = skip;
+    while (!found && hasMore) {
+      setIsLoadingMore(true);
+
+      try {
+        const res = await dispatch(
+          fetchTopicChats({ topicId, skip: localSkip })
+        ).unwrap();
+        localSkip += 15;
+
+        if (res?.hasMore === false) setHasMore(false);
+        setSkip(localSkip);
+        await new Promise((r) => setTimeout(r, 300));
+        const newlyLoadedChat = chatRefs.current.get(chatId);
+        if (newlyLoadedChat) {
+          newlyLoadedChat.scrollIntoView({
+            behavior: "smooth",
+            block: "center",
+          });
+          setHighlightedChatId(chatId);
+          setTimeout(() => setHighlightedChatId(null), 2500);
+          found = true;
+        }
+      } catch (error) {
+        console.error("Error loading more chats", error);
+        break;
+      } finally {
+        setIsLoadingMore(false);
+      }
     }
   };
 
@@ -286,7 +317,7 @@ const PageChatData = ({ topicId, isLoggedIn, myData, onNewMessageSent }) => {
   useEffect(() => {
     const handleReceiveMessage = (message) => {
       if (message?.topic === topicId && message?.user?.username) {
-        if (myData.username && message?.user?.username !== myData?.username) {
+        if (myData?.username && message?.user?.username !== myData?.username) {
           dispatch(addMessage(message));
           const userAtBottom = isUserNearBottom();
 
@@ -443,7 +474,8 @@ const PageChatData = ({ topicId, isLoggedIn, myData, onNewMessageSent }) => {
       )}
 
       {Chats.map((chat, index) => {
-        const isMyMessage = chat.user?._id === myData?._id;
+        const isMyMessage = false;
+        const ownMessage = chat.user?._id === myData?._id;
         const currentDate = chat.createdAt;
         const prevDate = index > 0 ? Chats[index - 1].createdAt : null;
 
@@ -547,79 +579,94 @@ const PageChatData = ({ topicId, isLoggedIn, myData, onNewMessageSent }) => {
                   </div>
                 </span>
               )}
+
               {chat.replyTo !== null && (
                 <div
-                  className={`flex ${
-                    isMyMessage ? "flex-row-reverse" : "flex-row"
-                  }  items-center space-x-1 mb-1 w-max cursor-pointer ${
-                    isMyMessage ? "ml-auto mr-8" : "ml-4"
-                  }`}
+                  className={`flex  ${
+                    isMyMessage ? "justify-end pr-4" : "justify-start pl-4 "
+                  } w-full mb-1 cursor-pointer`}
                   onClick={() => scrollToChat(chat.replyTo._id)}
                 >
-                  <img
-                    src={ReplyIcon}
-                    alt="logo"
-                    className={`${
-                      isMyMessage ? "-scale-x-100" : ""
-                    } rounded-full w-8 h-auto object-cover`}
-                  />
-                  {/* <img
-                  src={chat.replyTo.user?.logo || Profile}
-                  alt="logo"
-                  className="rounded-full w-4 h-4 object-cover"
-                /> */}
-                  {chat.replyTo.user.logo ? (
-                    <img
-                      src={chat.replyTo.user?.logo}
-                      alt="profile-icon"
-                      className="rounded-full w-4 h-4 object-cover "
-                      loading="lazy"
-                    />
-                  ) : chat.replyTo.user.color_logo ? (
-                    <div
-                      className="rounded-full w-4 h-4  shrink-0 flex items-center justify-center"
-                      style={{ backgroundColor: chat.replyTo.user?.color_logo }}
-                    >
-                      <img
-                        src={ColorProfile}
-                        alt="color-profile"
-                        className="w-2 h-2"
-                      />
-                    </div>
-                  ) : (
-                    <img
-                      src={Profile}
-                      alt="profile-icon"
-                      className="rounded-full w-4 h-4 object-cover"
-                    />
-                  )}
-                  <p className="text-theme-emptyEvent font-normal text-xs">
-                    {chat.replyTo.user?.username}
-                  </p>
-                  <p
-                    className={`text-theme-emptyEvent font-light text-xs pl-0.5 whitespace-pre-wrap break-words 
-    ${isMyMessage ? "text-right" : "text-left"} max-w-[60vw] overflow-hidden`}
+                  <div
+                    className={`flex ${
+                      isMyMessage ? "flex-row-reverse mr-4" : "flex-row ml-4"
+                    } items-center max-w-[75%]`}
                   >
-                    {chat.replyTo.content
-                      ? chat.replyTo.content.length > 50
-                        ? `${chat.replyTo.content.substring(0, 50)}...`
-                        : chat.replyTo.content
-                      : chat.replyTo.media
-                      ? "Tap to see Attachment"
-                      : chat.replyTo.event
-                      ? "Tap to see Event"
-                      : "Tap to see Poll"}
-                  </p>
+                    <img
+                      src={ReplyIcon}
+                      alt="logo"
+                      className={` ${
+                        isMyMessage ? "-scale-x-100 ml-1" : "mr-1"
+                      } rounded-full w-8 h-auto object-cover `}
+                    />
+
+                    <div
+                      className={`flex flex-col w-4/5 ${
+                        isMyMessage ? "items-end" : "items-start"
+                      }`}
+                    >
+                      <div className="flex flex-row items-center space-x-1">
+                        {chat.replyTo?.user?.logo ? (
+                          <img
+                            src={chat.replyTo.user.logo}
+                            alt="profile-icon"
+                            className="rounded-full w-4 h-4 object-cover"
+                            loading="lazy"
+                          />
+                        ) : chat.replyTo?.user?.color_logo ? (
+                          <div
+                            className="rounded-full w-4 h-4 shrink-0 flex items-center justify-center"
+                            style={{
+                              backgroundColor: chat.replyTo.user.color_logo,
+                            }}
+                          >
+                            <img
+                              src={ColorProfile}
+                              alt="color-profile"
+                              className="w-2 h-2"
+                            />
+                          </div>
+                        ) : (
+                          <img
+                            src={Profile}
+                            alt="profile-icon"
+                            className="rounded-full w-4 h-4 object-cover"
+                          />
+                        )}
+                        <p className="text-theme-emptyEvent font-normal text-xs truncate">
+                          {chat.replyTo?.user?.username === chat?.user?.username
+                            ? "You"
+                            : chat.replyTo?.user?.username}
+                        </p>
+                      </div>
+
+                      {/* Message Snippet */}
+                      <p
+                        className={`text-theme-emptyEvent mt-0.5 font-light text-xs max-w-full text-ellipsis whitespace-nowrap overflow-hidden ${
+                          isMyMessage ? "text-right" : "text-left"
+                        }`}
+                      >
+                        {chat.replyTo.content
+                          ? chat.replyTo.content
+                          : chat.replyTo.media
+                          ? "Tap to see Attachment"
+                          : chat.replyTo.event
+                          ? "Tap to see Event"
+                          : "Tap to see Poll"}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
 
               <div
-                className={`flex w-full relative px-2 ${
+                className={`flex w-full relative px-2   ${
                   isMyMessage ? "justify-end" : "justify-start"
                 }`}
               >
+                {/* bg-theme-chatDivider rounded-lg pl-1 pr-2 pt-2 pb-1 */}
                 <div
-                  className={`flex ${
+                  className={`flex  ${
                     isMyMessage ? "flex-row-reverse" : ""
                   } w-max md:max-w-[60%] max-w-[90%] items-start`}
                 >
@@ -665,19 +712,19 @@ const PageChatData = ({ topicId, isLoggedIn, myData, onNewMessageSent }) => {
                     >
                       <span
                         className={`${
-                          isMyMessage
+                          ownMessage
                             ? "text-[#FF8C4E] font-medium"
                             : "text-theme-emptyEvent"
                         }  cursor-pointer`}
                         onClick={() =>
                           navigate(
                             `${getAppPrefix()}/user/${
-                              chat.user.username
+                              chat.user?.username
                             }/profile`
                           )
                         }
                       >
-                        {isMyMessage ? "You" : chat.user?.username}
+                        {ownMessage ? "You" : chat.user?.username}
                       </span>
                       <span className="font-light ml-1 text-xs">
                         {formatChatDate(chat.createdAt)}

@@ -122,7 +122,7 @@ const ChannelsTab = ({ gallery = false }) => {
       }
     }
   };
-  if (userChannels.length === 0 && isLoggedIn) {
+  if (userChannels.length !== 0 && isLoggedIn) {
     return <EmptyChannelCard />;
   }
   if (userChannels.length === 0) {
@@ -152,7 +152,7 @@ const ChannelsTab = ({ gallery = false }) => {
           onClick={() => handleChannelPage(channel)}
         />
       )}
-      <div className="flex flex-col xs:ml-3 ">
+      <div className="flex flex-col xs:ml-3 xs:mt-0  mt-1.5 ">
         <div
           className="text-theme-secondaryText text-lg font-normal  cursor-pointer"
           onClick={() => handleChannelPage(channel)}
@@ -160,7 +160,7 @@ const ChannelsTab = ({ gallery = false }) => {
           {channel.name}
         </div>
         <p
-          className="text-theme-emptyEvent text-sm font-light"
+          className="text-theme-emptyEvent text-sm font-light xs:mt-0 mt-2.5"
           style={{ whiteSpace: "pre-line" }}
         >
           {channel.description?.length > 150

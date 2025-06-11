@@ -13,7 +13,7 @@ const ThemeToggleButton = () => {
   return (
     <button
       onClick={() => setIsDark(!isDark)}
-      className="px-3 py-2 bg-theme-tertiaryBackground text-theme-primaryText rounded-md text-sm font-normal"
+      className="px-3 py-2 bg-theme-tertiaryBackground text-theme-primaryText rounded-md text-sm font-light"
     >
       {isDark ? "🌙 Dark" : "☀️ Light"}
     </button>

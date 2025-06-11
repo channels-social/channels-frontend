@@ -59,10 +59,16 @@ export default function Integrations() {
         ))}
       </div>
 
-      {/* Code Output */}
       <pre className="bg-gray-100 p-4 rounded text-sm overflow-x-auto whitespace-pre-wrap">
         <code>{codeMap[tab]}</code>
       </pre>
+      <p className="text-gray-500 text-xs mt-1">
+        (Replace{" "}
+        <span className="font-mono">
+          {"{CHANNEL_NAME}"}, {"{TOPIC_NAME}"}, {"{USER_EMAIL}"}
+        </span>{" "}
+        with your real values.)
+      </p>
     </div>
   );
 }

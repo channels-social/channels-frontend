@@ -23,7 +23,7 @@ const EmbedAuthPage = ({ initialEmail = "" }) => {
   const [showOtp, setShowOtp] = useState("");
   const dispatch = useDispatch();
   const csrfToken = getCsrfToken();
-  const currentDomain = window.location.origin;
+  const [currentDomain, setCurrentDomain] = useState("");
   const location = useLocation();
   const [redirectUrl, setRedirectUrl] = useState("");
   const [redirectDomain, setRedirectDomain] = useState("");
@@ -31,18 +31,13 @@ const EmbedAuthPage = ({ initialEmail = "" }) => {
 
   // const [channelId, setChannelId] = useState("");
 
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     const data = localStorage.getItem("embedFetchedData");
-  //     if (data) {
-  //       const dataId = JSON.parse(data);
-  //       setChannelId(dataId.selectedChannel);
-  //       clearInterval(interval);
-  //     }
-  //   }, 200);
-
-  //   return () => clearInterval(interval);
-  // }, []);
+  useEffect(() => {
+    const data = localStorage.getItem("embedData");
+    if (data) {
+      const dataId = JSON.parse(data);
+      setCurrentDomain(dataId.domain);
+    }
+  }, []);
 
   const clearData = () => {
     setFullName("");

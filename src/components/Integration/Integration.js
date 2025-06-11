@@ -68,7 +68,6 @@ const Integration = () => {
         "/check/domain/verification",
         { domain: domain }
       );
-      console.log(response);
       setLoading(false);
       if (response.success) {
         setVerificationToken(response.token);
@@ -127,7 +126,6 @@ const Integration = () => {
         "/domain/verification/method",
         { verificationMethod: activeTab }
       );
-      console.log(response);
       setLoadingVerify(false);
       if (response.success) {
         setSuccessMessage(response.message);

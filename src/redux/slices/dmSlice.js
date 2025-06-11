@@ -110,7 +110,7 @@ export const markDMLastSeen = createAsyncThunk(
   async (receiver, { rejectWithValue }) => {
     try {
       const response = await postRequestAuthenticated("/mark/dm/last/seen", {
-        receiver,
+        receiver: receiver,
       });
       if (response.success) {
         const data = {

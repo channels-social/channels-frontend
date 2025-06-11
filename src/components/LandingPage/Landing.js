@@ -58,7 +58,10 @@ const Landing = () => {
         </div>
 
         {isSidebarOpen && (
-          <div className="fixed inset-0 bg-black bg-opacity-40 z-30 sm:hidden"></div>
+          <div
+            className="fixed inset-0 bg-black bg-opacity-40 z-30 sm:hidden"
+            onClick={closeSidebar}
+          ></div>
         )}
 
         <div className="lg:w-full-minus-250 md:w-3/4 sm:w-[70%] w-full h-full">

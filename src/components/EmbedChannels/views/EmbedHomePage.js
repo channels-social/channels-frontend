@@ -7,6 +7,7 @@ import { setTheme } from "../../../redux/slices/themeSlice";
 import {
   initializeEmbedAuth,
   checkAutoLogin,
+  logOutEmbed,
 } from "../embedSlices/embedAuthSlice";
 import { setEmbedItem } from "../embedSlices/embedHomeSlice";
 import Modals from "./../../../utils/modals";
@@ -72,9 +73,15 @@ const EmbedHomePage = () => {
 
   const navigateToChannelFromStorage = () => {
     const stored = localStorage.getItem("embedFetchedData");
-    if (!stored) return;
+    const authData = localStorage.getItem("auth-token");
     const data = JSON.parse(stored);
-    if (data.selectedChannel && data.selectedTopic) {
+    if (!stored) return;
+
+    if (!authData) {
+      navigate(
+        `/embed/channels/user/${data.username}/channel/${data.selectedChannel}`
+      );
+    } else if (data.selectedChannel && data.selectedTopic) {
       navigate(
         `/embed/channels/user/${data.username}/channel/${data.selectedChannel}/c-id/topic/${data.selectedTopic}`
       );
@@ -103,20 +110,18 @@ const EmbedHomePage = () => {
             embedData.theme === "dark"
           );
           dispatch(setTheme(embedData.theme));
-          // if (embedData.email) {
-          //   dispatch(initializeEmbedAuth());
-          // }
+          dispatch(logOutEmbed());
+          dispatch(clearMyData());
           const formData = new FormData();
           formData.append("email", embedData.email);
           formData.append("domain", embedData.domain);
           formData.append("apiKey", embedData.apiKey);
           formData.append("channelName", embedData.selectedChannel);
-
+          formData.append("autoLogin", embedData.autoLogin);
           const authResult = await dispatch(checkAutoLogin(formData))
             .unwrap()
             .catch(() => null);
-
-          if (authResult) {
+          if (authResult && authResult.token && authResult.user) {
             const user = authResult.user;
             localStorage.setItem(
               "user",
@@ -130,14 +135,11 @@ const EmbedHomePage = () => {
               })
             );
             localStorage.setItem("auth-token", authResult.token);
-            await dispatch(fetchMyData());
-          } else {
-            dispatch(clearMyData());
+            dispatch(fetchMyData());
           }
 
           dispatch(initializeEmbedAuth());
           await fetchData();
-
           setReadyToRender(true);
           navigateToChannelFromStorage();
         } catch (err) {
@@ -178,14 +180,23 @@ const EmbedHomePage = () => {
   const closeSidebar = () => setIsSidebarOpen(false);
 
   return (
-    <div className="flex flex-col h-full w-full overflow-hidden">
-      {!embedLoadTimeout && (
+    <div className="flex flex-col h-full w-full overflow-hidden relative">
+      {/* <div
+        className="absolute top-2 right-4 z-50 bg-white text-black px-3 py-1 rounded shadow"
+        onClick={() => {
+          // optional: redirect or call window.parent.postMessage to close iframe
+          window.parent.postMessage({ type: "closeChannelsWidget" }, "*");
+        }}
+      >
+        ✖ Close Channel
+      </div> */}
+      {!embedLoadTimeout && !loading && (
         <div className="flex w-full">
           <EmbedHeaderPage />
         </div>
       )}
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden ">
         {isSidebarOpen && (
           <div
             className="fixed inset-0 bg-black bg-opacity-40 z-30 sm:hidden"
@@ -204,7 +215,7 @@ const EmbedHomePage = () => {
           ) : embedLoadTimeout ? (
             <div className="text-center mt-10">
               <p className="text-theme-secondaryText mb-2">
-                Failed to load embed data. Try refreshing.
+                Internet connection is slow. Try refreshing.
               </p>
               <button
                 className="px-4 py-2 bg-blue-500 text-theme-secondaryText rounded"

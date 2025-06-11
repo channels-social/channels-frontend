@@ -9,7 +9,6 @@ export const deleteCuration = createAsyncThunk(
       const response = await postRequestAuthenticated("/delete/curation", {
         curation_id: curationId,
       });
-      console.log(response);
       if (response.success) {
         const curation = {
           _id: curationId,

@@ -22,7 +22,6 @@ export const fetchTopicChats = createAsyncThunk(
         limit,
         skip,
       });
-      // console.log(response);
       if (response.success) {
         return {
           chats: response.chats,
@@ -40,10 +39,10 @@ export const fetchTopicChats = createAsyncThunk(
 
 export const fetchBrandChats = createAsyncThunk(
   "channelChat/fetchBrandChats",
-  async (domain, { rejectWithValue }) => {
+  async (user_id, { rejectWithValue }) => {
     try {
       const response = await postRequestAuthenticated("/fetch/brand/chats", {
-        domain: domain,
+        user_id: user_id,
       });
       if (response.success) {
         return response.chats;
@@ -302,6 +301,9 @@ export const chatSlice = createSlice({
       const { field, value } = action.payload;
       state[field] = value;
     },
+    addBrandMessage: (state, action) => {
+      state.brandChats.push(action.payload);
+    },
     setEventField: (state, action) => {
       state.event = action.payload;
     },
@@ -532,6 +534,7 @@ export const {
   clearMedia,
   deleteMessage,
   setEventField,
+  addBrandMessage,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

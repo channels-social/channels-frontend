@@ -4,6 +4,7 @@ import {
   Footer,
   useEffect,
   hostUrl,
+  postRequestUnAuthenticated,
 } from "../../globals/imports";
 import PricingCard from "./widgets.js/PricingCard";
 import PricingImage from "../../assets/icons/pricing_card.svg";
@@ -139,8 +140,10 @@ const Pricing = () => {
 
   useEffect(() => {
     const fetchPlans = async () => {
-      const response = await axios.post(`${hostUrl}/api/get/plans`);
-      setPlans(response.data.plans);
+      const response = await postRequestUnAuthenticated(
+        `${hostUrl}/api/get/plans`
+      );
+      setPlans(response.plans);
     };
     fetchPlans();
   }, []);

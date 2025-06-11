@@ -25,7 +25,7 @@ const EmbedHeaderPage = () => {
 
   const dropdownRef = useRef(null);
   const navigate = useNavigate();
-  const [channelsData, setChannelsData] = useState([]);
+  // const [channelsData, setChannelsData] = useState([]);
   const hasFetched = useRef(false);
 
   const [username, setUsername] = useState("");
@@ -35,6 +35,7 @@ const EmbedHeaderPage = () => {
   const channel = useSelector((state) => state.channel);
   const myData = useSelector((state) => state.myData);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
+  const channelsData = useSelector((state) => state.channelItems.channels);
 
   const channelName = channel.name;
 
@@ -69,7 +70,6 @@ const EmbedHeaderPage = () => {
       dispatch(fetchChannels(username))
         .unwrap()
         .then((channels) => {
-          setChannelsData(channels);
           hasFetched.current = true;
         })
         .catch((error) => {
@@ -100,9 +100,8 @@ const EmbedHeaderPage = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
   const toggleChannel = (channel) => {
-    console.log(channel);
     toggleDropdown();
-    if (channel.members.includes(myData._id)) {
+    if (channel.members?.includes(myData?._id)) {
       navigate(
         `${getAppPrefix()}/user/${username}/channel/${channel._id}/c-id/topic/${
           channel.topics[0]._id
@@ -210,23 +209,25 @@ const EmbedHeaderPage = () => {
                 return shouldShow ? (
                   <div
                     key={channel._id}
-                    className="flex px-3 items-center sm:py-2 py-2 text-center text-theme-primaryText font-light cursor-pointer hover:bg-theme-sidebarHighlight"
+                    className={`flex border-b border-theme-chatDivider px-3 items-center sm:py-2 py-2 text-center
+                     text-theme-primaryText font-light cursor-pointer hover:bg-theme-sidebarHighlight `}
                     onClick={() => toggleChannel(channel)}
                   >
-                    <p className="mr-1">{channel.name}</p>
+                    <p className="mr-1 text-sm">{channel.name}</p>
                   </div>
                 ) : null;
               })}
-              <div className="border-t border-t-theme-chatDivider"></div>
               <p
-                className="flex px-3 items-center sm:py-2 py-2 text-center text-theme-primaryText font-light cursor-pointer hover:bg-theme-sidebarHighlight"
+                className="flex px-3 items-center text-sm sm:py-2 py-2 text-center text-theme-primaryText 
+                font-light cursor-pointer hover:bg-theme-sidebarHighlight"
                 onClick={handleBrandProfile}
               >
                 Brand Profile
               </p>
               <div className="border-t border-t-theme-chatDivider"></div>
               <p
-                className="flex px-3 items-center sm:py-2 py-2 text-center text-theme-primaryText font-light cursor-pointer hover:bg-theme-sidebarHighlight"
+                className="flex px-3 items-center text-sm sm:py-2 py-2 text-center
+                 text-theme-primaryText font-light cursor-pointer hover:bg-theme-sidebarHighlight"
                 onClick={handleMessagePage}
               >
                 Messages
@@ -238,7 +239,8 @@ const EmbedHeaderPage = () => {
 
               {isLoggedIn && (
                 <p
-                  className="flex px-3 items-center sm:py-2 py-1 text-center text-theme-primaryText font-light cursor-pointer hover:bg-theme-sidebarHighlight"
+                  className="flex px-3 items-center text-sm sm:py-2 py-1.5 text-center text-theme-primaryText
+                   font-light cursor-pointer hover:bg-theme-sidebarHighlight"
                   onClick={handleLogout}
                 >
                   Logout
@@ -247,7 +249,7 @@ const EmbedHeaderPage = () => {
               {!isLoggedIn && (
                 <p
                   onClick={handleLogin}
-                  className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6  text-theme-primaryText`}
+                  className={`block text-sm font-light font-inter cursor-pointer py-2 px-6  text-theme-primaryText`}
                 >
                   Login
                 </p>
@@ -256,11 +258,11 @@ const EmbedHeaderPage = () => {
           </div>
         )}
       </div>
-      {myData.username && (
+      {myData?.username && (
         <div
           className="rounded-full h-7 w-7  sm:hidden flex cursor-pointer"
           onClick={() =>
-            navigate(`/embed/channels/user/${myData.username}/profile`)
+            navigate(`/embed/channels/user/${myData?.username}/profile`)
           }
         >
           {/* <img
@@ -268,7 +270,7 @@ const EmbedHeaderPage = () => {
             alt="profile"
             className="w-full h-full object-cover cursor-pointer"
           /> */}
-          {myData.logo ? (
+          {myData?.logo ? (
             <img
               src={myData.logo}
               alt="profile-icon"

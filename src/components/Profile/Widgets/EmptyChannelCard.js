@@ -12,9 +12,9 @@ const EmptyChannelCard = () => {
       <img
         src="https://chips-social.s3.ap-south-1.amazonaws.com/channelsWebsite/channelEmptyCard.svg"
         alt="empty-channel"
-        className="h-40 w-auto xs:mb-0 mb-3"
+        className="h-40 xs:w-auto w-full xs:mb-0 mb-3 object-cover rounded-lg"
       />
-      <div className="ml-4 flex flex-col justify-between">
+      <div className="xs:ml-4 flex flex-col justify-between">
         <p className="text-theme-primaryText font-light text-xs">
           Hellooo 👋
           <br />

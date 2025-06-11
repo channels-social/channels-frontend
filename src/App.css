@@ -115,10 +115,6 @@ input[type="file"] {
   text-underline-offset: 2px;
 }
 
-.emoji-picker-react .epr-emoji-name-container {
-  display: none; /* Hides the "What's Your Mood?" section */
-}
-
 
 .custom-radio {
   position: absolute;
@@ -351,6 +347,39 @@ li.react-datepicker__time-list-item:hover{
   border-radius: 50% / 100% !important;
 }
 
+.epr_-ucs3ns {
+  font-weight: light !important;
+}
+.epr_-rk4ix5 {
+    font-size: 14px !important;
+}
+.epr_-99lr9q {
+  border-radius: 8px !important;
+}
+
+.emoji-picker-react .epr-emoji-name-container {
+  display: none; 
+}
+
+.custom-emoji-wrapper .EmojiPickerReact {
+  border: none !important;
+  background-color: #f5f5f5 !important; 
+  box-shadow: none !important;
+  border-radius: 8px;
+  padding: 8px;
+  max-width: 450px !important;
+  max-height: 450px !important;
+ 
+}
+ .epr-hidden-on-search{
+  display: none !important;
+ }
+
+.dark .custom-emoji-wrapper .EmojiPickerReact {
+  background-color: #2c2c2c !important; 
+  color: white;
+}
+
 @keyframes flicker {
   0% {
     background-color: #202020; /* Light color */
@@ -373,6 +402,15 @@ li.react-datepicker__time-list-item:hover{
     margin-left: auto;
   }
 }
+@media (max-width: 500px) {
+   .custom-emoji-wrapper .EmojiPickerReact{
+    max-height:300px !important;
+    max-width:350px !important;
+    height: auto !important;
+    width: auto !important;
+   }
+  
+}
 
 @media (min-width: 768px) {
   .profile-text {
@@ -382,6 +420,7 @@ li.react-datepicker__time-list-item:hover{
     display: none !important;
   }
 }
+
 @media (min-width: 1024px) {
   .profile-text2 {
     text-align: start;

@@ -54,7 +54,7 @@ const LeaveChannelModal = () => {
             <div className="flex flex-col p-5">
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-theme-secondaryText text-lg font-normal fonr-inter">
-                  Exit Channel
+                  Exit this Channel?
                 </h2>
                 <img
                   src={Close}
@@ -64,7 +64,10 @@ const LeaveChannelModal = () => {
                 />
               </div>
               <div className="mt-2 text-theme-secondaryText font-normal font-inter">
-                Do you really want to leave the channel?
+                You'll lose access to all its content and updates.
+              </div>
+              <div className="mt-2 text-theme-secondaryText font-normal font-inter">
+                To come back, you'll need to request to join again.
               </div>
               <div className="flex flex-row mt-5 space-x-8">
                 <button

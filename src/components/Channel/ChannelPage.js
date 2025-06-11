@@ -363,7 +363,7 @@ const ChannelPage = () => {
           loading="lazy"
         />
         {!isEmbeddedOrExternal() && (
-          <div className="absolute left-3 top-3 text-theme-secondaryText">
+          <div className="sm:hidden absolute left-6 top-3 text-theme-secondaryText">
             <img
               src={ArrowBack}
               alt="arrow-back"

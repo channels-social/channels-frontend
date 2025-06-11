@@ -141,35 +141,27 @@ const UserSidebar = ({ closeSidebar }) => {
   return (
     <div className="flex flex-col justify-between h-screen w-full overflow-y-auto custom-side-scrollbar ">
       <div>
-        <div className="w-full sm:hidden flex justify-end">
-          <img
-            src={Close}
-            alt="close"
-            className="mt-4 mb-2 mr-6 h-5 w-5 cursor-pointer"
-            onClick={closeSidebar}
-          />
-        </div>
-
-        <div className="ml-6 mt-4" onClick={() => navigate(`/`)}>
-          <img
-            src={Logo}
-            alt="logo"
-            className="dark:block hidden cursor-pointer  w-9 h-9   rounded-sm object-contain"
-          />
-          <img
-            src={DarkLogo}
-            alt="logo"
-            className="dark:hidden cursor-pointer  w-9 h-9   rounded-sm object-contain"
-          />
-          {/* {myData.logo ? (
+        <div className="ml-6 mt-4 flex flex-row justify-between ">
+          <div onClick={() => navigate(`/`)}>
             <img
-              src={myData.logo}
+              src={Logo}
               alt="logo"
-              className="w-full h-full rounded-lg object-cover"
+              className="dark:block hidden cursor-pointer  w-9 h-9   rounded-sm object-contain"
             />
-          ) : (
-            username.charAt(0).toUpperCase() + username.charAt(1).toUpperCase()
-          )} */}
+            <img
+              src={DarkLogo}
+              alt="logo"
+              className="dark:hidden cursor-pointer  w-9 h-9   rounded-sm object-contain"
+            />
+          </div>
+          <div className="w-full sm:hidden flex justify-end">
+            <img
+              src={Close}
+              alt="close"
+              className="mt-2 mr-6 h-5 w-5 cursor-pointer"
+              onClick={closeSidebar}
+            />
+          </div>
         </div>
 
         <nav className="mt-6">
@@ -326,7 +318,7 @@ const UserSidebar = ({ closeSidebar }) => {
           )}
         </nav>
       </div>
-      <div className="mb-2 mt-2">
+      <div className="pb-5">
         {isLoggedIn && (
           <div
             className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6 text-theme-primaryText`}
@@ -371,7 +363,7 @@ const UserSidebar = ({ closeSidebar }) => {
             className="dark:hidden h-7 w-7"
           /> */}
         {/* </div> */}
-        <div>
+        {/* <div>
           {expandedCommunityChannel &&
             communityChannel?.topics?.map((topic, topicIndex) => (
               <div key={topic._id}>
@@ -388,7 +380,7 @@ const UserSidebar = ({ closeSidebar }) => {
                 </Link>
               </div>
             ))}
-        </div>
+        </div> */}
         <div className="border-t  border-t-theme-sidebarDivider my-2"></div>
         {/* <div
           className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6 text-theme-primaryText`}

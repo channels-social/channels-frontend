@@ -302,7 +302,7 @@ const Gallery = () => {
                       <img
                         src={ColorProfile}
                         alt="color-profile"
-                        className="w-5 h-5"
+                        className="w-12 h-12"
                       />
                     </div>
                   ) : (

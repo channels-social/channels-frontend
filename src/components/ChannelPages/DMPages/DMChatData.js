@@ -323,14 +323,14 @@ const DMChatData = ({ receiver, sender, onNewMessageSent }) => {
     >
       {Chats.length > 0 &&
         Chats.map((chat) => {
-          const isMyMessage = chat.sender._id === myData?._id;
+          const isMyMessage = chat.sender?._id === myData?._id;
           return (
             <div
               ref={(el) => chatRefs.current.set(chat._id, el)}
               key={chat._id}
               className={`flex flex-col relative w-full mb-2 px-0 pt-2.5 ${
                 hoveredChatId === chat._id
-                  ? "bg-theme-primaryBackground bg-opacity-20"
+                  ? "bg-theme-sidebarHighlight"
                   : highlightedChatId === chat._id
                   ? "flicker-highlight"
                   : ""
@@ -390,7 +390,7 @@ const DMChatData = ({ receiver, sender, onNewMessageSent }) => {
                             </p>
                           </div>
                         </div>
-                        {chat.sender._id === myData?._id && (
+                        {chat.sender?._id === myData?._id && (
                           <div
                             className="py-1"
                             role="menu"
@@ -411,69 +411,80 @@ const DMChatData = ({ receiver, sender, onNewMessageSent }) => {
                   </div>
                 </span>
               )}
+
               {chat.replyTo !== null && (
                 <div
-                  className={`flex ${
-                    isMyMessage ? "flex-row-reverse" : "flex-row"
-                  }  items-center space-x-1 mb-1 w-max cursor-pointer ${
-                    isMyMessage ? "ml-auto mr-8" : "ml-4"
-                  }`}
+                  className={`flex  ${
+                    isMyMessage ? "justify-end pr-4" : "justify-start pl-4 "
+                  } w-full mb-1 cursor-pointer`}
                   onClick={() => scrollToChat(chat.replyTo._id)}
                 >
-                  <img
-                    src={ReplyIcon}
-                    alt="logo"
-                    className={`${
-                      isMyMessage ? "-scale-x-100" : ""
-                    } rounded-full w-8 h-auto object-cover`}
-                  />
-                  {/* <img
-                    src={chat.replyTo.user?.logo || Profile}
-                    alt="logo"
-                    className="rounded-full w-4 h-4 object-cover"
-                  /> */}
-                  {chat.replyTo.user?.logo ? (
-                    <img
-                      src={chat.replyTo.user?.logo}
-                      alt="profile-icon"
-                      className="rounded-full w-4 h-4 object-cover"
-                      loading="lazy"
-                    />
-                  ) : chat.replyTo.user?.color_logo ? (
-                    <div
-                      className="rounded-full w-4 h-4 shrink-0 flex items-center justify-center"
-                      style={{ backgroundColor: chat.replyTo.user?.color_logo }}
-                    >
-                      <img
-                        src={ColorProfile}
-                        alt="color-profile"
-                        className="w-5 h-5"
-                      />
-                    </div>
-                  ) : (
-                    <img
-                      src={Profile}
-                      alt="profile-icon"
-                      className="rounded-full w-4 h-4 object-cover"
-                    />
-                  )}
-                  <p className="text-theme-emptyEvent font-normal text-xs">
-                    {chat.replyTo.user?.username}
-                  </p>
-                  <p
-                    className={`text-theme-emptyEvent font-light text-xs pl-0.5 whitespace-pre-wrap break-words 
-    ${isMyMessage ? "text-right" : "text-left"} max-w-[60vw] overflow-hidden`}
+                  <div
+                    className={`flex ${
+                      isMyMessage ? "flex-row-reverse mr-4" : "flex-row ml-4"
+                    } items-center max-w-[75%]`}
                   >
-                    {chat.replyTo.content
-                      ? chat.replyTo.content.length > 50
-                        ? `${chat.replyTo.content.substring(0, 50)}...`
-                        : chat.replyTo.content
-                      : chat.replyTo.media
-                      ? "Tap to see Attachment"
-                      : chat.replyTo.event
-                      ? "Tap to see Event"
-                      : "Tap to see Poll"}
-                  </p>
+                    <img
+                      src={ReplyIcon}
+                      alt="logo"
+                      className={` ${
+                        isMyMessage ? "-scale-x-100 ml-1" : "mr-1"
+                      } rounded-full w-8 h-auto object-cover overflow-visible`}
+                    />
+
+                    <div
+                      className={`flex flex-col w-4/5 ${
+                        isMyMessage ? "items-end" : "items-start"
+                      }`}
+                    >
+                      <div className="flex flex-row items-center space-x-1">
+                        {chat.replyTo?.user?.logo ? (
+                          <img
+                            src={chat.replyTo.user.logo}
+                            alt="profile-icon"
+                            className="rounded-full w-4 h-4 object-cover"
+                            loading="lazy"
+                          />
+                        ) : chat.replyTo?.user?.color_logo ? (
+                          <div
+                            className="rounded-full w-4 h-4 shrink-0 flex items-center justify-center"
+                            style={{
+                              backgroundColor: chat.replyTo.user.color_logo,
+                            }}
+                          >
+                            <img
+                              src={ColorProfile}
+                              alt="color-profile"
+                              className="w-2 h-2"
+                            />
+                          </div>
+                        ) : (
+                          <img
+                            src={Profile}
+                            alt="profile-icon"
+                            className="rounded-full w-4 h-4 object-cover"
+                          />
+                        )}
+                        <p className="text-theme-emptyEvent font-normal text-xs truncate">
+                          {chat.replyTo.user?.username}
+                        </p>
+                      </div>
+
+                      <p
+                        className={`text-theme-emptyEvent mt-0.5 font-light text-xs max-w-full text-ellipsis whitespace-nowrap overflow-hidden ${
+                          isMyMessage ? "text-right" : "text-left"
+                        }`}
+                      >
+                        {chat.replyTo.content
+                          ? chat.replyTo.content
+                          : chat.replyTo.media
+                          ? "Tap to see Attachment"
+                          : chat.replyTo.event
+                          ? "Tap to see Event"
+                          : "Tap to see Poll"}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -720,7 +731,7 @@ const DMChatData = ({ receiver, sender, onNewMessageSent }) => {
       {Chats.length === 0 && (
         <div className="flex flex-col h-full justify-center items-center mx-auto w-1/2">
           <img src={EmptyChatIcon} alt="emptyChatIcon" className="h-28" />
-          <p className="text-theme-emptyEvent font-normal text-sm text-center mt-1 ">
+          <p className="text-theme-emptyEvent font-normal sm:text-xl text-lg text-center mt-1 ">
             Start Messaging
           </p>
         </div>

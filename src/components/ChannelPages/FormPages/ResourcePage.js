@@ -131,7 +131,7 @@ const ResourcePage = () => {
     setSearchQuery(e.target.value);
     // handleSearchMedia();
   };
-  const isOwner = username === myData.username;
+  const isOwner = username === myData?.username;
 
   return (
     <div className="flex flex-col">
@@ -211,12 +211,15 @@ const ResourcePage = () => {
         resourceChats.map((chat, index) => (
           <div
             className="flex flex-col mt-2 h-full  overflow-y-auto custom-scrollbar"
-            // key={`${chat._id}-${index}`}
+            key={`${chat._id}-${index}-${chat._id}`}
           >
             {chat.media.map(
               (media, index) =>
                 media.resource === true && (
-                  <div className="flex flex-row space-x-2 mt-2 overflow-x-auto w-full custom-scrollbar">
+                  <div
+                    className="flex flex-row space-x-2 mt-2 overflow-x-auto w-full custom-scrollbar"
+                    key={`${media._id}-${index}`}
+                  >
                     <div
                       className="relative flex flex-col"
                       onMouseEnter={() =>
@@ -225,7 +228,7 @@ const ResourcePage = () => {
                       onMouseLeave={handleMouseLeaveMedia}
                     >
                       <div className="text-theme-emptyEvent font-extralight text-xs mb-1">
-                        {chat.user.username}{" "}
+                        {chat.user?.username}{" "}
                         {new Date(chat.createdAt).toLocaleString()}
                       </div>
                       {media.type === "image" ? (

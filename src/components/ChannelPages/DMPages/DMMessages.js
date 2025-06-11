@@ -1,14 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getAppPrefix } from "./../../EmbedChannels/utility/embedHelper";
 import ProfileIcon from "../../../assets/icons/profile.svg";
 import { useSelector } from "react-redux";
 import ColorProfile from "../../../assets/images/color_profile.svg";
+import EmptyChatIcon from "../../../assets/icons/empty_chat.svg";
+import { useDispatch } from "react-redux";
+import {
+  fetchInboxMessages,
+  setDMChatField,
+} from "./../../../redux/slices/dmSlice";
 
 const DMMessages = ({}) => {
   const chats = useSelector((state) => state.dmChat.messages);
   const loading = useSelector((state) => state.dmChat.loading);
   const { username } = useParams();
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchInboxMessages());
+  }, []);
 
   const handleChatNavigation = (chat) => {
     navigate(
@@ -28,11 +39,13 @@ const DMMessages = ({}) => {
           Loading...
         </div>
       ) : (
+        !loading &&
         chats.length !== 0 && (
           <div className=" h-full w-full pt-4 px-2">
-            {chats.map((chat) => {
+            {chats.map((chat, index) => {
               return (
                 <div
+                  key={`${chat._id}-${index}`}
                   className={`flex flex-row justify-between px-3 items-center mb-4 
                 sm:py-1.5 py-1 rounded-full cursor-pointer text-theme-secondaryText`}
                   onClick={() => handleChatNavigation(chat)}
@@ -78,11 +91,11 @@ const DMMessages = ({}) => {
         )
       )}
       {chats.length === 0 && !loading && (
-        <div
-          className="bg-theme-secondaryBackground h-full w-full mx-auto items-center flex flex-col
-         justify-center text-theme-secondaryText sm:text-2xl text-lg"
-        >
-          No Conversation ...Start one
+        <div className="h-full w-3/4 mx-auto flex flex-col justify-center items-center mb-10">
+          <img src={EmptyChatIcon} alt="emptyChatIcon" className="h-28" />
+          <p className="mt-2 text-theme-secondaryText sm:text-2xl text-sm font-normal text-center">
+            You don’t have any conversations yet
+          </p>
         </div>
       )}
     </div>

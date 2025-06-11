@@ -68,6 +68,7 @@ const PageChat = ({
   const isDark = document.documentElement.classList.contains("dark");
   const [showAddMenu, setShowAddMenu] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [data, setData] = useState("");
   const [notificationDropdown, setNotificationDropdown] = useState(false);
   const [successPage, setSuccessPage] = useState(false);
   const [otpPage, setOtpPage] = useState(false);
@@ -79,8 +80,11 @@ const PageChat = ({
   const [fileObjects, setFileObjects] = useState([]);
   const inputRef = useRef(null);
   const addMenuRef = useRef(null);
+  const addMenuButtonRef = useRef(null);
   const dispatch = useDispatch();
   const fileInputRef = useRef(null);
+  const emojiButtonRef = useRef(null);
+
   const emojiRef = useRef(null);
   const channelChat = useSelector((state) => state.chat);
   const chatStatus = useSelector((state) => state.chat.chatStatus);
@@ -111,10 +115,20 @@ const PageChat = ({
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (addMenuRef.current && !addMenuRef.current.contains(event.target)) {
+      if (
+        addMenuRef.current &&
+        !addMenuRef.current.contains(event.target) &&
+        addMenuButtonRef.current &&
+        !addMenuButtonRef.current.contains(event.target)
+      ) {
         setShowAddMenu(false);
       }
-      if (emojiRef.current && !emojiRef.current.contains(event.target)) {
+      if (
+        emojiRef.current &&
+        !emojiRef.current.contains(event.target) &&
+        emojiButtonRef.current &&
+        !emojiButtonRef.current.contains(event.target)
+      ) {
         setShowEmojiPicker(false);
       }
     };
@@ -408,13 +422,13 @@ const PageChat = ({
   };
 
   useEffect(() => {
-    if (myData.username && topicId) {
-      socket.emit("join_topic", { username: myData.username, topicId });
+    if (myData?.username && topicId) {
+      socket.emit("join_topic", { username: myData?.username, topicId });
       return () => {
-        socket.emit("leave_topic", { username: myData.username, topicId });
+        socket.emit("leave_topic", { username: myData?.username, topicId });
       };
     }
-  }, [topicId, myData.username]);
+  }, [topicId, myData?.username]);
 
   const handleReplyClear = () => {
     dispatch(setChatField({ field: "replyTo", value: null }));
@@ -505,9 +519,9 @@ const PageChat = ({
 
   return (
     <div
-      className={` w-full relative flex flex-col ${
-        isEmbeddedOrExternal() ? "h-full" : "sm:h-full h-full-height-36 "
-      } `}
+      className={`w-full relative flex flex-col ${
+        isEmbeddedOrExternal() ? "h-full" : "sm:h-full h-full-height-36"
+      }`}
     >
       {!isBrandTalk && (
         <PageHeader
@@ -522,10 +536,11 @@ const PageChat = ({
           // isSidebarOpen={isSidebarOpen}
         />
       )}
+
       {isBrandTalk && (
-        <div className="relative h-8 sm:h-10 bg-theme-secondaryBackground w-full  shrink-0">
+        <div className="relative h-8 sm:h-10 bg-theme-secondaryBackground w-full shrink-0">
           <div
-            className="absolute flex flex-row items-center space-x-1 top-4 sm:top-12 left-[40%] sm:left-[45%] border-theme-emptyEvent border rounded-full 
+            className="absolute flex flex-row items-center space-x-1 top-2 sm:top-8 left-[40%] sm:left-[45%] border-theme-emptyEvent border rounded-full 
           bg-theme-tertiaryBackground z-20 text-theme-emptyEvent py-1 px-2 font-light text-xs sm:text-sm cursor-pointer"
             onClick={() => setIsBrandTalk(false)}
           >
@@ -534,6 +549,7 @@ const PageChat = ({
           </div>
         </div>
       )}
+
       {/* {notificationDropdown && (
         <div
           className="z-40 w-full items-center bg-theme-chatDivider border-b
@@ -672,64 +688,64 @@ const PageChat = ({
           )}
         </div>
       )} */}
-      {isBrandTalk && (
-        <div className=" bg-theme-primaryBackground w-full h-full overflow-y-auto  ">
-          <PageChatData2
-            topicId={topicId}
-            isLoggedIn={isLoggedIn}
-            myData={myData}
-            user_id={topic.user}
-            onNewMessageSent={(fn) => (newMessageScrollRef.current = fn)}
-          />
-        </div>
-      )}
-      {!isBrandTalk && (
-        <div className=" bg-theme-secondaryBackground w-full h-full overflow-y-auto pt-1 ">
-          <PageChatData
-            topicId={topicId}
-            isLoggedIn={isLoggedIn}
-            myData={myData}
-            onNewMessageSent={(fn) => (newMessageScrollRef.current = fn)}
-          />
-        </div>
-      )}
 
-      <div className={`absolute ${"bottom-24"}  w-full `}>
+      {/* Chat Section */}
+      <div className="flex flex-col flex-grow overflow-hidden">
+        {isBrandTalk ? (
+          <div className="bg-theme-primaryBackground w-full h-full overflow-y-auto">
+            <PageChatData2
+              topicId={topicId}
+              isLoggedIn={isLoggedIn}
+              myData={myData}
+              user_id={topic.user}
+              onNewMessageSent={(fn) => (newMessageScrollRef.current = fn)}
+              channelName={channelName}
+            />
+          </div>
+        ) : (
+          <div className="bg-theme-secondaryBackground w-full h-full overflow-y-auto pt-1">
+            <PageChatData
+              topicId={topicId}
+              isLoggedIn={isLoggedIn}
+              myData={myData}
+              onNewMessageSent={(fn) => (newMessageScrollRef.current = fn)}
+            />
+          </div>
+        )}
+
+        {/* Media Preview Section */}
         {channelChat.media.length > 0 && (
-          <div
-            className="w-full bg-theme-chatDivider flex flex-row  space-x-5 overflow-x-auto custom-scrollbar flex-shrink-0 z-50
-        pl-4 pr-2 pt-4 pb-2"
-          >
+          <div className="w-full bg-theme-chatDivider flex flex-row space-x-5 overflow-x-auto custom-scrollbar flex-shrink-0 z-50 pl-4 pr-2 pt-4 pb-2">
             {channelChat.media.map((item, index) => (
-              <div className="bg-theme-tertiaryBackground rounded-lg p-2 relative ">
+              <div
+                key={item._id || index}
+                className="bg-theme-tertiaryBackground rounded-lg p-2 relative"
+              >
                 <div className="flex flex-col">
                   <div
                     className="absolute -top-2 -right-1 cursor-pointer bg-theme-emptyEvent rounded-full p-1"
                     onClick={() => handleRemoveMedia(index, item._id)}
                   >
-                    <img src={Delete} alt="delete" className="w-4 h-4 " />
+                    <img src={Delete} alt="delete" className="w-4 h-4" />
                   </div>
                   {item.type === "image" ? (
-                    <div className="">
-                      <img
-                        src={item.url}
-                        alt="pdf-image"
-                        className=" rounded-lg h-24  max-w-32 w-auto object-cover "
-                        loading="lazy"
-                      />
-                    </div>
+                    <img
+                      src={item.url}
+                      alt="media"
+                      className="rounded-lg h-24 max-w-32 w-auto object-cover"
+                      loading="lazy"
+                    />
                   ) : item.type === "video" ? (
                     <video
                       controls
                       className="w-auto h-24 object-cover max-w-32 rounded-t-xl"
                     >
                       <source src={item.url} type="video/mp4" />
-                      Your browser does not support the video tag.
                     </video>
                   ) : (
                     <img
                       src={PdfImage}
-                      alt="pdf-image"
+                      alt="pdf"
                       className="rounded-lg h-24 max-w-32 w-auto"
                       loading="lazy"
                     />
@@ -742,8 +758,9 @@ const PageChat = ({
             ))}
           </div>
         )}
-        {channelChat.replyTo && channelChat.replyUsername && (
-          <div className="text-theme-secondaryText bg-theme-chatDivider  mt-1 py-1 px-4 text-sm font-light w-full flex flex-row justify-between items-center">
+
+        {channelChat.replyTo && channelChat?.replyUsername && (
+          <div className="text-theme-secondaryText bg-theme-chatDivider mt-1 py-1 px-4 text-sm font-light w-full flex flex-row justify-between items-center">
             <p>Replying to {channelChat.replyUsername}</p>
             <div
               className="p-2 rounded-full bg-theme-secondaryBackground cursor-pointer"
@@ -753,200 +770,209 @@ const PageChat = ({
             </div>
           </div>
         )}
-      </div>
 
-      {(topic.editability === "anyone" ||
-        topic.user === myData._id ||
-        (topic.editability === "invite" &&
-          topic.allowedEditUsers?.includes(myData._id))) && (
-        <div className="flex flex-col items-center px-2 pt-2 pb-3 space-x-2 bg-theme-secondaryBackground border-t border-t-theme-chatDivider">
-          <div className="relative flex flex-row items-center w-full">
-            <img
-              src={Smiley}
-              alt="emoji"
-              className="absolute right-2  cursor-pointer w-8 h-8"
-              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
-            />
-            <textarea
-              type="text"
-              placeholder="Type your message"
-              className="pl-3 bg-transparent  pr-10 py-2 
-              rounded-3xl text-theme-secondaryText placeholder:text-theme-emptyEvent placeholder:font-light 
-              focus:outline-none w-full font-inter font-light resize-none"
-              style={{ fontSize: "15px", overflow: "hidden" }}
-              value={channelChat.content}
-              rows={1}
-              ref={inputRef}
-              onClick={() => setShowEmojiPicker(false)}
-              onChange={(e) => {
-                dispatch(
-                  setChatField({ field: "content", value: e.target.value })
-                );
-                autoExpand(e.target);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey) {
-                  e.preventDefault();
-                  if (
-                    channelChat.content.trim() !== "" ||
-                    channelChat.media.length > 0
-                  ) {
-                    isBrandTalk ? handleSendBrandChat() : handleSendChat();
-                  }
-                }
-              }}
-            />
-            {showEmojiPicker && (
-              <div className="absolute right-0 bottom-full mb-2" ref={emojiRef}>
-                <EmojiPicker
-                  onEmojiClick={onEmojiClick}
-                  skinTonesDisabled={true}
-                  theme={
-                    document.documentElement.classList.contains("dark")
-                      ? "dark"
-                      : "light"
-                  }
-                  height={350}
-                  searchDisabled={true}
-                  lazyLoadEmojis={true}
-                  previewConfig={previewConfig}
-                />
-              </div>
-            )}
-          </div>
-          <div className="flex flex-row justify-between items-center w-full px-2 mt-2">
-            <div className="flex flex-row justify-start">
+        {/* Input Section (preserved, just moved below reply/media) */}
+        {(topic.editability === "anyone" ||
+          topic.user === myData._id ||
+          (topic.editability === "invite" &&
+            topic.allowedEditUsers?.includes(myData._id))) && (
+          <div className="flex flex-col items-center px-2 pt-2 pb-3 space-x-2 bg-theme-secondaryBackground border-t border-t-theme-chatDivider">
+            <div className="relative flex flex-row items-center w-full">
               <img
-                src={AddButton}
-                ref={addMenuRef}
-                alt="add-btn"
-                className="dark:block hidden w-8 h-8 cursor-pointer"
-                onClick={() => setShowAddMenu((prev) => !prev)}
+                src={Smiley}
+                alt="emoji"
+                ref={emojiButtonRef}
+                className="absolute right-2 cursor-pointer w-8 h-8"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowEmojiPicker((prev) => !prev);
+                }}
               />
-              <img
-                src={AddButtonLight}
-                ref={addMenuRef}
-                alt="add-btn"
-                className="dark:hidden w-8 h-8 cursor-pointer"
-                onClick={() => setShowAddMenu((prev) => !prev)}
+              <textarea
+                placeholder="Type your message"
+                className="pl-3 bg-transparent  py-2 rounded-3xl pr-12 text-theme-secondaryText placeholder:text-theme-emptyEvent placeholder:font-light focus:outline-none w-full font-inter font-light resize-none"
+                style={{ fontSize: "15px", overflow: "hidden" }}
+                value={channelChat.content}
+                rows={1}
+                ref={inputRef}
+                onClick={() => setShowEmojiPicker(false)}
+                onChange={(e) => {
+                  setData(e.target.value);
+                  dispatch(
+                    setChatField({ field: "content", value: e.target.value })
+                  );
+                  autoExpand(e.target);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    if (
+                      channelChat.content.trim() !== "" ||
+                      channelChat.media.length > 0
+                    ) {
+                      setShowEmojiPicker(false);
+                      isBrandTalk ? handleSendBrandChat() : handleSendChat();
+                    }
+                  }
+                }}
               />
-              {showAddMenu && (
+              {showEmojiPicker && (
                 <div
-                  className="absolute bottom-12 left-2 mb-2 bg-theme-tertiaryBackground border
-           border-theme-modalBorder shadow-lg rounded-lg p-3 z-10"
-                  onClick={(e) => e.stopPropagation()} // Prevent click from propagating to the document
-                  ref={addMenuRef}
+                  className="absolute right-0 bottom-full mb-2 custom-emoji-wrapper"
+                  ref={emojiRef}
                 >
-                  <div className="relative flex flex-row items-center space-x-2 px-1 py-2 cursor-pointer">
-                    <img src={Media} alt="media" className-="w-5 h-5 mr-1" />
-                    <p className="block text-theme-emptyEvent" role="menuitem">
-                      Media
-                    </p>
+                  <EmojiPicker
+                    onEmojiClick={onEmojiClick}
+                    skinTonesDisabled={true}
+                    theme={
+                      document.documentElement.classList.contains("dark")
+                        ? "dark"
+                        : "light"
+                    }
+                    height={350}
+                    searchDisabled={true}
+                    lazyLoadEmojis={true}
+                    previewConfig={previewConfig}
+                  />
+                </div>
+              )}
+            </div>
 
-                    <input
-                      type="file"
-                      accept="image/*,video/*"
-                      multiple
-                      onChange={handleMediaChange}
-                      className="absolute inset-0 opacity-0 cursor-pointer"
-                      ref={fileInputRef}
-                    />
-                  </div>
+            <div className="flex flex-row justify-between items-center w-full px-2 mt-2">
+              <div className="flex flex-row justify-start">
+                <div
+                  ref={addMenuButtonRef}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowAddMenu((prev) => !prev);
+                  }}
+                  className="cursor-pointer"
+                >
+                  <img
+                    src={AddButton}
+                    alt="add-btn"
+                    className="dark:block hidden w-8 h-8"
+                  />
+                  <img
+                    src={AddButtonLight}
+                    alt="add-btn"
+                    className="dark:hidden w-8 h-8"
+                  />
+                </div>
 
-                  <div className="relative flex flex-row items-center space-x-2 px-1 py-2 cursor-pointer">
-                    <img src={Document} alt="doc" className-="w-5 h-5 mr-1" />
-                    <p className="block text-theme-emptyEvent" role="menuitem">
-                      Document
-                    </p>
-
-                    <input
-                      type="file"
-                      accept=".pdf,.doc,.docx"
-                      multiple
-                      onChange={handleFileChange}
-                      className="absolute inset-0 opacity-0 cursor-pointer"
-                      ref={fileInputRef}
-                    />
-                  </div>
-                  {/* <div
+                {showAddMenu && (
+                  <div
+                    className="absolute bottom-12 left-2 mb-2 bg-theme-tertiaryBackground border 
+                    border-theme-modalBorder shadow-lg rounded-lg z-10 px-3 space-y-3 py-3"
+                    onClick={(e) => e.stopPropagation()}
+                    ref={addMenuRef}
+                  >
+                    <div className="relative flex flex-row items-center space-x-2 cursor-pointer">
+                      <img src={Media} alt="media" className-="w-5 h-5 mr-1" />
+                      <p
+                        className="block text-theme-emptyEvent"
+                        role="menuitem"
+                      >
+                        Media
+                      </p>
+                      <input
+                        type="file"
+                        accept="image/*,video/*"
+                        multiple
+                        onChange={handleMediaChange}
+                        className="absolute inset-0 opacity-0 cursor-pointer"
+                        ref={fileInputRef}
+                      />
+                    </div>
+                    <div className="relative flex flex-row items-center space-x-2  cursor-pointer">
+                      <img src={Document} alt="doc" className-="w-5 h-5 mr-1" />
+                      <p
+                        className="block text-theme-emptyEvent"
+                        role="menuitem"
+                      >
+                        Document
+                      </p>
+                      <input
+                        type="file"
+                        accept=".pdf,.doc,.docx"
+                        multiple
+                        onChange={handleFileChange}
+                        className="absolute inset-0 opacity-0 cursor-pointer"
+                        ref={fileInputRef}
+                      />
+                    </div>
+                    {/* <div
                     className="flex flex-row items-center space-x-2 px-1 py-2 cursor-pointer "
                     onClick={() => console.log("Poll Clicked")}
                   >
                     <img src={Poll} alt="poll" className-="w-5 h-5 mr-1" />
                     <span className="text-theme-emptyEvent">Poll</span>
                   </div> */}
-                  {topic.user === myData._id && (
-                    <div
-                      className="flex flex-row items-center px-1 py-2 cursor-pointer "
-                      onClick={handleEventOpen}
-                    >
-                      <img
-                        src={Event}
-                        alt="event"
-                        className="dark:block hidden w-5 h-5 mr-2"
-                      />
-                      <img
-                        src={EventLight}
-                        alt="event"
-                        className="dark:hidden w-5 h-5 mr-2"
-                      />
-                      <span className="text-theme-emptyEvent">Event</span>
-                    </div>
-                  )}
-                </div>
-              )}
-              {topic.user !== myData._id && (
-                <div
-                  className={`${
-                    isBrandTalk
-                      ? " bg-theme-secondaryText text-theme-primaryBackground"
-                      : "bg-theme-buttonDisable text-theme-buttonDisableText"
-                  } 
-                  ml-4 text-theme-primaryText rounded-full px-3 py-1.5 text-center flex flex-row cursor-pointer`}
-                  onClick={handleBrandTalk}
-                >
-                  <img
-                    src={isBrandTalk ? ChatIcon2 : ChatIcon}
-                    alt="icon"
-                    className={`w-5 h-5 mr-1`}
-                  />
-                  <p
-                    className={` text-sm font-light ${
+
+                    {topic.user === myData._id && (
+                      <div
+                        className="flex flex-row items-center px-1 py-2 cursor-pointer"
+                        onClick={handleEventOpen}
+                      >
+                        <img
+                          src={Event}
+                          alt="event"
+                          className="dark:block hidden w-5 h-5 mr-2"
+                        />
+                        <img
+                          src={EventLight}
+                          alt="event"
+                          className="dark:hidden w-5 h-5 mr-2"
+                        />
+                        <span className="text-theme-emptyEvent">Event</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+                {topic.user !== myData._id && (
+                  <div
+                    className={`${
                       isBrandTalk
+                        ? "bg-theme-secondaryText text-theme-primaryBackground"
+                        : "dark:bg-theme-tertiaryBackground bg-theme-buttonDisable text-theme-buttonDisableText"
+                    } ml-4 rounded-full px-3 py-1.5 flex flex-row cursor-pointer`}
+                    onClick={handleBrandTalk}
+                  >
+                    <img
+                      src={isBrandTalk ? ChatIcon2 : ChatIcon}
+                      alt="icon"
+                      className="w-5 h-5 mr-1"
+                    />
+                    <p
+                      className={`text-sm font-light ${
+                        isBrandTalk
+                          ? "text-theme-primaryBackground"
+                          : "text-theme-emptyEvent"
+                      }`}
+                    >
+                      Talk to us
+                    </p>
+                  </div>
+                )}
+                <div
+                  className={`xl:hidden flex text-center ml-4 rounded-full px-3 py-1.5 flex-row cursor-pointer ${
+                    isOpen
+                      ? "bg-theme-secondaryText text-theme-primaryBackground"
+                      : "dark:bg-theme-tertiaryBackground bg-theme-buttonDisable text-theme-buttonDisableText"
+                  }`}
+                  onClick={toggleBottomSheet}
+                >
+                  <p
+                    className={`text-sm font-light ${
+                      isOpen
                         ? "text-theme-primaryBackground"
                         : "text-theme-emptyEvent"
                     }`}
                   >
-                    Talk to us
+                    Resource
                   </p>
                 </div>
-              )}
-
-              <div
-                className={`xl:hidden text-center flex  ${
-                  isOpen
-                    ? " bg-theme-secondaryText text-theme-primaryBackground"
-                    : "bg-theme-buttonDisable text-theme-buttonDisableText"
-                } 
-                  ml-4  rounded-full px-3 py-1.5 flex-row cursor-pointer`}
-                onClick={toggleBottomSheet}
-              >
-                {/* <img
-                    src={isBrandTalk ? ChatIcon2 : ChatIcon}
-                    alt="icon"
-                    className={`w-6 h-6 mr-1`}
-                  /> */}
-                <p
-                  className={` text-sm font-light ${
-                    isOpen
-                      ? "text-theme-primaryBackground"
-                      : "text-theme-emptyEvent"
-                  }`}
-                >
-                  Resource
-                </p>
-              </div>
-              {/* <div className="flex flex-row">
+                {/* <div className="flex flex-row">
                   <img
                     src={isOpen ? Close : Menu}
                     alt="menu"
@@ -975,27 +1001,32 @@ const PageChat = ({
                     </div>
                   )}
                 </div> */}
-            </div>
-
-            {(channelChat.content || channelChat.media.length > 0) && (
-              <div className="relative ">
-                {loading ? (
-                  <div className="absolute inset-0 flex items-center justify-center pl-2 ">
-                    <div className="w-5 h-5 border-[3px] border-t-[3px] border-gray-900 mr-2 border-theme-secondaryText rounded-full animate-spin"></div>
-                  </div>
-                ) : (
-                  <img
-                    src={SendButton}
-                    alt="send-btn"
-                    className="w-9 h-9 cursor-pointer"
-                    onClick={isBrandTalk ? handleSendBrandChat : handleSendChat}
-                  />
-                )}
               </div>
-            )}
+
+              {(data.length > 0 ||
+                channelChat.content ||
+                channelChat.media.length > 0) && (
+                <div className="relative">
+                  {loading ? (
+                    <div className="absolute inset-0 flex items-center justify-center pl-2">
+                      <div className="w-5 h-5 border-[3px] border-t-[3px] border-gray-900 mr-10 border-theme-secondaryText rounded-full animate-spin"></div>
+                    </div>
+                  ) : (
+                    <img
+                      src={SendButton}
+                      alt="send-btn"
+                      className="w-9 h-9 cursor-pointer"
+                      onClick={
+                        isBrandTalk ? handleSendBrandChat : handleSendChat
+                      }
+                    />
+                  )}
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

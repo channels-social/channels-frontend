@@ -33,8 +33,9 @@ const PageHome = () => {
   const channel = useSelector((state) => state.channel);
   const myData = useSelector((state) => state.myData);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
-  const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const galleryUsername = useSelector((state) => state.galleryData.username);
+  const channelLoading = useSelector((state) => state.channel.loading);
   const location = useLocation();
   const fromGallery = location.state?.fromGallery;
   const params = useParams();
@@ -50,9 +51,6 @@ const PageHome = () => {
     dispatch(fetchTopic(topicId));
     dispatch(fetchChannel(channelId));
     // dispatch(fetchTopicSubscription(topicId));
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 500);
   }, [topicId, channelId, dispatch]);
 
   useEffect(() => {
@@ -71,11 +69,11 @@ const PageHome = () => {
     }, 200);
 
     return () => clearTimeout(timer);
-  }, [isLoggedIn]);
+  }, [isLoggedIn, navigate, username, channelId, topicId]);
 
+  const loading = topicStatus === "loading" || channelLoading;
   const isChannelMember = channel?.members?.includes(myData?._id);
   const isTopicOwner = topic.user === myData._id;
-
   const isUnauthorized =
     (!isChannelMember && !isTopicOwner) ||
     (channel.visibility === "me" && !isTopicOwner) ||
@@ -93,7 +91,7 @@ const PageHome = () => {
     );
   }
 
-  if (topicStatus === "loading" || channel.loading || loading) {
+  if (loading) {
     return <TopicHomeSkeleton />;
   }
 

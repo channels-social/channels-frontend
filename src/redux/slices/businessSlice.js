@@ -87,7 +87,6 @@ export const declineChannelRequest = createAsyncThunk(
         `/decline/channel/request`,
         data
       );
-      console.log(response);
       if (response.success) {
         const newData = {
           channelId: response.channelId,

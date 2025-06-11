@@ -6,7 +6,7 @@ import StorageManager from "./../components/EmbedChannels/utility/storage_manage
 export const isEmbeddedOrExternal = () => {
   if (typeof window === "undefined") return false;
 
-  const host = StorageManager.getItem("embedData");
+  const host = localStorage.getItem("embedData");
   if (!host) return false;
   const data = JSON.parse(host);
   const domain = data.domain;
