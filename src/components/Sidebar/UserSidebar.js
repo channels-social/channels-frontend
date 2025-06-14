@@ -39,7 +39,7 @@ const UserSidebar = ({ closeSidebar }) => {
     useState(false);
   const galleryUsername = useSelector((state) => state.galleryData.username);
 
-  const { channels, loading, error, communityChannel } = useSelector(
+  const { userChannels, loading, error, communityChannel } = useSelector(
     (state) => state.channelItems
   );
   const { channelId, username } = useParams();
@@ -78,13 +78,13 @@ const UserSidebar = ({ closeSidebar }) => {
   useEffect(() => {
     dispatch(fetchMyChannels()).then(() => {
       const initialExpandedState = {};
-      channels.forEach((channel) => {
+      userChannels.forEach((channel) => {
         initialExpandedState[channel._id] = channel._id === channelId;
       });
       setExpandedChannels(initialExpandedState);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dispatch, channelId, channels.length]);
+  }, [dispatch, channelId, userChannels.length]);
 
   useEffect(() => {
     const checkInitialKey = async () => {
@@ -102,9 +102,9 @@ const UserSidebar = ({ closeSidebar }) => {
     checkInitialKey();
   }, []);
 
-  useEffect(() => {
-    dispatch(fetchCommunityChannel());
-  }, [dispatch]);
+  // useEffect(() => {
+  //   dispatch(fetchCommunityChannel());
+  // }, [dispatch]);
 
   const handleLogout = () => {
     closeSidebar();
@@ -139,7 +139,7 @@ const UserSidebar = ({ closeSidebar }) => {
 
   if (error) return <p>Error loading channels: {error}</p>;
   return (
-    <div className="flex flex-col justify-between h-screen w-full overflow-y-auto custom-side-scrollbar ">
+    <div className="flex flex-col justify-between h-full  w-full overflow-y-auto custom-side-scrollbar ">
       <div>
         <div className="ml-6 mt-4 flex flex-row justify-between ">
           <div onClick={() => navigate(`/`)}>
@@ -214,7 +214,7 @@ const UserSidebar = ({ closeSidebar }) => {
             </Link>
           )}
 
-          {channels.map((channel, channelIndex) => (
+          {userChannels.map((channel, channelIndex) => (
             <div key={channel._id} className="flex flex-col">
               <div className="border-t  border-t-theme-sidebarDivider my-2"></div>
               <div
@@ -318,7 +318,7 @@ const UserSidebar = ({ closeSidebar }) => {
           )}
         </nav>
       </div>
-      <div className="pb-5">
+      <div className="pb-5 mt-12">
         {isLoggedIn && (
           <div
             className={`block text-sm font-normal font-inter cursor-pointer py-2 px-6 text-theme-primaryText`}

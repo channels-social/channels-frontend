@@ -140,9 +140,7 @@ const Pricing = () => {
 
   useEffect(() => {
     const fetchPlans = async () => {
-      const response = await postRequestUnAuthenticated(
-        `${hostUrl}/api/get/plans`
-      );
+      const response = await postRequestUnAuthenticated(`/get/plans`);
       setPlans(response.plans);
     };
     fetchPlans();
@@ -179,7 +177,7 @@ const Pricing = () => {
         </button>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6  w-full max-w-7xl mt-12">
-        {plans.map((plan, index) => (
+        {plans?.map((plan, index) => (
           <PricingCard key={index} plan={plan} type={activeTabPricing} />
         ))}
       </div>

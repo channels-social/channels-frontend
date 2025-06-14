@@ -57,9 +57,9 @@ const PageHeader = ({
   const [isEditDropdownOpen, setIsEditDropdownOpen] = useState(false);
   const dropdownEditRef = useRef(null);
   const reorderTopics = useSelector((state) => state.reorderTopic);
-  const channels = useSelector((state) => state.channelItems.channels);
+  const channelsData = useSelector((state) => state.channelItems.channels);
   const myData = useSelector((state) => state.myData);
-  const [channelsData, setChannelsData] = useState([]);
+  // const [channelsData, setChannelsData] = useState([]);
   const hasFetched = useRef(false);
   const navigate = useNavigate();
   const [isDark, setIsDark] = useState(
@@ -114,7 +114,6 @@ const PageHeader = ({
       dispatch(fetchChannels(username))
         .unwrap()
         .then((channels) => {
-          setChannelsData(channels);
           hasFetched.current = true;
         })
         .catch((error) => {

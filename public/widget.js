@@ -87,6 +87,10 @@
       panelStyles += "right: 0; bottom: 0;";
     } else if (position === "left") {
       panelStyles += "left: 0; bottom: 0;";
+    } else if (position === "top-left") {
+      panelStyles += "left: 0; top: 0;";
+    } else if (position === "top-right") {
+      panelStyles += "right: 0; top: 0;";
     } else if (position === "center") {
       panelStyles += `
       top: 50%; left: 50%;

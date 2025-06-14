@@ -112,24 +112,24 @@ export const fetchChannels = createAsyncThunk(
 //     }
 //   }
 // );
-export const fetchUserChannels = createAsyncThunk(
-  "channel/fetch-user-channels",
-  async (username, { rejectWithValue }) => {
-    try {
-      const response = await postRequestUnAuthenticated(
-        "/fetch/user/channels",
-        { username }
-      );
-      if (response.success) {
-        return response.channels;
-      } else {
-        return rejectWithValue(response.message);
-      }
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
+// export const fetchUserChannels = createAsyncThunk(
+//   "channel/fetch-user-channels",
+//   async (username, { rejectWithValue }) => {
+//     try {
+//       const response = await postRequestUnAuthenticated(
+//         "/fetch/user/channels",
+//         { username }
+//       );
+//       if (response.success) {
+//         return response.channels;
+//       } else {
+//         return rejectWithValue(response.message);
+//       }
+//     } catch (error) {
+//       return rejectWithValue(error.message);
+//     }
+//   }
+// );
 export const fetchCommunityChannel = createAsyncThunk(
   "channel/fetch-community-channels",
   async (_, { rejectWithValue }) => {
@@ -279,21 +279,22 @@ const channelItemsSlice = createSlice({
       .addCase(fetchMyChannels.pending, (state) => {
         state.loading = true;
       })
-      .addCase(fetchChannels.pending, (state) => {
-        state.loading = true;
-      })
       .addCase(fetchMyChannels.fulfilled, (state, action) => {
         state.loading = false;
-        state.channels = action.payload;
-      })
-      .addCase(fetchChannels.fulfilled, (state, action) => {
-        state.loading = false;
-        state.channels = action.payload;
+        state.userChannels = action.payload;
       })
       .addCase(fetchMyChannels.rejected, (state, action) => {
         state.loading = false;
         state.channelNameError = action.payload || action.error.message;
       })
+      .addCase(fetchChannels.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchChannels.fulfilled, (state, action) => {
+        state.loading = false;
+        state.channels = action.payload;
+      })
+
       // .addCase(fetchEmbedChannels.pending, (state) => {
       //   state.loading = true;
       // })
@@ -305,17 +306,17 @@ const channelItemsSlice = createSlice({
       //   state.loading = false;
       //   state.channelNameError = action.payload || action.error.message;
       // })
-      .addCase(fetchUserChannels.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(fetchUserChannels.fulfilled, (state, action) => {
-        state.loading = false;
-        state.userChannels = action.payload;
-      })
-      .addCase(fetchUserChannels.rejected, (state, action) => {
-        state.loading = false;
-        state.channelNameError = action.payload || action.error.message;
-      })
+      // .addCase(fetchUserChannels.pending, (state) => {
+      //   state.loading = true;
+      // })
+      // .addCase(fetchUserChannels.fulfilled, (state, action) => {
+      //   state.loading = false;
+      //   state.userChannels = action.payload;
+      // })
+      // .addCase(fetchUserChannels.rejected, (state, action) => {
+      //   state.loading = false;
+      //   state.channelNameError = action.payload || action.error.message;
+      // })
       .addCase(fetchCommunityChannel.pending, (state) => {
         state.loading = true;
       })

@@ -50,9 +50,10 @@ const Landing = () => {
       </div>
       <div className="flex flex-row sm:h-screen w-[100%] ">
         <div
-          className={`fixed top-0 left-0 h-full transition-transform duration-300 z-40 sm:relative sm:translate-x-0  sm:flex ${
-            isSidebarOpen ? "translate-x-0 " : "-translate-x-full "
-          } lg:w-[248px]  md:w-1/4 sm:w-[30%] w-[250px]  bg-theme-sidebarBackground`}
+          className={`fixed top-0 left-0 h-full transition-transform 
+            duration-300 z-40 sm:relative sm:translate-x-0  sm:flex ${
+              isSidebarOpen ? "translate-x-0 " : "-translate-x-full "
+            } lg:w-[248px]  md:w-1/4 sm:w-[30%] w-[250px]  bg-theme-sidebarBackground`}
         >
           <UserSidebar closeSidebar={closeSidebar} />
         </div>

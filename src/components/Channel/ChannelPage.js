@@ -494,7 +494,7 @@ const ChannelPage = () => {
               >
                 Share join link
               </div>
-            ) : channel.members?.includes(myData?._id) ? (
+            ) : channel.members?.includes(myData?._id) && myData?._id ? (
               <div
                 className={`border border-theme-primaryText py-2 px-3 rounded-lg cursor-pointer text-theme-secondaryText text-sm font-inter`}
                 onClick={() => handleLeaveChannel(channel)}

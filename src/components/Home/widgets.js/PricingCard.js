@@ -95,7 +95,7 @@ const PricingCard = ({ plan, type }) => {
       //   planId: planId,
       //   billingCycle: type,
       // };
-      // handlePayment(myData,data);
+      // handlePayment(myData, data);
     }
   };
 

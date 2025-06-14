@@ -18,16 +18,15 @@ import { useNavigate } from "react-router-dom";
 import { domainUrl } from "./../../../utils/globals";
 import { getAppPrefix } from "../../EmbedChannels/utility/embedHelper.js";
 
-const ChannelsTab = ({ gallery = false }) => {
+const ChannelsTab = ({ gallery = false, isOwner }) => {
   const { handleOpenModal } = useModal();
   const navigate = useNavigate();
-  const { userChannels } = useSelector((state) => state.channelItems);
+  const { channels } = useSelector((state) => state.channelItems);
   const dispatch = useDispatch();
   const galleryUsername = useSelector((state) => state.galleryData.username);
   const myData = useSelector((state) => state.myData);
   const isLoggedIn = useSelector((state) => state.auth.isLoggedIn);
   const isSubdomain = useSelector((state) => state.auth.isSubdomain);
-
   const handleEditChannel = (channel) => {
     const transformedData = {
       ...channel,
@@ -75,7 +74,7 @@ const ChannelsTab = ({ gallery = false }) => {
     if (isLoggedIn) {
       if (channel.members.includes(myData._id)) {
         navigate(
-          `/user/${channel.user.username}/channel/${channel._id}/c-id/topic/${channel.topics[0]}`
+          `/user/${channel.user.username}/channel/${channel._id}/c-id/topic/${channel.topics[0]._id}`
         );
       } else if (channel.requests.includes(myData._id)) {
         return;
@@ -88,7 +87,7 @@ const ChannelsTab = ({ gallery = false }) => {
                 navigate(
                   `${getAppPrefix()}/user/${channel.user.username}/channel/${
                     channel._id
-                  }/c-id/topic/${response.channel.topics[0]}`
+                  }/c-id/topic/${response.channel.topics[0]._id}`
                 );
               } else {
                 navigate(
@@ -122,17 +121,17 @@ const ChannelsTab = ({ gallery = false }) => {
       }
     }
   };
-  if (userChannels.length !== 0 && isLoggedIn) {
+  if (channels.length === 0 && isOwner) {
     return <EmptyChannelCard />;
   }
-  if (userChannels.length === 0) {
+  if (channels.length === 0) {
     return (
       <div className="text-theme-secondaryText text-center pt-6">
         No Channels found.
       </div>
     );
   }
-  return userChannels.map((channel) => (
+  return channels.map((channel) => (
     <div
       key={channel._id}
       className="p-3 rounded-lg mt-4 border border-theme-chatDivider justify-start flex xs:flex-row flex-col items-start"

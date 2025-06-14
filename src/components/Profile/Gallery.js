@@ -11,7 +11,7 @@ import {
   updateGalleryField,
 } from "./../../redux/slices/gallerySlice";
 import { setProfileEngagement } from "./../../redux/slices/profileEngagementSlice";
-import { fetchUserChannels } from "./../../redux/slices/channelItemsSlice";
+import { fetchChannels } from "./../../redux/slices/channelItemsSlice";
 import ProfileForm from "./FormProfile/ProfileForm";
 import ProfileSkeleton from "./../skeleton/profileSkeleton";
 import { domainUrl } from "./../../utils/globals";
@@ -125,7 +125,7 @@ const Gallery = () => {
         });
         if (response.success) {
           dispatch(fetchGallery(galleryData.username));
-          dispatch(fetchUserChannels(galleryData.username));
+          dispatch(fetchChannels(galleryData.username));
           setIsLoading(false);
         } else {
           setIsDomainExist(false);
@@ -596,7 +596,7 @@ const Gallery = () => {
             ></div>
             <div className="mt-6 mb-8">
               {activeTab === "channels" ? (
-                <ChannelsTab gallery={true} />
+                <ChannelsTab gallery={true} isOwner={isOwner} />
               ) : activeTab === "curations" ? (
                 <CurationsTab isOwner={isOwner} items={items} gallery={true} />
               ) : (

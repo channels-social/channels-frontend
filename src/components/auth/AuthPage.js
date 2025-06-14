@@ -460,7 +460,6 @@ const AuthPage = ({ isSubdomain }) => {
               withCredentials: true,
             })
             .then((response) => {
-              console.log(response);
               if (response.data.success === true) {
                 dispatch(
                   setCredentials({

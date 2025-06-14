@@ -64,6 +64,7 @@ export const checkAutoLogin = createAsyncThunk(
         "/check/auto/login",
         data
       );
+      // console.log(response);
       if (response.success) {
         const data = {
           token: response.token,

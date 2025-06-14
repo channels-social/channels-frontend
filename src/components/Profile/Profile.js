@@ -12,7 +12,7 @@ import {
 } from "./../../redux/slices/profileSlice";
 import ProfileSkeleton from "./../skeleton/profileSkeleton";
 import { updateProfileField } from "../../redux/slices/profileSlice";
-import { fetchUserChannels } from "../../redux/slices/channelItemsSlice";
+import { fetchChannels } from "../../redux/slices/channelItemsSlice";
 import { Outlet } from "react-router-dom";
 import EmptyProfileCard from "./Widgets/EmptyProfileCard";
 import { domainUrl } from "./../../utils/globals";
@@ -127,7 +127,7 @@ const Profile = () => {
         });
         if (response.success) {
           dispatch(fetchProfile(username));
-          dispatch(fetchUserChannels(username));
+          dispatch(fetchChannels(username));
         } else {
           setIsDomainExist(false);
         }
@@ -601,7 +601,7 @@ const Profile = () => {
             )}
             <div className="mt-6 mb-8">
               {activeTab === "channels" ? (
-                <ChannelsTab gallery={false} />
+                <ChannelsTab gallery={false} isOwner={isOwner} />
               ) : activeTab === "curations" ? (
                 <CurationsTab isOwner={isOwner} items={items} gallery={false} />
               ) : (
